@@ -139,6 +139,46 @@ class Curl
     }
 
     /**
+     * PUT 请求
+     * 用 POST 替代，添加 `_method` 字段.
+     *
+     * @param string $url
+     * @param array  $putBody
+     * @param array  $params  选填的 url 上的参数，可以直接拼在 url 上或者放在这里
+     *
+     * @return string
+     */
+    public function put($url, $putBody, $params = [])
+    {
+        $execUrl = $this->buildUrl($url, $params);
+        $options[CURLOPT_POST] = true;
+        $putBody['_method'] = 'PUT';
+        $options[CURLOPT_POSTFIELDS] = $putBody;
+        $this->setOptions($options);
+
+        return $this->exec($execUrl);
+    }
+    /**
+     * DELETE 请求
+     * 用 POST 替代，添加 `_method` 字段.
+     *
+     * @param string $url
+     * @param array  $deleteBody
+     * @param array  $params  选填的 url 上的参数，可以直接拼在 url 上或者放在这里
+     *
+     * @return string
+     */
+    public function delete($url,$deleteBody,$params =[]){
+        $execUrl = $this->buildUrl($url, $params);
+        $options[CURLOPT_POST] = true;
+        $putBody['_method'] = 'DELETE';
+        $options[CURLOPT_POSTFIELDS] = $deleteBody;
+        $this->setOptions($options);
+
+        return $this->exec($execUrl);
+    }
+
+    /**
      * 获取错误信息.
      */
     public function getError()
