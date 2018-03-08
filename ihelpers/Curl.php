@@ -171,7 +171,7 @@ class Curl
     public function delete($url,$deleteBody,$params =[]){
         $execUrl = $this->buildUrl($url, $params);
         $options[CURLOPT_POST] = true;
-        $putBody['_method'] = 'DELETE';
+        $deleteBody['_method'] = 'DELETE';
         $options[CURLOPT_POSTFIELDS] = $deleteBody;
         $this->setOptions($options);
 
