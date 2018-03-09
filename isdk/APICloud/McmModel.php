@@ -11,19 +11,27 @@ use icy2003\ihelpers\Json;
  */
 class McmModel extends ApiCloudModel
 {
-    const URL_MCM = 'https://d.apicloud.com/mcm/';
+    const URL_MCM = 'https://d.apicloud.com/mcm/api/';
 
-    const METHOD_OBJ_ADD = 'api/{{className}}';
-    const METHOD_OBJ_GET = 'api/{{className}}/{{objectId}}';
-    const METHOD_OBJ_UPDATE = 'api/{{className}}/{{objectId}}';
-    const METHOD_OBJ_FIND = 'api/{{className}}';
-    const METHOD_OBJ_DELETE = 'api/{{className}}/{{objectId}}';
-    const METHOD_OBJ_COUNT = 'api/{{className}}/count';
-    const METHOD_OBJ_EXISTS = 'api/{{className}}/{{objectId}}/exists';
+    const METHOD_OBJ_ADD = '{{1}}';
+    const METHOD_OBJ_GET = '{{1}}/{{2}}';
+    const METHOD_OBJ_UPDATE = '{{1}}/{{2}}';
+    const METHOD_OBJ_FIND = '{{1}}';
+    const METHOD_OBJ_DELETE = '{{1}}/{{2}}';
+    const METHOD_OBJ_COUNT = '{{1}}/count';
+    const METHOD_OBJ_EXISTS = '{{1}}/{{2}}/exists';
+    const METHOD_USER_ADD = 'user';
+    const METHOD_USER_VERIFYEMAIL = 'user/verifyEmail';
+    const METHOD_USER_RESETREQUEST = 'user/resetRequest';
+    const METHOD_USER_GET = 'user/{{1}}';
+    const METHOD_USER_UPDATE = 'user/{{1}}';
+    const METHOD_USER_DELETE = 'user/{{1}}';
+    const METHOD_USER_LOGIN = 'user/login';
+    const METHOD_USER_LOGOUT = 'user/logout';
 
     private function replace($string, $replace)
     {
-        $search = ['{{className}}', '{{objectId}}'];
+        $search = ['{{1}}', '{{2}}'];
 
         return str_replace($search, $replace, $string);
     }
@@ -66,5 +74,14 @@ class McmModel extends ApiCloudModel
     public function objExists($name, $id)
     {
         return $this->get(self::URL_MCM.$this->replace(self::METHOD_OBJ_EXISTS, [$name, $id]));
+    }
+
+    public function addUser($username, $password, $email = '')
+    {
+        $post['username'] = $username;
+        $post['password'] = $password;
+        $post['email'] = $email;
+
+        return $this->post(self::URL_MCM.self::METHOD_USER_ADD, Json::encode($post));
     }
 }
