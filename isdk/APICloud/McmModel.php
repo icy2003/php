@@ -92,4 +92,16 @@ class McmModel extends ApiCloudModel
 
         return $this->post(self::URL_MCM.self::METHOD_USER_LOGIN, Json::encode($post));
     }
+
+    public function userLogout($id)
+    {
+        array_push($this->appOptions, 'X-HTTP-Method-Override: POST');
+        array_push($this->appOptions, "authorization: {$id}");
+        $url = self::URL_MCM.self::METHOD_USER_LOGOUT;
+        $res = $this->curl
+                    ->setOption(CURLOPT_HTTPHEADER, $this->appOptions)
+                    ->post($url);
+
+        return $res;
+    }
 }

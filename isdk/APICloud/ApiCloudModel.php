@@ -6,8 +6,8 @@ use icy2003\ihelpers\Curl;
 
 class ApiCloudModel
 {
-    private $curl = null;
-    private $appOptions = [];
+    protected $curl = null;
+    protected $appOptions = [];
 
     public function __construct($appId, $appKey)
     {
@@ -52,6 +52,7 @@ class ApiCloudModel
 
         return  $res;
     }
+
     public function delete($url, $deleteBody, $params = [])
     {
         $value = 'X-HTTP-Method-Override: DELETE';
@@ -62,6 +63,4 @@ class ApiCloudModel
 
         return  $res;
     }
-
-
 }
