@@ -76,12 +76,20 @@ class McmModel extends ApiCloudModel
         return $this->get(self::URL_MCM.$this->replace(self::METHOD_OBJ_EXISTS, [$name, $id]));
     }
 
-    public function addUser($username, $password, $email = '')
+    public function userAdd($username, $password, $email = '')
     {
         $post['username'] = $username;
         $post['password'] = $password;
         $post['email'] = $email;
 
         return $this->post(self::URL_MCM.self::METHOD_USER_ADD, Json::encode($post));
+    }
+
+    public function userLogin($username, $password)
+    {
+        $post['username'] = $username;
+        $post['password'] = $password;
+
+        return $this->post(self::URL_MCM.self::METHOD_USER_LOGIN, Json::encode($post));
     }
 }
