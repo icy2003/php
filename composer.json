@@ -2,7 +2,7 @@
     "name": "icy2003/icy2003_php",
     "description": "icy2003's php library",
     "type": "library",
-    "license": "BSD 2-Clause",
+    "license": "BSD-2-Clause",
     "authors": [
         {
             "name": "icy2003",
