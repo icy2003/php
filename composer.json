@@ -1,6 +1,7 @@
 {
     "name": "icy2003/icy2003_php",
     "description": "icy2003's php library",
+    "type": "library",
     "keywords": [
         "curl",
         "工具",
