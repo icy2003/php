@@ -1,5 +1,7 @@
 # icy2003 的 php 库
 
+github 仓库 [https://github.com/icy2003/icy2003_php](https://github.com/icy2003/icy2003_php)
+
 ## 使用
 
 ### composer 安装
