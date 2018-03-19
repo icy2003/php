@@ -7,7 +7,7 @@
         "工具",
         "接口"
     ],
-    "minimum-stability": "dev-master",
+    "minimum-stability": "dev",
     "license": "BSD-2-Clause",
     "authors": [{
         "name": "icy2003",
