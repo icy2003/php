@@ -13,4 +13,17 @@ class Json
     {
         return json_decode($json, $assoc);
     }
+
+    public static function isJson($json)
+    {
+        if (!is_string($json)) {
+            return false;
+        }
+        $array = self::decode($json);
+        if (is_array($array)) {
+            return true;
+        }
+
+        return false;
+    }
 }

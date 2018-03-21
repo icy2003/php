@@ -6,6 +6,7 @@ use icy2003\ihelpers\Curl;
 
 class RongCloud
 {
+    const URL_IM = 'http://api.cn.ronghub.com/'; // IM服务地址
     protected $curl = null;
     protected $appOptions = [];
 
