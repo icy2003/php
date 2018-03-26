@@ -54,8 +54,10 @@ class ShapeFactory
     }
 }
 
+// HTML 代码格式化
 echo '<pre>',PHP_EOL;
 
+// 设计模式的使用示例
 $shapeFactory = new ShapeFactory();
 $shap1 = $shapeFactory->getShape('rectangle');
 $shap1->draw();
@@ -64,8 +66,7 @@ $shap2->draw();
 $shap3 = $shapeFactory->getShape('circle');
 $shap3->draw();
 
+// 显示图片
 $file = dirname(__FILE__).'/'.basename(__FILE__, '.php').'.jpg';
-
 include 'functions.php';
-
 image($file);

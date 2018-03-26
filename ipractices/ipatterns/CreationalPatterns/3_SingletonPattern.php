@@ -32,13 +32,14 @@ class SingleObject
     }
 }
 
+// HTML 代码格式化
 echo '<pre>',PHP_EOL;
 
+// 设计模式的使用示例
 SingleObject::getInstance()->showMessage();
 
+// 显示图片
 $file = dirname(__FILE__).'/'.basename(__FILE__, '.php').'.jpg';
-
 include 'functions.php';
-
 image($file);
 

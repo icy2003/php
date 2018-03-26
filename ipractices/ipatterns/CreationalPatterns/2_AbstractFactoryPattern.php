@@ -137,8 +137,10 @@ class FactoryProducer
     }
 }
 
+// HTML 代码格式化
 echo '<pre>',PHP_EOL;
 
+// 设计模式的使用示例
 $shapeFactory = FactoryProducer::getFactory('SHAPE');
 
 $shap1 = $shapeFactory->getShape('CIRCLE');
@@ -157,8 +159,7 @@ $color2->fill();
 $color3 = $colorFactory->getColor('BLUE');
 $color3->fill();
 
+// 显示图片
 $file = dirname(__FILE__).'/'.basename(__FILE__, '.php').'.jpg';
-
 include 'functions.php';
-
 image($file);

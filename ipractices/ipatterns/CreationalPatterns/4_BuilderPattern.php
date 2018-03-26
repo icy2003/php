@@ -160,8 +160,10 @@ class MealBuilder
     }
 }
 
+// HTML 代码格式化
 echo '<pre>',PHP_EOL;
 
+// 设计模式的使用示例
 $mealBuilder = new MealBuilder();
 
 $vegMeal = $mealBuilder->prepareVegMeal();
@@ -174,10 +176,9 @@ echo 'Non-Veg Meal';
 $nonVegMeal->showItems();
 echo 'Total Cost:',$nonVegMeal->getCost(),PHP_EOL;
 
+// 显示图片
 $file = dirname(__FILE__).'/'.basename(__FILE__, '.php').'.jpg';
-
 include 'functions.php';
-
 image($file);
 
 

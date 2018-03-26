@@ -42,4 +42,9 @@ class Charset
 
         return $converted;
     }
+
+    public static function isUtf8($string)
+    {
+        return 'UTF-8' === static::detect($string);
+    }
 }
