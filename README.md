@@ -47,6 +47,62 @@ composer require icy2003/icy2003_php dev-master
 
 ## 重要更新
 
+见底部
+
+# icy2003's PHP library
+
+## WHY ME?
+
+- Repaired an unusual bug in the former `Curl` class.
+
+- More contents such as: new functions, APIs, practice things.
+
+- Convenient to use, Continual updates.
+
+- Because of my cuteness. ～(ღゝ◡╹)ノ♡
+
+## Address
+
+-  [github](https://github.com/icy2003/icy2003_php)
+
+-  [packagist](https://packagist.org/packages/icy2003/icy2003_php)
+
+
+## Installation
+
+**Composer**
+
+Suggested use composer for the installation, because it's still in developing, and you need to bring `dev-master` after the composer command.
+
+```cmd
+composer require icy2003/icy2003_php dev-master
+```
+
+In that case, you can update me with the composer command `composer update` easily.
+
+**Common installation**
+
+`clone` it in your project.
+
+## Usage
+
+- The direct usages are put in the folder named `samples`, run `run.bat` to test them, it will start a built-in server of PHP, then visits them at `http://localhost:8000/[PHP demos]` on your brower.
+
+- By using `composer`, you need to add the following configuration item in `Yii/Yii2`
+    ```json
+     '@icy2003' => '@vendor/icy2003/icy2003_php',
+    ```
+
+- `icy2003` will be the namespace of `icy2003_php` folder,so you can update your configuration accordding to it in your own project.
+
+## Important updates
+
+Only lists the new things, see details in git log.
+
+See details at the bottom of this page(Chinese version).
+
+## 重要更新
+
 只标明新的东西，具体更新参见 git 日志
 
 ### 2018 03 19
@@ -66,55 +122,3 @@ composer require icy2003/icy2003_php dev-master
 ### 2018 03 26
 
 - `run.bat` 和 `samples\`: PHP 本地服务器以及示例文件夹
-
-# icy2003's PHP library
-
-## WHY ME?
-
-- Repaired an unusual bug in the former `Curl` class.
-
-- More contents such as: new functions, APIs, practice things.
-
-- Convenient to use, Continual updates.
-
-- Because of my cuteness. ～(ღゝ◡╹)ノ♡
-
-## address
-
--  [github](https://github.com/icy2003/icy2003_php)
-
--  [packagist](https://packagist.org/packages/icy2003/icy2003_php)
-
-
-## installation
-
-**composer**
-
-Suggested use composer for the installation, because it's still in developing, and you need to bring `dev-master` after the composer command.
-
-```cmd
-composer require icy2003/icy2003_php dev-master
-```
-
-In that case, you can update me with the composer command `composer update` easily.
-
-**common installation**
-
-`clone` it in your project.
-
-## usage
-
-- The direct usages are put in the folder named `samples`, run `run.bat` to test them, it will start a built-in server of PHP, then visits them at `http://localhost:8000/[PHP demos]` on your brower.
-
-- By using `composer`, you need to add the following configuration item in `Yii/Yii2`
-    ```json
-     '@icy2003' => '@vendor/icy2003/icy2003_php',
-    ```
-
-- `icy2003` will be the namespace of `icy2003_php` folder,so you can update your configuration accordding to it in your own project.
-
-## Important Updates
-
-Only lists the new things, see details in git log.
-
-See Chinese version.
