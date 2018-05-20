@@ -2,8 +2,6 @@
 
 use icy2003\BaseI;
 
-include '../I.php';
+include __DIR__.'/../I.php';
 
 echo BaseI::getVersion();
-
-

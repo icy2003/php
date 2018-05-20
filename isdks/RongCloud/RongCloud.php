@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\isdk\RongCloud;
+namespace icy2003\isdks\RongCloud;
 
 use icy2003\ihelpers\Curl;
 

@@ -17,7 +17,7 @@ class Xml
     public function toArray()
     {
         if ($this->_xml) {
-            foreach ($_xml->children() as $child) {
+            foreach ($this->_xml->children() as $child) {
                 $this->_array[$child->getName()] = (string) $child;
             }
         }

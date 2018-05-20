@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\isdk\APICloud;
+namespace icy2003\isdks\APICloud;
 
 use icy2003\ihelpers\Json;
 
