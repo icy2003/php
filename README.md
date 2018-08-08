@@ -37,69 +37,25 @@ composer require icy2003/icy2003_php dev-master
 
 - 直接使用的例子放在 `samples\` 里，需要测试则执行 `run.bat`，将会开启 PHP 内置服务器，浏览器访问 `http://localhost:8000/[PHP 示例]`
 
-- 使用 `composer` 安装时，`Yii/Yii2` 配置项里添加
+- `Yii/Yii2` 建议使用这种方式，在配置项里添加
 
     ```json
      '@icy2003' => '@vendor/icy2003/icy2003_php',
     ```
 
-- 其他项目中，`icy2003_php` 这层的命名空间是 `icy2003`，具体请根据对应项目自行设置
+- 其他 `composer` 项目，在你的 `composer.json` 里添加
 
-## 重要更新
-
-见底部
-
-# icy2003's PHP library
-
-## WHY ME?
-
-- Repaired an unusual bug in the former `Curl` class.
-
-- More contents such as: new functions, APIs, practice things.
-
-- Convenient to use, Continual updates.
-
-- Because of my cuteness. ～(ღゝ◡╹)ノ♡
-
-## Address
-
--  [github](https://github.com/icy2003/icy2003_php)
-
--  [packagist](https://packagist.org/packages/icy2003/icy2003_php)
-
-
-## Installation
-
-**Composer**
-
-Suggested use composer for the installation, because it's still in developing, and you need to bring `dev-master` after the composer command.
-
-```cmd
-composer require icy2003/icy2003_php dev-master
-```
-
-In that case, you can update me with the composer command `composer update` easily.
-
-**Common installation**
-
-`clone` it in your project.
-
-## Usage
-
-- The direct usages are put in the folder named `samples`, run `run.bat` to test them, it will start a built-in server of PHP, then visits them at `http://localhost:8000/[PHP demos]` on your brower.
-
-- By using `composer`, you need to add the following configuration item in `Yii/Yii2`
     ```json
-     '@icy2003' => '@vendor/icy2003/icy2003_php',
+    "autoload": {
+        "psr-4": {"icy2003\\": "vendor/icy2003/icy2003_php/"}
+    }
     ```
 
-- `icy2003` will be the namespace of `icy2003_php` folder,so you can update your configuration accordding to it in your own project.
+- 其他非 `composer` 项目，可以使用我写的自动加载
 
-## Important updates
-
-Only lists the new things, see details in git log.
-
-See details at the bottom of this page(Chinese version).
+    ```php
+    require 'vendor/icy2003/icy2003_php/I.php';
+    ```
 
 ## 重要更新
 
@@ -122,3 +78,7 @@ See details at the bottom of this page(Chinese version).
 ### 2018 03 26
 
 - `run.bat` 和 `samples\`: PHP 本地服务器以及示例文件夹
+
+### 2018 08 08
+
+- 只更新了 `README.md`，关于使用的其他一些方式。最近没搞 PHP，不过 `icy2003_php` 很快就会有新内容了~
