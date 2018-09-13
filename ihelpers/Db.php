@@ -284,10 +284,10 @@ class Db
         };
         $operator = ' AND ';
         if (!empty($where[0])) {
-            if ('or' === strtolower($where[0])) {
-                $operator = ' OR ';
+            if (is_string($where[0]) && in_array(strtolower($where[0]), ['or', 'and'])) {
+                $operator = ' '.strtoupper($where[0]).' ';
+                $where = array_slice($where, 1);
             }
-            $where = array_slice($where, 1);
         }
         foreach ($where as $key => $value) {
             $conditions[] = $generator($key, $value);
