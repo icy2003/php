@@ -359,7 +359,7 @@ class Db
         if (!empty($this->offset)) {
             $this->limit += 0;
         }
-        $this->queryString = implode(' ', [$this->queryString, $this->where, $this->orderBy, $this->limit, $this->offset]);
+        $this->queryString = implode(' ', array_filter([$this->queryString, $this->where, $this->orderBy, $this->limit, $this->offset]));
     }
 
     private function bindParams()
