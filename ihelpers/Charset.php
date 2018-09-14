@@ -44,6 +44,24 @@ class Charset
         return $converted;
     }
 
+    /**
+     * 将任意编码的字符串转成中文编码.
+     *
+     * @param string $string
+     *
+     * @return string 转码后的字符串
+     */
+    public static function convert2cn($string, $charset = '')
+    {
+        $charset = $charset ?: static::detect($string);
+        $converted = @iconv($charset, 'EUC-CN', $string);
+        if (false === $converted) {
+            return '';
+        }
+
+        return $converted;
+    }
+
     public static function isUtf8($string)
     {
         return 'UTF-8' === static::detect($string);

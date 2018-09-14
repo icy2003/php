@@ -75,13 +75,15 @@ class Db
                         self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                         self::$instance->conn->exec('set names utf8');
                     } catch (PDOException $e) {
-                        echo $e->getMessage();
+                        echo Charset::convert2utf($e->getMessage());
+                        die;
                     }
                 } else {
                     throw new \Exception('必须给出配置');
                 }
             } catch (\Exception $e) {
                 echo $e->getMessage();
+                die;
             }
         }
 
