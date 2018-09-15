@@ -33,14 +33,18 @@ class Arrays
      * ]
      * ```
      */
-    public static function indexBy($array, $index)
+    public static function indexBy($array, $index, $isMerge = false)
     {
         $result = [];
         foreach ($array as $row) {
-            if (empty($row[$index])) {
+            if (!array_key_exists($index, $row)) {
                 return [];
             }
-            $result[$row[$index]] = $row;
+            if (false === $isMerge) {
+                $result[$row[$index]] = $row;
+            } else {
+                $result[$row[$index]][] = $row;
+            }
         }
 
         return $result;
@@ -71,13 +75,32 @@ class Arrays
         $result = [];
         foreach ($array as $key => $row) {
             foreach ($fields as $field) {
-                if (!empty($row[$field])) {
+                if (array_key_exists($field, $row)) {
                     $result[$key][$field] = $row[$field];
                 }
             }
         }
 
         return $result;
+    }
+
+    public static function arrayColumn($array, $column, $index = null)
+    {
+        if (function_exists('array_column')) {
+            return array_column($array, $column, $index);
+        } else {
+            $result = [];
+            foreach ($array as $row) {
+                $data = !empty($row[$column]) ? $row[$column] : null;
+                if (null === $inedx) {
+                    $result[] = $data;
+                } else {
+                    $result[$row[$index]] = $data;
+                }
+            }
+
+            return $result;
+        }
     }
 
     /**
