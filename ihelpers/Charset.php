@@ -17,7 +17,7 @@ class Charset
     public static function detect($string)
     {
         // EUC-CN 是 GB2312 的表现方式
-        $charset = mb_detect_encoding($string, 'UTF-8, EUC-CN, ISO-8859-2, ASCII, UTF-7, EUC-JP, SJIS, eucJP-win, SJIS-win, JIS, ISO-2022-JP');
+        $charset = mb_detect_encoding($string, 'EUC-CN, UTF-8, ISO-8859-2, ASCII, UTF-7, EUC-JP, SJIS, eucJP-win, SJIS-win, JIS, ISO-2022-JP', true);
         // `mb_detect_encoding` 会把 `WINDOWS-1250` 处理成 `ISO-8859-2`
         if ('ISO-8859-2' === $charset && preg_match('~[\x7F-\x9F\xBC]~', $string)) {
             $charset = 'WINDOWS-1250';
@@ -38,7 +38,7 @@ class Charset
         $charset = $charset ?: static::detect($string);
         $converted = @iconv($charset, 'UTF-8//TRANSLIT//IGNORE', $string);
         if (false === $converted) {
-            return '';
+            $converted = mb_convert_encoding($string, 'UTF-8');
         }
 
         return $converted;
@@ -54,9 +54,9 @@ class Charset
     public static function convert2cn($string, $charset = '')
     {
         $charset = $charset ?: static::detect($string);
-        $converted = @iconv($charset, 'EUC-CN', $string);
+        $converted = @iconv($charset, 'EUC-CN//TRANSLIT//IGNORE', $string);
         if (false === $converted) {
-            return '';
+            $converted = mb_convert_encoding($string, 'EUC-CN');
         }
 
         return $converted;
