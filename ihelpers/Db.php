@@ -30,6 +30,7 @@ class Db
     private $params = [];
     private $queryString = '';
     private $query = null;
+    private $i = 0;
 
     private function reset()
     {
@@ -41,6 +42,7 @@ class Db
         $this->params = [];
         $this->queryString = '';
         $this->query = null;
+        $this->i = 0;
     }
 
     private function __construct()
@@ -229,10 +231,27 @@ class Db
     public function sql()
     {
         $this->parse();
-        $sql = str_replace(array_keys($this->params), array_map(function ($data) {return 'string' == gettype($data) ? "'".$data."'" : $data; }, array_values($this->params)), $this->queryString);
+        $sql = $this->queryString;
         $this->reset();
 
         return $sql;
+    }
+
+    public function params()
+    {
+        $params = $this->params;
+        $this->reset();
+
+        return $params;
+    }
+
+    public function rawSql()
+    {
+        $this->parse();
+        $rawSql = str_replace(array_keys($this->params), array_map(function ($data) {return 'string' == gettype($data) ? "'".$data."'" : $data; }, array_values($this->params)), $this->queryString);
+        $this->reset();
+
+        return $rawSql;
     }
 
     public function where($where)
@@ -250,45 +269,53 @@ class Db
                                 $conds[] = $generator($k, $v);
                             }
 
-                            return'('.implode(' '.strtoupper($value[0]).' ', $conds).')';
+                            $condition = '('.implode(' '.strtoupper($value[0]).' ', $conds).')';
+                            break;
                         case 'like':
                         case 'not like':
                         case '>':
                         case '<':
                         case '>=':
                         case '<=':
-                            $this->params[':lc'.$value[1]] = $value[2];
+                            $this->params[':lc'.$this->i] = $value[2];
 
-                            return '('.$value[1].' '.strtoupper($value[0]).' '.':lc'.$value[1].')';
+                            $condition = '('.$value[1].' '.strtoupper($value[0]).' '.':lc'.$this->i.')';
+                            ++$this->i;
+                            break;
                         case 'in':
                         case 'not in':
-                            array_map(function ($data) use ($value) {$this->params[':i'.$value[1].$data] = $data; }, $value[2]);
+                            array_map(function ($data, $i) {$this->params[':i'.($this->i + $i)] = $data; }, $value[2], array_keys($value[2]));
 
-                            return '('.$value[1].' '.strtoupper($value[0]).' ('.implode(',', array_map(function ($data) use ($value) {return ':i'.$value[1].$data; }, $value[2])).')'.')';
+                            $condition = '('.$value[1].' '.strtoupper($value[0]).' ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value[2]))).'))';
+                            $this->i += count($value[2]);
+                            break;
                     }
+                    return $condition;
                 } else {
                     // 因为安全问题，字符串条件暂时不给予支持
                 }
             } else {
-                $conditions = [];
                 if (is_array($value)) {
-                    $conditions[] = $key.' IN ('.implode(',', array_map(function ($data) use ($key) {return ':i'.$key.$data; }, $value)).')';
-                    array_map(function ($data) use ($key) { $this->params[':i'.$key.$data] = $data; }, $value);
+                    $condition = '('.$key.' IN ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value))).'))';
+                    array_map(function ($data, $i) { $this->params[':i'.($this->i + $i)] = $data; }, $value, array_keys($value));
+                    $this->i += count($value);
                 } elseif (null === $value) {
-                    $conditions[] = $key.' IS NULL';
+                    $condition = '('.$key.' IS NULL'.')';
                 } else {
-                    $conditions[] = $key.'=:w'.$key;
-                    $this->params[':w'.$key] = $value;
+                    $condition = '('.$key.'=:w'.$this->i.')';
+                    $this->params[':w'.$this->i] = $value;
+                    ++$this->i;
                 }
 
-                return '('.implode(' AND ', $conditions).')';
+                return $condition;
             }
         };
         $operator = ' AND ';
-        if (!empty($where[0])) {
-            if (is_string($where[0]) && in_array(strtolower($where[0]), ['or', 'and'])) {
-                $operator = ' '.strtoupper($where[0]).' ';
+        foreach ($where as $key => $row) {
+            if (0 === $key && is_string($row) && in_array(strtolower($row), ['or', 'and'])) {
+                $operator = ' '.strtoupper($row).' ';
                 $where = array_slice($where, 1);
+                break;
             }
         }
         foreach ($where as $key => $value) {
