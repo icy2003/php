@@ -117,9 +117,10 @@ class File
         }
     }
 
-    public function save($savePath)
+    public function save($savePath, $fileName = null)
     {
-        !empty($this->attribute) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/').'/'.$this->attribute['fileName']);
+        $fileName = null === $fileName ? $this->attribute['fileName'] : $fileName;
+        !empty($this->attribute) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/').'/'.$fileName);
 
         return $this;
     }

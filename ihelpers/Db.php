@@ -257,6 +257,7 @@ class Db
     public function where($where)
     {
         $generator = function ($key, $value) use (&$generator) {
+            // 索引列
             if (is_numeric($key)) {
                 if (is_array($value) && !empty($value)) {
                     // 0 操作符 1 字段 2 值
@@ -264,6 +265,12 @@ class Db
                     switch (strtolower($value[0])) {
                         case 'and':
                         case 'or':
+                            /**
+                             * [
+                             *      ['and', ['id'=>1]]
+                             * ]
+                             * ==>> AND id = 1
+                             */
                             $conds = [];
                             foreach ($array as $k => $v) {
                                 $conds[] = $generator($k, $v);
@@ -277,6 +284,12 @@ class Db
                         case '<':
                         case '>=':
                         case '<=':
+                            /*
+                             * [
+                             *      ['>', 'id', 13]
+                             * ]
+                             * ==>> id > 13
+                             */
                             $this->params[':lc'.$this->i] = $value[2];
 
                             $condition = '('.$value[1].' '.strtoupper($value[0]).' '.':lc'.$this->i.')';
@@ -284,17 +297,34 @@ class Db
                             break;
                         case 'in':
                         case 'not in':
+                            /*
+                             * [
+                             *      ['in', 'id', [1,2,3]]
+                             * ]
+                             * ==>> id IN (1,2,3)
+                             */
                             array_map(function ($data, $i) {$this->params[':i'.($this->i + $i)] = $data; }, $value[2], array_keys($value[2]));
 
                             $condition = '('.$value[1].' '.strtoupper($value[0]).' ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value[2]))).'))';
                             $this->i += count($value[2]);
                             break;
+                        case 'none':
+                            /**
+                             * [
+                             *      ['none'],
+                             * ].
+                             * ==>> 0
+                             */
+                            $condition = 0;
+                            break;
                     }
+
                     return $condition;
                 } else {
                     // 因为安全问题，字符串条件暂时不给予支持
                 }
             } else {
+                // 关联列
                 if (is_array($value)) {
                     $condition = '('.$key.' IN ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value))).'))';
                     array_map(function ($data, $i) { $this->params[':i'.($this->i + $i)] = $data; }, $value, array_keys($value));
