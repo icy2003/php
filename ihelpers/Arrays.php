@@ -60,7 +60,7 @@ class Arrays
      *
      * @example
      * ```php
-     * $result = Arrays::columns($array,['name','value']);
+     * $result = Arrays::columns($array,['name','value'],2);
      * ```
      * $result
      * ```php
@@ -70,15 +70,19 @@ class Arrays
      * ]
      * ```
      */
-    public static function columns($array, $fields)
+    public static function columns($array, $fields, $dimension)
     {
         $result = [];
-        foreach ($array as $key => $row) {
-            foreach ($fields as $field) {
-                if (array_key_exists($field, $row)) {
-                    $result[$key][$field] = $row[$field];
+        if (2 === $dimension) {
+            foreach ($array as $key => $row) {
+                foreach ($fields as $field) {
+                    if (array_key_exists($field, $row)) {
+                        $result[$key][$field] = $row[$field];
+                    }
                 }
             }
+        } elseif (1 === $dimension) {
+            $result = array_intersect_key($array, array_flip($fields));
         }
 
         return $result;
