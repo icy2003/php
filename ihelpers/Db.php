@@ -72,7 +72,7 @@ class Db
                     }
                     try {
                         self::$instance->conn = new PDO(self::$instance->dsn, self::$instance->user, self::$instance->password, [
-                            PDO::ATTR_PERSISTENT => true,
+                            PDO::ATTR_PERSISTENT => false,
                         ]);
                         self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                         self::$instance->conn->exec('set names utf8');
@@ -102,10 +102,12 @@ class Db
     public function insert($table, $columns)
     {
         $keys = $values = $params = [];
+        $k = 0;
         foreach ($columns as $key => $value) {
             $keys[] = $key;
-            $values[] = ':'.$key;
-            $this->params[':'.$key] = $value;
+            $values[] = ':k'.$k;
+            $this->params[':k'.$k] = $value;
+            ++$k;
         }
         $keysString = implode(',', $keys);
         $valuesString = implode(',', $values);
@@ -121,9 +123,11 @@ class Db
     public function update($table, $columns, $where)
     {
         $sets = $params = [];
+        $k = 0;
         foreach ($columns as $key => $value) {
-            $sets[] = $key.'=:'.$key;
-            $this->params[':'.$key] = $value;
+            $sets[] = $key.'=:k'.$k;
+            $this->params[':k'.$k] = $value;
+            ++$k ;
         }
         $setsString = implode(',', $sets);
         $this->where($where);
@@ -269,7 +273,7 @@ class Db
                              * [
                              *      ['and', ['id'=>1]]
                              * ]
-                             * ==>> AND id = 1
+                             * ==>> AND id = 1.
                              */
                             $conds = [];
                             foreach ($array as $k => $v) {
@@ -313,7 +317,7 @@ class Db
                              * [
                              *      ['none'],
                              * ].
-                             * ==>> 0
+                             * ==>> 0.
                              */
                             $condition = 0;
                             break;
