@@ -419,9 +419,6 @@ class Db
     private function parse()
     {
         $this->queryString = str_replace('[[select]]', $this->select, $this->queryString);
-        if (!empty($this->offset)) {
-            $this->limit += 0;
-        }
         $this->queryString = implode(' ', array_filter([$this->queryString, $this->where, $this->orderBy, $this->limit, $this->offset]));
     }
 
