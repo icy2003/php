@@ -13,12 +13,12 @@ class Db
 
     // db config
     private $dsn;
-    private $db;
-    private $dbName;
-    private $host;
-    private $user;
-    private $password;
-    private $port;
+    private $db = 'mysql';
+    private $dbName = 'test';
+    private $host = '127.0.0.1';
+    private $user = 'root';
+    private $password = 'root';
+    private $port = '3306';
 
     // db properties
     private $select = '*';
@@ -53,7 +53,21 @@ class Db
     {
     }
 
-    public static function create($config)
+    /**
+     * DB 的单例.
+     *
+     * @param array $config DB 配置
+     *                      dsn         DSN 字符串，默认是由下面配置组成的 DSN
+     *                      db          数据库类型，默认 'mysql'
+     *                      dbName      数据库名，默认 'test'
+     *                      host        连接地址，默认 '127.0.0.1'
+     *                      port        端口，默认 '3306'
+     *                      user        用户名，默认 'root'
+     *                      password    密码，默认 'root'
+     *
+     * @return static
+     */
+    public static function create($config = [])
     {
         if (!self::$instance instanceof self) {
             self::$instance = new self();
@@ -62,17 +76,17 @@ class Db
                     if (!empty($config['dsn'])) {
                         self::$instance->dsn = $config['dsn'];
                     } else {
-                        self::$instance->db = $db = !empty($config['db']) ? $config['db'] : 'mysql';
-                        self::$instance->dbName = $dbName = $config['dbName'];
-                        self::$instance->host = $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
-                        self::$instance->port = $port = !empty($config['port']) ? $config['port'] : 3306;
-                        self::$instance->user = !empty($config['user']) ? $config['user'] : 'root';
-                        self::$instance->password = !empty($config['password']) ? $config['password'] : 'root';
+                        self::$instance->db = $db = !empty($config['db']) ? $config['db'] : self::$instance->db;
+                        self::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : self::$instance->dbName;
+                        self::$instance->host = $host = !empty($config['host']) ? $config['host'] : self::$instance->host;
+                        self::$instance->port = $port = !empty($config['port']) ? $config['port'] : self::$instance->port;
+                        self::$instance->user = !empty($config['user']) ? $config['user'] : self::$instance->user;
+                        self::$instance->password = !empty($config['password']) ? $config['password'] : self::$instance->password;
                         self::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
                     }
                     try {
                         self::$instance->conn = new PDO(self::$instance->dsn, self::$instance->user, self::$instance->password, [
-                            PDO::ATTR_PERSISTENT => false,
+                            PDO::ATTR_PERSISTENT => true,
                         ]);
                         self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                         self::$instance->conn->exec('set names utf8');
@@ -92,6 +106,11 @@ class Db
         return self::$instance;
     }
 
+    /**
+     * 关闭数据库连接.
+     *
+     * @return static
+     */
     public function close()
     {
         $this->conn = null;
@@ -99,6 +118,16 @@ class Db
 
     // base operations
 
+    /**
+     * 插入一条记录.
+     *
+     * @param string $table   表名
+     * @param array  $columns 记录键值对
+     *
+     * @example insert('user', ['username' => 'icy2003'])
+     *
+     * @return int 记录 ID
+     */
     public function insert($table, $columns)
     {
         $keys = $values = $params = [];
@@ -120,6 +149,15 @@ class Db
         return $this->conn->lastInsertId();
     }
 
+    /**
+     * 更新记录.
+     *
+     * @param string $table   表名
+     * @param string $columns 记录键值对
+     * @param array  $where   参考 where 函数
+     *
+     * @return int 修改的记录条数
+     */
     public function update($table, $columns, $where)
     {
         $sets = $params = [];
@@ -127,7 +165,7 @@ class Db
         foreach ($columns as $key => $value) {
             $sets[] = $key.'=:k'.$k;
             $this->params[':k'.$k] = $value;
-            ++$k ;
+            ++$k;
         }
         $setsString = implode(',', $sets);
         $this->where($where);
@@ -141,6 +179,12 @@ class Db
         return $count;
     }
 
+    /**
+     * 删除记录.
+     *
+     * @param string $table 表名
+     * @param array  $where 参考 where 函数
+     */
     public function delete($table, $where)
     {
         $this->where($where);
@@ -156,6 +200,13 @@ class Db
 
     // 链式操作
 
+    /**
+     * 链式操作：FROM.
+     *
+     * @param string $table
+     *
+     * @return static
+     */
     public function find($table)
     {
         $this->queryString = "SELECT [[select]] FROM {$table}";
@@ -163,6 +214,13 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：SELECT.
+     *
+     * @param string $fields
+     *
+     * @return static
+     */
     public function select($fields = '*')
     {
         $this->select = $fields;
@@ -170,6 +228,13 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：生成为数组.
+     *
+     * @param bool $asArray 默认 true
+     *
+     * @return static
+     */
     public function asArray($asArray = true)
     {
         $this->asArray = (bool) $asArray;
@@ -177,6 +242,11 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：查询一条.
+     *
+     * @return object
+     */
     public function one()
     {
         $this->parse();
@@ -189,6 +259,11 @@ class Db
         return $result;
     }
 
+    /**
+     * 链式操作：查询多条.
+     *
+     * @return object
+     */
     public function all()
     {
         $this->parse();
@@ -201,6 +276,11 @@ class Db
         return $results;
     }
 
+    /**
+     * 链式操作：查询字段.
+     *
+     * @return object
+     */
     public function column()
     {
         $this->parse();
@@ -213,6 +293,11 @@ class Db
         return $results;
     }
 
+    /**
+     * 链式操作：查询单个.
+     *
+     * @return object
+     */
     public function scalar()
     {
         $this->parse();
@@ -225,6 +310,11 @@ class Db
         return $results;
     }
 
+    /**
+     * 链式操作：COUNT(*).
+     *
+     * @return object
+     */
     public function count()
     {
         $this->select = 'COUNT(*)';
@@ -232,6 +322,11 @@ class Db
         return $this->scalar();
     }
 
+    /**
+     * 链式操作：返回绑定参数前的 SQL.
+     *
+     * @return string
+     */
     public function sql()
     {
         $this->parse();
@@ -241,6 +336,11 @@ class Db
         return $sql;
     }
 
+    /**
+     * 链式操作：返回绑定参数.
+     *
+     * @return array
+     */
     public function params()
     {
         $params = $this->params;
@@ -249,6 +349,11 @@ class Db
         return $params;
     }
 
+    /**
+     * 链式操作：返回最终 SQL（只做参考）.
+     *
+     * @return string
+     */
     public function rawSql()
     {
         $this->parse();
@@ -258,6 +363,20 @@ class Db
         return $rawSql;
     }
 
+    /**
+     * 链式操作：WHERE.
+     *
+     * @param array $where
+     *
+     * @example [
+     *      'username'=>'icy2003',
+     *      ['and', $where],
+     *      ['>', 'id', 11],
+     *      ['in', 'name' , ['a','b']]
+     * ]
+     *
+     * @return static
+     */
     public function where($where)
     {
         $generator = function ($key, $value) use (&$generator) {
@@ -360,6 +479,13 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：ORDER BY.
+     *
+     * @param string $orderBy
+     *
+     * @return static
+     */
     public function orderBy($orderBy)
     {
         $this->orderBy = 'ORDER BY '.$orderBy;
@@ -367,6 +493,13 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：LIMIT.
+     *
+     * @param string $limit
+     *
+     * @return static
+     */
     public function limit($limit)
     {
         $this->limit = 'LIMIT '.$limit;
@@ -374,6 +507,13 @@ class Db
         return $this;
     }
 
+    /**
+     * 链式操作：OFFSET.
+     *
+     * @param string $offset
+     *
+     * @return static
+     */
     public function offset($offset)
     {
         $this->offset = 'OFFSET '.$offset;
@@ -383,18 +523,27 @@ class Db
 
     // 事务
 
+    /**
+     * 开启事务
+     */
     public function beginTransaction()
     {
         $this->conn->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
         $this->conn->beginTransaction();
     }
 
+    /**
+     * 提交事务
+     */
     public function commit()
     {
         //如果数据库类型不支持事务，那有没有这个一点影响都没有，该执行还是执行了
         $this->conn->commit();
     }
 
+    /**
+     * 回滚.
+     */
     public function rollback()
     {
         $this->conn->rollback();

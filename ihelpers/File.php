@@ -56,6 +56,16 @@ class File
     private $extLimit = [];
     private $errorCode = 0;
 
+    /**
+     * 创建文件上传单例.
+     *
+     * @param array $config
+     *                      formName 文件上传时的表单名，默认 'file'
+     *                      sizeLimit 文件上传大小限制，默认 0，不限制
+     *                      extLimit 文件类型限制，默认 []，不限制
+     *
+     * @return static
+     */
     public static function create($config = [])
     {
         if (!self::$instance instanceof self) {
@@ -70,11 +80,11 @@ class File
         return self::$instance;
     }
 
-    private function getSizeLimit()
-    {
-        return min(Convert::size(Env::get('upload_max_filesize', 0)), Convert::size(Env::get('post_max_size', 0)));
-    }
-
+    /**
+     * 文件上传，对上传的文件进行处理，需要用 save() 保存.
+     *
+     * @return static
+     */
     public function upload()
     {
         if (self::ERROR_SUCCESS === $_FILES[$this->formName]['error']) {
@@ -117,6 +127,14 @@ class File
         }
     }
 
+    /**
+     * 保存文件至路径.
+     *
+     * @param string $savePath 目录
+     * @param string $fileName 文件名，如果不给则用系统随机的文件名
+     *
+     * @return static
+     */
     public function save($savePath, $fileName = null)
     {
         $fileName = null === $fileName ? $this->attribute['fileName'] : $fileName;
@@ -135,18 +153,50 @@ class File
         return pathinfo($fileName, PATHINFO_EXTENSION);
     }
 
+    /**
+     * 文件上传的错误码
+     *
+     * @return string
+     */
     public function getErrorCode()
     {
         return $this->errorCode;
     }
 
+    /**
+     * 文件上传是否成功
+     *
+     * @return boolean
+     */
+    public function success()
+    {
+        return self::ERROR_SUCCESS === $this->errorCode;
+    }
+
+    /**
+     * 文件上传的错误信息.
+     *
+     * @return string
+     */
     public function getErrorMessage()
     {
         return self::$errorMap[$this->errorCode];
     }
 
+    /**
+     * 返回上传后文件的属性.
+     *
+     * @return array
+     */
     public function getAttribute()
     {
         return $this->attribute;
+    }
+
+    // private
+
+    private function getSizeLimit()
+    {
+        return min(Convert::size(Env::get('upload_max_filesize', 0)), Convert::size(Env::get('post_max_size', 0)));
     }
 }
