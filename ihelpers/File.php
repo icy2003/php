@@ -2,6 +2,11 @@
 
 namespace icy2003\ihelpers;
 
+/**
+ * 文件类：主要处理上传下载.
+ * File::download($fileName) 静态方法
+ * File::create() 创建一个用于接收上传的单例对象，可用方法：upload、save、success、getAttributes、getErrorCode、getErrorMessage.
+ */
 class File
 {
     private static $instance;
@@ -12,6 +17,31 @@ class File
 
     private function __clone()
     {
+    }
+
+    /**
+     * 下载一个文件.
+     *
+     * @param string $fileName
+     *
+     * @return
+     */
+    public static function download($fileName)
+    {
+        try {
+            if ($file = FileIO::create($fileName)) {
+                header('Content-type:application/octet-stream');
+                header('Accept-Ranges:bytes');
+                header('Accept-Length:'.$file->getAttribute('fileSize'));
+                header('Content-Disposition: attachment; filename='.Charset::convert2cn(basename($fileName)));
+                foreach ($file->data() as $data) {
+                    echo $data;
+                }
+            }
+        } catch (\Exception $e) {
+            Http::code(404, '找不到页面');
+            echo $e->getMessage();
+        }
     }
 
     // 成功
@@ -50,7 +80,7 @@ class File
         self::ERROR_I_SIZE_LIMIT => '超出自定义的文件上传大小限制',
         self::ERROR_I_EXT_LIMIT => '不允许的文件类型',
     ];
-    private $attribute = [];
+    private $attributes = [];
     private $formName = 'file';
     private $sizeLimit = 0;
     private $extLimit = [];
@@ -102,15 +132,15 @@ class File
 
                     return $this;
                 }
-                $this->attribute['md5'] = md5_file($file);
-                $this->attribute['sha1'] = sha1_file($file);
-                $this->attribute['ext'] = $fileExt;
-                $this->attribute['size'] = $fileSize;
-                $this->attribute['filectime'] = filectime($file);
-                $this->attribute['filemtime'] = filemtime($file);
-                $this->attribute['fileatime'] = fileatime($file);
-                $this->attribute['originName'] = $fileName;
-                $this->attribute['fileName'] = $this->randomFileName($fileName);
+                $this->attributes['md5'] = md5_file($file);
+                $this->attributes['sha1'] = sha1_file($file);
+                $this->attributes['ext'] = $fileExt;
+                $this->attributes['size'] = $fileSize;
+                $this->attributes['filectime'] = filectime($file);
+                $this->attributes['filemtime'] = filemtime($file);
+                $this->attributes['fileatime'] = fileatime($file);
+                $this->attributes['originName'] = $fileName;
+                $this->attributes['fileName'] = $this->randomFileName($fileName);
                 $this->errorCode = self::ERROR_SUCCESS;
 
                 return $this;
@@ -137,8 +167,8 @@ class File
      */
     public function save($savePath, $fileName = null)
     {
-        $fileName = null === $fileName ? $this->attribute['fileName'] : $fileName;
-        !empty($this->attribute) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/').'/'.$fileName);
+        $fileName = null === $fileName ? $this->attributes['fileName'] : $fileName;
+        !empty($this->attributes) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/').'/'.$fileName);
 
         return $this;
     }
@@ -188,9 +218,9 @@ class File
      *
      * @return array
      */
-    public function getAttribute()
+    public function getAttributes()
     {
-        return $this->attribute;
+        return $this->attributes;
     }
 
     // private
