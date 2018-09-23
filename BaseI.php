@@ -34,4 +34,31 @@ class BaseI
     {
         return '0.0.1';
     }
+
+    /**
+     * 获取一个属性
+     * $object 类型：
+     * 1：如果是数组，则获取对应键的值
+     * 2：如果是字符串并且 $key 为数字，则获取该位置的字符
+     * 3：如果是对象，则获取该对象的属性
+     * 如果获取不到值，则按照 $defaultValue 给出默认值
+     *
+     * @param mixed $object
+     *
+     * @return mixed
+     */
+    public static function v($object, $key, $defaultValue = null)
+    {
+        if (is_array($object)) {
+            if (array_key_exists($key, $object)) {
+                return $object[$key];
+            }
+        } elseif (is_string($object) && is_numeric($key)) {
+            return mb_substr($object, $key, 1);
+        } elseif (is_object($object)) {
+            return $object->$key;
+        }
+
+        return $defaultValue;
+    }
 }
