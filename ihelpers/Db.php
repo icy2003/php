@@ -2,6 +2,7 @@
 
 namespace icy2003\ihelpers;
 
+use Exception;
 use PDO;
 use PDOException;
 
@@ -71,34 +72,35 @@ class Db
     {
         if (!self::$instance instanceof self) {
             self::$instance = new self();
+            if (!empty($config['dsn'])) {
+                self::$instance->dsn = $config['dsn'];
+            } else {
+                self::$instance->db = $db = !empty($config['db']) ? $config['db'] : self::$instance->db;
+                self::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : self::$instance->dbName;
+                self::$instance->host = $host = !empty($config['host']) ? $config['host'] : self::$instance->host;
+                self::$instance->port = $port = !empty($config['port']) ? $config['port'] : self::$instance->port;
+                self::$instance->user = !empty($config['user']) ? $config['user'] : self::$instance->user;
+                self::$instance->password = !empty($config['password']) ? $config['password'] : self::$instance->password;
+                self::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
+            }
             try {
-                if (!empty($config)) {
-                    if (!empty($config['dsn'])) {
-                        self::$instance->dsn = $config['dsn'];
-                    } else {
-                        self::$instance->db = $db = !empty($config['db']) ? $config['db'] : self::$instance->db;
-                        self::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : self::$instance->dbName;
-                        self::$instance->host = $host = !empty($config['host']) ? $config['host'] : self::$instance->host;
-                        self::$instance->port = $port = !empty($config['port']) ? $config['port'] : self::$instance->port;
-                        self::$instance->user = !empty($config['user']) ? $config['user'] : self::$instance->user;
-                        self::$instance->password = !empty($config['password']) ? $config['password'] : self::$instance->password;
-                        self::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
-                    }
-                    try {
-                        self::$instance->conn = new PDO(self::$instance->dsn, self::$instance->user, self::$instance->password, [
-                            PDO::ATTR_PERSISTENT => true,
-                        ]);
-                        self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                        self::$instance->conn->exec('set names utf8');
-                    } catch (PDOException $e) {
-                        echo Charset::convert2utf($e->getMessage());
-                        die;
-                    }
-                } else {
-                    throw new \Exception('必须给出配置');
+                self::$instance->conn = new PDO(self::$instance->dsn, self::$instance->user, self::$instance->password, [
+                        PDO::ATTR_PERSISTENT => true,
+                    ]);
+                self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$instance->conn->exec('set names utf8');
+            } catch (PDOException $e) {
+                switch ($e->getCode()) {
+                    case '1049':
+                        $message = "数据库 {$dbName} 不存在";
+                        break;
+                    case '2002':
+                        $message = "连接失败，请检查数据库连接设置";
+                        break;
+                    default:
+                        $message = $e->getMessage();
                 }
-            } catch (\Exception $e) {
-                echo $e->getMessage();
+                echo $message;
                 die;
             }
         }
@@ -108,12 +110,26 @@ class Db
 
     /**
      * 关闭数据库连接.
-     *
-     * @return static
      */
     public function close()
     {
         $this->conn = null;
+    }
+
+    public function tableExists($table)
+    {
+        $result = $this->conn->query("SHOW TABLES LIKE '{$table}'");
+        $rows = $result->fetchAll();
+        try {
+            if ($isExists = 1 != count($rows)) {
+                throw new Exception("表 {$table} 不存在");
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+
+        return $isExists;
     }
 
     // base operations
@@ -130,6 +146,7 @@ class Db
      */
     public function insert($table, $columns)
     {
+        $this->tableExists($table);
         $keys = $values = $params = [];
         $k = 0;
         foreach ($columns as $key => $value) {
@@ -160,6 +177,7 @@ class Db
      */
     public function update($table, $columns, $where)
     {
+        $this->tableExists($table);
         $sets = $params = [];
         $k = 0;
         foreach ($columns as $key => $value) {
@@ -187,6 +205,7 @@ class Db
      */
     public function delete($table, $where)
     {
+        $this->tableExists($table);
         $this->where($where);
         $this->queryString = "DELETE FROM {$table} {$this->where}";
         $this->query = $this->conn->prepare($this->queryString);
@@ -209,6 +228,7 @@ class Db
      */
     public function find($table)
     {
+        $this->tableExists($table);
         $this->queryString = "SELECT [[select]] FROM {$table}";
 
         return $this;
