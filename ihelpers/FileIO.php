@@ -2,6 +2,7 @@
 
 namespace icy2003\ihelpers;
 
+use Exception;
 use I;
 
 /**
@@ -209,7 +210,7 @@ class FileIO
     private function fileInit($fileName)
     {
         if (preg_match('/^https?:\/\//', $fileName)) {
-            if (extension_loaded('curl')) {
+            if (Env::hasExt('curl')) {
                 $curl = curl_init($fileName);
                 curl_setopt($curl, CURLOPT_NOBODY, true);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -301,11 +302,11 @@ class FileIO
             self::$instance = new self();
             self::$instance->fileInit($fileName);
             if (!self::$instance->attributes['isExists']) {
-                throw new \Exception("文件 {$fileName} 不存在");
+                throw new Exception("文件 {$fileName} 不存在");
                 return false;
             }
             if (!self::$instance->handler = fopen($fileName, 'rb')) {
-                throw new \Exception('无法打开文件');
+                throw new Exception('无法打开文件');
                 return false;
             }
         }

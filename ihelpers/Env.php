@@ -10,4 +10,9 @@ class Env
 
         return null === $result ? $defaultValue : $result;
     }
+
+    public static function hasExt($extension)
+    {
+        return extension_loaded($extension);
+    }
 }
