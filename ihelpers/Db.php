@@ -100,8 +100,7 @@ class Db
                     default:
                         $message = $e->getMessage();
                 }
-                echo $message;
-                die;
+                throw new Exception($message);
             }
         }
 
