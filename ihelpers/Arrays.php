@@ -164,4 +164,33 @@ class Arrays
 
         return $result;
     }
+    /**
+     * 递归地合并多个数组，区别于 array_merge_recursive，如果有相同的键，后者会覆盖前者
+     *
+     * @param array $a
+     * @param array $b
+     * @return array
+     */
+    public static function arrayMergeRecursive($a, $b)
+    {
+        $args = func_get_args();
+        $res = array_shift($args);
+        while (!empty($args)) {
+            foreach (array_shift($args) as $k => $v) {
+                if (is_int($k)) {
+                    if (array_key_exists($k, $res)) {
+                        $res[] = $v;
+                    } else {
+                        $res[$k] = $v;
+                    }
+                } elseif (is_array($v) && isset($res[$k]) && is_array($res[$k])) {
+                    $res[$k] = self::arrayMergeRecursive($res[$k], $v);
+                } else {
+                    $res[$k] = $v;
+                }
+            }
+        }
+
+        return $res;
+    }
 }
