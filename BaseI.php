@@ -3,6 +3,9 @@
 namespace icy2003;
 
 defined('I_DEBUG') || define('I_DEBUG', false);
+$defaultConfig = __DIR__ . '/config.php';
+defined("I_DEFAULT_CONFIG_FILE") || define("I_DEFAULT_CONFIG_FILE", $defaultConfig);
+defined("I_CONFIG_FILE") || define("I_CONFIG_FILE", $defaultConfig);
 
 /**
  * @filename BaseI.php
@@ -17,7 +20,7 @@ class BaseI
     public static function autoload($className)
     {
         if (false !== strpos($className, '\\')) {
-            $classFile = dirname(__DIR__).'/'.str_replace('icy2003', 'icy2003_php', str_replace('\\', '/', $className).'.php');
+            $classFile = dirname(__DIR__) . '/' . str_replace('icy2003', 'icy2003_php', str_replace('\\', '/', $className) . '.php');
             if (false === $classFile || !is_file($classFile)) {
                 return;
             }
