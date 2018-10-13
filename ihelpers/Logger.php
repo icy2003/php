@@ -44,9 +44,10 @@ class Logger
     public function errorHandler($errno, $errstr, $errfile, $errline)
     {
         if ($this->file) {
-            $logPath = $this->config['file_path'];
+            $logPath = trim($this->config['file_path'], '/') . '/';
             $logString = date('Y-m-d H:i:s') . " [{$errfile}]({$errno})第 {$errline} 行：{$errstr}" . PHP_EOL;
-            file_put_contents(trim($logPath, '/') . '/' . date('Y-m-d') . '.log', $logString, FILE_APPEND);
+            FileIO::createDir($logPath);
+            file_put_contents($logPath . date('Y-m-d') . '.log', $logString, FILE_APPEND);
         }
     }
 
