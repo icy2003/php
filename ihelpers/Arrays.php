@@ -193,4 +193,24 @@ class Arrays
 
         return $res;
     }
+    /**
+     * 获取数组某个值，以点代替数组层级
+     *
+     * @param array $array
+     * @param string $keyString
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public static function value($array, $keyString, $defaultValue = null)
+    {
+        $keyArray = explode(".", $keyString);
+        foreach ($keyArray as $key) {
+            if (array_key_exists($key, $array)) {
+                $array = $array[$key];
+            } else {
+                return $defaultValue;
+            }
+        }
+        return $array;
+    }
 }
