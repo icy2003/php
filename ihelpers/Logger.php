@@ -30,7 +30,7 @@ class Logger
     {
         if (!self::$instance instanceof self) {
             self::$instance = new self();
-            $config = Arrays::arrayMergeRecursive(require_once I_DEFAULT_CONFIG_FILE, require_once I_CONFIG_FILE, $config);
+            $config = Arrays::arrayMergeRecursive(require I_DEFAULT_CONFIG_FILE, require I_CONFIG_FILE, $config);
             self::$instance->config = $config['Logger'];
             self::$instance->file = self::$instance->config['file'];
         }
