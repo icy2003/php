@@ -213,4 +213,32 @@ class Arrays
         }
         return $array;
     }
+    /**
+     *  range 的优化版
+     *
+     * @param integer $start
+     * @param integer $end
+     * @param integer $step
+     * @return \Generator
+     */
+    public static function range($start, $end, $step = 1)
+    {
+        if ($start < $end) {
+            if ($step <= 0) {
+                throw new \LogicException("步长必须大于 0 ");
+            }
+            for ($i = $start; $i <= $end; $i += $step) {
+                yield $i;
+            }
+        } else if ($start > $end) {
+            if ($step >= 0) {
+                throw new \LogicException("步长必须小于 0");
+            }
+            for ($i = $start; $i >= $end; $i += $step) {
+                yield $i;
+            }
+        } else {
+            yield $start;
+        }
+    }
 }
