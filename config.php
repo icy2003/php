@@ -2,7 +2,12 @@
 
 return [
     'Logger' => [
-        'file' => true,
-        'file_path' => __DIR__ . '/logs/'
+        'isLog' => false,
+        'useFile' => true,
+        'filePath' => '@icy2003/logs'
+    ],
+    'Language' => [
+        'language' => 'zh-cn',
+        'basePath' => '@icy2003/language'
     ]
 ];
