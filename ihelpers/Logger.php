@@ -60,20 +60,27 @@ class Logger
     }
 
     /**
-     * 返回 var_dump 的值的字符串
+     * 通用的输出函数
      *
+     * @param callback php 的各种输出函数以及自定义函数
      * @param mixed $data
      * @return string
      */
-    public static function varDump($data)
+    public static function out($callable, $data)
     {
         ob_start();
-        var_dump($data);
+        is_callable($callable) && call_user_func($callable, $data);
         $content = ob_get_contents();
         ob_end_clean();
         return $content;
     }
 
+    /**
+     * 输出日志
+     *
+     * @param mixed $message
+     * @return void
+     */
     public static function info($message)
     {
         $config = BaseI::config('Logger');
@@ -85,7 +92,7 @@ class Logger
             '{date}' => date($config['dateFormat']),
             '{file}' => $array[0]['file'],
             '{line}' => $array[0]['line'],
-            '{message}' => $message,
+            '{message}' => static::out($config['info']['function'], $message),
         ];
         $string = str_replace(array_keys($map), array_values($map), $config['infoTemplete']);
         static::handler($config, $string);
@@ -104,8 +111,7 @@ class Logger
             file_put_contents($logPath . $fileName, $string . PHP_EOL, $config['file']['flag']);
         }
         if (in_array('print', $typeArray)) {
-            $function = $config['print']['function'];
-            is_callable($function) && call_user_func($function, $string . PHP_EOL);
+            echo $string . PHP_EOL;
         }
     }
 }
