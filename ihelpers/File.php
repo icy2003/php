@@ -32,8 +32,8 @@ class File
             if ($file = FileIO::create($fileName)) {
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Accept-Length:'.$file->getAttribute('fileSize'));
-                header('Content-Disposition: attachment; filename='.Charset::convert2cn(basename($fileName)));
+                header('Accept-Length:' . $file->getAttribute('fileSize'));
+                header('Content-Disposition: attachment; filename=' . Charset::convert2cn(basename($fileName)));
                 foreach ($file->data() as $data) {
                     echo $data;
                 }
@@ -151,7 +151,7 @@ class File
             }
         } else {
             // 其他错误时的处理
-            $this->errorCode = $_FILES[$formName]['error'];
+            $this->errorCode = $_FILES[$this->formName]['error'];
 
             return $this;
         }
@@ -168,14 +168,14 @@ class File
     public function save($savePath, $fileName = null)
     {
         $fileName = null === $fileName ? $this->attributes['fileName'] : $fileName;
-        !empty($this->attributes) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/').'/'.$fileName);
+        !empty($this->attributes) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
 
         return $this;
     }
 
     public function randomFileName($fileName)
     {
-        return date('YmdHis').Strings::random(10).'.'.$this->getExt($fileName);
+        return date('YmdHis') . Strings::random(10) . '.' . $this->getExt($fileName);
     }
 
     public function getExt($fileName)
