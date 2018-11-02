@@ -54,7 +54,7 @@ class Logger
      * @param string $string
      * @return void
      */
-    public static function echo($string)
+    public static function iEcho($string)
     {
         echo $string;
     }

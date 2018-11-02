@@ -8,7 +8,7 @@ return [
         'dateFormat' => 'Y-m-d H:i:s',
         'type' => 'file,print',//file,print,db
         'info' => [
-            'function' => ['\icy2003\ihelpers\Logger', 'echo'],// string|callable
+            'function' => ['\icy2003\ihelpers\Logger', 'iEcho'],// string|callable
         ],
         'file' => [
             'filePath' => '@icy2003/logs',
