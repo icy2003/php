@@ -20,4 +20,16 @@ class Env
     {
         return 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
     }
+
+    /**
+     * 让 empty 支持函数调用
+     * @see http://php.net/manual/zh/function.empty.php
+     *
+     * @param mixed $data
+     * @return boolean
+     */
+    public static function isEmpty($data)
+    {
+        return empty($data);
+    }
 }
