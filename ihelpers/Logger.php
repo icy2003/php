@@ -81,7 +81,7 @@ class Logger
      * @param mixed $message
      * @return void
      */
-    public static function info($message)
+    public static function info($message, $function = null)
     {
         $config = BaseI::config('Logger');
         if (false === $config['isLog']) {
@@ -92,7 +92,7 @@ class Logger
             '{date}' => date($config['dateFormat']),
             '{file}' => $array[0]['file'],
             '{line}' => $array[0]['line'],
-            '{message}' => static::out($config['info']['function'], $message),
+            '{message}' => static::out(null === $function ? $config['info']['function'] : $function, $message),
         ];
         $string = str_replace(array_keys($map), array_values($map), $config['infoTemplete']);
         static::handler($config, $string);
