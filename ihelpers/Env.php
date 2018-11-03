@@ -15,4 +15,9 @@ class Env
     {
         return extension_loaded($extension);
     }
+
+    public static function isWin()
+    {
+        return 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
+    }
 }
