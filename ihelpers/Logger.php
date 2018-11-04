@@ -46,7 +46,7 @@ class Logger
             '{errstr}' => $errstr,
         ];
         $string = str_replace(array_keys($map), array_values($map), $config['errorTemplete']);
-        static::handler($config, $string);
+        $this->handler($string);
     }
     /**
      * 让 echo 可以当函数使用
