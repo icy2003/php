@@ -81,9 +81,9 @@ class Logger
      * @param mixed $message
      * @return void
      */
-    public static function info($message, $function = null)
+    public function info($message, $function = null)
     {
-        $config = BaseI::config('Logger');
+        $config = $this->config;
         if (false === $config['isLog']) {
             return;
         }
@@ -95,11 +95,12 @@ class Logger
             '{message}' => static::out(null === $function ? $config['info']['function'] : $function, $message),
         ];
         $string = str_replace(array_keys($map), array_values($map), $config['infoTemplete']);
-        static::handler($config, $string);
+        $this->handler($string);
     }
 
-    private static function handler($config, $string)
+    private function handler($string)
     {
+        $config = $this->config;
         $typeArray = explode(',', $config['type']);
         if (in_array('file', $typeArray)) {
             $logPath = BaseI::getAlias(trim($config['file']['filePath'], '/') . '/');
