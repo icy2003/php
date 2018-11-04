@@ -106,8 +106,8 @@ class FileIO
      */
     public static function copyDir($fromDir, $toDir, $overWrite = false)
     {
-        $fromDir = rtrim($fromDir, '/').'/';
-        $toDir = rtrim($toDir, '/').'/';
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
         if (!is_dir($fromDir)) {
             return false;
         }
@@ -119,10 +119,10 @@ class FileIO
             if ('.' == $file || '..' == $file) {
                 continue;
             }
-            if (is_dir($fromDir.$file)) {
-                self::copyDir($fromDir.$file, $toDir.$file, $overWrite);
+            if (is_dir($fromDir . $file)) {
+                self::copyDir($fromDir . $file, $toDir . $file, $overWrite);
             } else {
-                self::copyFile($fromDir.$file, $toDir.$file, $overWrite);
+                self::copyFile($fromDir . $file, $toDir . $file, $overWrite);
             }
         }
         closedir($dirHanlder);
@@ -168,8 +168,8 @@ class FileIO
      */
     public static function moveDir($fromDir, $toDir, $overWrite = false)
     {
-        $fromDir = rtrim($fromDir, '/').'/';
-        $toDir = rtrim($toDir, '/').'/';
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
         if (!is_dir($fromDir)) {
             return false;
         }
@@ -181,10 +181,10 @@ class FileIO
             if ('.' == $file || '..' == $file) {
                 continue;
             }
-            if (is_dir($fromDir.$file)) {
-                self::moveDir($fromDir.$file, $toDir.$file, $overWrite);
+            if (is_dir($fromDir . $file)) {
+                self::moveDir($fromDir . $file, $toDir . $file, $overWrite);
             } else {
-                self::moveFile($fromDir.$file, $toDir.$file, $overWrite);
+                self::moveFile($fromDir . $file, $toDir . $file, $overWrite);
             }
         }
         closedir($dirHanlder);
@@ -202,6 +202,35 @@ class FileIO
 
     private function __clone()
     {
+    }
+
+    /**
+     *
+     * @return static
+     */
+    public static function create()
+    {
+        if (!self::$instance instanceof self) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    /**
+     * 加载一个文件
+     *
+     * @param string $fileName
+     * @return static
+     */
+    public function load($fileName)
+    {
+        $this->fileInit($fileName);
+        if (!$this->attributes['isExists']) {
+            throw new Exception("文件 {$fileName} 不存在");
+        }
+        if (!$this->handler = fopen($fileName, 'rb')) {
+            throw new Exception('无法打开文件');
+        }
+        return $this;
     }
 
     private $handler;
@@ -245,7 +274,7 @@ class FileIO
                         "HOST: {$host}:{$port}",
                         'Connection: Close',
                     ];
-                    fwrite($fp, implode('\r\n', $header)."\r\n\r\n");
+                    fwrite($fp, implode('\r\n', $header) . "\r\n\r\n");
                     $this->attributes['isExists'] = false;
                     while (!feof($fp)) {
                         $line = fgets($fp);
@@ -292,29 +321,6 @@ class FileIO
     }
 
     /**
-     * @param string $fileName 文件名
-     *
-     * @return static
-     */
-    public static function create($fileName)
-    {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            self::$instance->fileInit($fileName);
-            if (!self::$instance->attributes['isExists']) {
-                throw new Exception("文件 {$fileName} 不存在");
-                return false;
-            }
-            if (!self::$instance->handler = fopen($fileName, 'rb')) {
-                throw new Exception('无法打开文件');
-                return false;
-            }
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * 遍历行的生成器.
      *
      * @return \Generator
@@ -325,7 +331,8 @@ class FileIO
             while ($line = fgets($this->handler)) {
                 yield $line;
             }
-        } finally {
+        }
+        finally {
             fclose($this->handler);
         }
     }
@@ -360,7 +367,8 @@ class FileIO
                 $bufferSize += $buffer;
                 yield fread($this->handler, $buffer);
             }
-        } finally {
+        }
+        finally {
             fclose($this->handler);
         }
     }

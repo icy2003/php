@@ -20,6 +20,30 @@ class File
     }
 
     /**
+     * 创建文件上传单例.
+     *
+     * @param array $config
+     *                      formName 文件上传时的表单名，默认 'file'
+     *                      sizeLimit 文件上传大小限制，默认 0，不限制
+     *                      extLimit 文件类型限制，默认 []，不限制
+     *
+     * @return static
+     */
+    public static function create($config = [])
+    {
+        if (!self::$instance instanceof self) {
+            self::$instance = new self();
+            !empty($config['formName']) && self::$instance->formName = $config['formName'];
+            !empty($config['sizeLimit']) && self::$instance->sizeLimit = $config['sizeLimit'];
+            $systemLimit = self::$instance->getSizeLimit();
+            self::$instance->sizeLimit = 0 === self::$instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(self::$instance->sizeLimit));
+            !empty($config['extLimit']) && self::$instance->extLimit = $config['extLimit'];
+        }
+
+        return self::$instance;
+    }
+
+    /**
      * 下载一个文件.
      *
      * @param string $fileName
@@ -85,30 +109,6 @@ class File
     private $sizeLimit = 0;
     private $extLimit = [];
     private $errorCode = 0;
-
-    /**
-     * 创建文件上传单例.
-     *
-     * @param array $config
-     *                      formName 文件上传时的表单名，默认 'file'
-     *                      sizeLimit 文件上传大小限制，默认 0，不限制
-     *                      extLimit 文件类型限制，默认 []，不限制
-     *
-     * @return static
-     */
-    public static function create($config = [])
-    {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            !empty($config['formName']) && self::$instance->formName = $config['formName'];
-            !empty($config['sizeLimit']) && self::$instance->sizeLimit = $config['sizeLimit'];
-            $systemLimit = self::$instance->getSizeLimit();
-            self::$instance->sizeLimit = 0 === self::$instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(self::$instance->sizeLimit));
-            !empty($config['extLimit']) && self::$instance->extLimit = $config['extLimit'];
-        }
-
-        return self::$instance;
-    }
 
     /**
      * 文件上传，对上传的文件进行处理，需要用 save() 保存.
