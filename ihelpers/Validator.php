@@ -17,6 +17,11 @@ class Validator
     private function __clone()
     {
     }
+    /**
+     * 创建一个验证器
+     *
+     * @return static
+     */
     public static function create()
     {
         if (!static::$instance instanceof self) {
@@ -25,7 +30,12 @@ class Validator
 
         return static::$instance;
     }
-
+    /**
+     * 预加载数据
+     *
+     * @param array $data
+     * @return static
+     */
     public function load($data)
     {
         $this->data = $data;
@@ -37,7 +47,12 @@ class Validator
     {
         $this->message = [];
     }
-
+    /**
+     * 验证规则
+     *
+     * @param array $rules
+     * @return static
+     */
     public function rules($rules)
     {
         $this->clear();
@@ -69,7 +84,7 @@ class Validator
 
     protected function requiredValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists([$field], $data)) {
+        if ($this->isEmpty(Arrays::value($data, $field))) {
             $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 必填");
         }
     }
@@ -126,6 +141,20 @@ class Validator
             if (!$function($value)) {
                 $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 不唯一");
             }
+        }
+    }
+
+    protected function callValidator($data, $field, $rule)
+    {
+        if (!Arrays::arrayKeysExists(['function'], $rule)) {
+            throw new Exception('function error');
+        }
+        $function = Arrays::value($rule, 'function');
+        if (!is_callable($function)) {
+            throw new Exception('function call error');
+        }
+        if ($function(Arrays::value($data, $field))) {
+            $this->message[$field][] = Arrays::value($rule, 'message', '{$field}验证不通过');
         }
     }
 
