@@ -128,10 +128,8 @@ class Arrays
      */
     public static function arrayKeysExists($keys, $array)
     {
-        $count = count($keys);
-        $diff = array_diff($keys, array_keys($array));
 
-        return count($diff) === $count;
+        return Env::isEmpty(array_diff($keys, array_keys($array)));
     }
 
     /**
@@ -201,11 +199,12 @@ class Arrays
      * @param mixed $defaultValue
      * @return mixed
      */
-    public static function value($array, $keyString, $defaultValue = null)
+    public static function value($array, $keyString, $defaultValue = null, $isStrict = true)
     {
         $keyArray = explode(".", $keyString);
         foreach ($keyArray as $key) {
-            if (array_key_exists($key, $array)) {
+            $isExist = true === $isStrict ? array_key_exists($key, $array) : !empty($array[$key]);
+            if ($isExist) {
                 $array = $array[$key];
             } else {
                 return $defaultValue;
