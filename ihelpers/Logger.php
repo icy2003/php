@@ -30,7 +30,7 @@ class Logger
 
         return self::$instance;
     }
-    public function run()
+    public function error()
     {
         $this->config['isLog'] && set_error_handler([$this, 'errorHandler']);
     }
