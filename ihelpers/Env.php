@@ -32,4 +32,35 @@ class Env
     {
         return empty($data);
     }
+
+    /**
+     * 获取值，以点代替层级，可以是对象嵌套数组
+     *
+     * @param mixed $mixed
+     * @param string $keyString
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public static function value($mixed, $keyString, $defaultValue = null)
+    {
+        $keyArray = explode(".", $keyString);
+        foreach ($keyArray as $key) {
+            if (is_array($mixed)) {
+                if (array_key_exists($key, $mixed)) {
+                    $mixed = $mixed[$key];
+                } else {
+                    return $defaultValue;
+                }
+            } else if (is_object($mixed)) {
+                if (property_exists($mixed, $key)) {
+                    $mixed = $mixed->$key;
+                } else {
+                    return $defaultValue;
+                }
+            } else {
+                return $defaultValue;
+            }
+        }
+        return $mixed;
+    }
 }
