@@ -153,7 +153,7 @@ class Validator
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        if ($function(Arrays::value($data, $field))) {
+        if (!$function(Arrays::value($data, $field))) {
             $this->message[$field][] = Arrays::value($rule, 'message', '{$field}验证不通过');
         }
     }
@@ -166,7 +166,11 @@ class Validator
         $value = Arrays::value($rule, 'value');
         $isStrict = Arrays::value($rule, 'isStrict', false);
         $defaultValue = is_callable($value) ? $value() : $value;
-        $this->data[$field] = Arrays::value($data, $field, $defaultValue, $isStrict);
+        if (true === $isStrict) {
+            $this->data[$field] = Arrays::value($data, $field, $defaultValue);
+        } else {
+            $this->data[$field] = !empty($data[$field]) ? $data[$field] : $defaultValue;
+        }
     }
 
     protected function setValidator($data, $field, $rule)
