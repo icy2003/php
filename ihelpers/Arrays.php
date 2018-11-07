@@ -55,12 +55,13 @@ class Arrays
      *
      * @param array $array
      * @param array $fields 某几项字段
+     * @param int $dimension 维度，默认 2 维数组
      *
      * @return array
      *
      * @example
      * ```php
-     * $result = Arrays::columns($array,['name','value'],2);
+     * $result = Arrays::columns($array, ['name','value'], 2);
      * ```
      * $result
      * ```php
@@ -70,7 +71,7 @@ class Arrays
      * ]
      * ```
      */
-    public static function columns($array, $fields, $dimension)
+    public static function columns($array, $fields, $dimension = 2)
     {
         $result = [];
         if (2 === $dimension) {
@@ -88,6 +89,16 @@ class Arrays
         return $result;
     }
 
+    /**
+     * array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
+     * 如果需要取某几项，建议使用 Arrays::columns
+     * @see http://php.net/array_column
+     *
+     * @param array $array
+     * @param string $column
+     * @param string $index
+     * @return array
+     */
     public static function arrayColumn($array, $column, $index = null)
     {
         if (function_exists('array_column')) {
@@ -133,7 +144,8 @@ class Arrays
     }
 
     /**
-     * 参照 PHP 的 array_combine 函数，array_combine 得到的是一行记录的格式，该函数得到多行.
+     * 参照 PHP 的 array_combine 函数，array_combine 得到的是一行记录的格式，该函数得到多行
+     * @see http://php.net/array_combine
      *
      * @param array $keys
      * @param array $arrays
@@ -164,9 +176,11 @@ class Arrays
     }
     /**
      * 递归地合并多个数组，区别于 array_merge_recursive，如果有相同的键，后者会覆盖前者
+     * @see http://php.net/array_merge_recursive
      *
      * @param array $a
      * @param array $b
+     *
      * @return array
      */
     public static function arrayMergeRecursive($a, $b)
@@ -198,6 +212,7 @@ class Arrays
      * @param array $array
      * @param string $keyString
      * @param mixed $defaultValue
+     *
      * @return mixed
      */
     public static function value($array, $keyString, $defaultValue = null)
@@ -207,10 +222,13 @@ class Arrays
 
     /**
      *  range 的优化版
+     * @see http://php.net/manual/zh/language.generators.overview.php
      *
      * @param integer $start
      * @param integer $end
      * @param integer $step
+     * @version PHP >= 5.5
+     *
      * @return \Generator
      */
     public static function range($start, $end, $step = 1)
