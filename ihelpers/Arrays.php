@@ -191,6 +191,7 @@ class Arrays
 
         return $res;
     }
+
     /**
      * 获取数组某个值，以点代替数组层级
      *
@@ -199,19 +200,11 @@ class Arrays
      * @param mixed $defaultValue
      * @return mixed
      */
-    public static function value($array, $keyString, $defaultValue = null, $isStrict = true)
+    public static function value($array, $keyString, $defaultValue = null)
     {
-        $keyArray = explode(".", $keyString);
-        foreach ($keyArray as $key) {
-            $isExist = true === $isStrict ? array_key_exists($key, $array) : !empty($array[$key]);
-            if ($isExist) {
-                $array = $array[$key];
-            } else {
-                return $defaultValue;
-            }
-        }
-        return $array;
+        return Env::value($array, $keyString, $defaultValue);
     }
+
     /**
      *  range 的优化版
      *
