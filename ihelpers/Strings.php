@@ -6,15 +6,36 @@ use Exception;
 
 class Strings
 {
-
+    /**
+     * 返回字符串的字节长（一个中文等于 3 字节哦~）
+     *
+     * @param string $string
+     * @return int
+     */
     public static function byteLength($string)
     {
         return mb_strlen($string, '8bit');
     }
-
-    public static function random($length = 32)
+    /**
+     * 返回字符个数（一个中文就是 1 个啦~）
+     *
+     * @param string $string
+     * @return int
+     */
+    public static function length($string)
     {
-        $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        return mb_strlen($string, 'UTF-8');
+    }
+
+    /**
+     * 生成随机字符串
+     *
+     * @param integer $length
+     * @param string $chars 字符列表，默认为 a-z 和 0-9
+     * @return string
+     */
+    public static function random($length = 32, $chars = 'abcdefghijklmnopqrstuvwxyz0123456789')
+    {
         $str = '';
         for ($i = 0; $i < $length; ++$i) {
             $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
@@ -23,6 +44,13 @@ class Strings
         return $str;
     }
 
+    /**
+     * 生成密码 hash
+     *
+     * @param string $password
+     * @param int $cost
+     * @return string
+     */
     public static function generatePasswordHash($password, $cost = null)
     {
         null === $cost && $cost = 13;
@@ -42,6 +70,13 @@ class Strings
         return $hash;
     }
 
+    /**
+     * 验证密码
+     *
+     * @param string $password
+     * @param string $hash
+     * @return boolean
+     */
     public static function validatePassword($password, $hash)
     {
         if (!is_string($password) || $password === '') {
@@ -78,6 +113,30 @@ class Strings
         }
 
         return $diff === 0;
+    }
+
+    /**
+     * 小驼峰转化成下划线（如需要大写下划线，用 strtoupper 转化即可）
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function camel2underline($string)
+    {
+        return strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $string));
+    }
+
+    /**
+     * 下划线转化为小驼峰（如需要大驼峰，用 ucfirst 转化即可）
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function underline2camel($string)
+    {
+        return preg_replace_callback('/_+([a-z])/', function ($matches) {
+            return strtoupper($matches[1]);
+        }, strtolower($string));
     }
 
 }
