@@ -9,7 +9,7 @@ namespace icy2003\ihelpers;
  */
 class File
 {
-    private static $instance;
+    protected static $instance;
 
     private function __construct()
     {
@@ -31,16 +31,16 @@ class File
      */
     public static function create($config = [])
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            !empty($config['formName']) && self::$instance->formName = $config['formName'];
-            !empty($config['sizeLimit']) && self::$instance->sizeLimit = $config['sizeLimit'];
-            $systemLimit = self::$instance->getSizeLimit();
-            self::$instance->sizeLimit = 0 === self::$instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(self::$instance->sizeLimit));
-            !empty($config['extLimit']) && self::$instance->extLimit = $config['extLimit'];
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
+            !empty($config['formName']) && static::$instance->formName = $config['formName'];
+            !empty($config['sizeLimit']) && static::$instance->sizeLimit = $config['sizeLimit'];
+            $systemLimit = static::$instance->getSizeLimit();
+            static::$instance->sizeLimit = 0 === static::$instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$instance->sizeLimit));
+            !empty($config['extLimit']) && static::$instance->extLimit = $config['extLimit'];
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     /**

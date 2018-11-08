@@ -8,7 +8,7 @@ use PDOException;
 
 class Db
 {
-    private static $instance;
+    protected static $instance;
 
     private $conn;
 
@@ -70,25 +70,25 @@ class Db
      */
     public static function create($config = [])
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
             if (!empty($config['dsn'])) {
-                self::$instance->dsn = $config['dsn'];
+                static::$instance->dsn = $config['dsn'];
             } else {
-                self::$instance->db = $db = !empty($config['db']) ? $config['db'] : self::$instance->db;
-                self::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : self::$instance->dbName;
-                self::$instance->host = $host = !empty($config['host']) ? $config['host'] : self::$instance->host;
-                self::$instance->port = $port = !empty($config['port']) ? $config['port'] : self::$instance->port;
-                self::$instance->user = !empty($config['user']) ? $config['user'] : self::$instance->user;
-                self::$instance->password = !empty($config['password']) ? $config['password'] : self::$instance->password;
-                self::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
+                static::$instance->db = $db = !empty($config['db']) ? $config['db'] : static::$instance->db;
+                static::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : static::$instance->dbName;
+                static::$instance->host = $host = !empty($config['host']) ? $config['host'] : static::$instance->host;
+                static::$instance->port = $port = !empty($config['port']) ? $config['port'] : static::$instance->port;
+                static::$instance->user = !empty($config['user']) ? $config['user'] : static::$instance->user;
+                static::$instance->password = !empty($config['password']) ? $config['password'] : static::$instance->password;
+                static::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
             }
             try {
-                self::$instance->conn = new PDO(self::$instance->dsn, self::$instance->user, self::$instance->password, [
-                        PDO::ATTR_PERSISTENT => true,
-                    ]);
-                self::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                self::$instance->conn->exec('set names utf8');
+                static::$instance->conn = new PDO(static::$instance->dsn, static::$instance->user, static::$instance->password, [
+                    PDO::ATTR_PERSISTENT => true,
+                ]);
+                static::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                static::$instance->conn->exec('set names utf8');
             } catch (PDOException $e) {
                 switch ($e->getCode()) {
                     case '1049':
@@ -104,7 +104,7 @@ class Db
             }
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     /**
@@ -150,8 +150,8 @@ class Db
         $k = 0;
         foreach ($columns as $key => $value) {
             $keys[] = $key;
-            $values[] = ':k'.$k;
-            $this->params[':k'.$k] = $value;
+            $values[] = ':k' . $k;
+            $this->params[':k' . $k] = $value;
             ++$k;
         }
         $keysString = implode(',', $keys);
@@ -180,8 +180,8 @@ class Db
         $sets = $params = [];
         $k = 0;
         foreach ($columns as $key => $value) {
-            $sets[] = $key.'=:k'.$k;
-            $this->params[':k'.$k] = $value;
+            $sets[] = $key . '=:k' . $k;
+            $this->params[':k' . $k] = $value;
             ++$k;
         }
         $setsString = implode(',', $sets);
@@ -256,7 +256,7 @@ class Db
      */
     public function asArray($asArray = true)
     {
-        $this->asArray = (bool) $asArray;
+        $this->asArray = (bool)$asArray;
 
         return $this;
     }
@@ -376,7 +376,9 @@ class Db
     public function rawSql()
     {
         $this->parse();
-        $rawSql = str_replace(array_keys($this->params), array_map(function ($data) {return 'string' == gettype($data) ? "'".$data."'" : $data; }, array_values($this->params)), $this->queryString);
+        $rawSql = str_replace(array_keys($this->params), array_map(function ($data) {
+            return 'string' == gettype($data) ? "'" . $data . "'" : $data;
+        }, array_values($this->params)), $this->queryString);
         $this->reset();
 
         return $rawSql;
@@ -418,7 +420,7 @@ class Db
                                 $conds[] = $generator($k, $v);
                             }
 
-                            $condition = '('.implode(' '.strtoupper($value[0]).' ', $conds).')';
+                            $condition = '(' . implode(' ' . strtoupper($value[0]) . ' ', $conds) . ')';
                             break;
                         case 'like':
                         case 'not like':
@@ -432,9 +434,9 @@ class Db
                              * ]
                              * ==>> id > 13
                              */
-                            $this->params[':lc'.$this->i] = $value[2];
+                            $this->params[':lc' . $this->i] = $value[2];
 
-                            $condition = '('.$value[1].' '.strtoupper($value[0]).' '.':lc'.$this->i.')';
+                            $condition = '(' . $value[1] . ' ' . strtoupper($value[0]) . ' ' . ':lc' . $this->i . ')';
                             ++$this->i;
                             break;
                         case 'in':
@@ -445,9 +447,13 @@ class Db
                              * ]
                              * ==>> id IN (1,2,3)
                              */
-                            array_map(function ($data, $i) {$this->params[':i'.($this->i + $i)] = $data; }, $value[2], array_keys($value[2]));
+                            array_map(function ($data, $i) {
+                                $this->params[':i' . ($this->i + $i)] = $data;
+                            }, $value[2], array_keys($value[2]));
 
-                            $condition = '('.$value[1].' '.strtoupper($value[0]).' ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value[2]))).'))';
+                            $condition = '(' . $value[1] . ' ' . strtoupper($value[0]) . ' (' . implode(',', array_map(function ($i) {
+                                return ':i' . ($this->i + $i);
+                            }, array_keys($value[2]))) . '))';
                             $this->i += count($value[2]);
                             break;
                         case 'none':
@@ -468,14 +474,18 @@ class Db
             } else {
                 // 关联列
                 if (is_array($value)) {
-                    $condition = '('.$key.' IN ('.implode(',', array_map(function ($i) {return ':i'.($this->i + $i); }, array_keys($value))).'))';
-                    array_map(function ($data, $i) { $this->params[':i'.($this->i + $i)] = $data; }, $value, array_keys($value));
+                    $condition = '(' . $key . ' IN (' . implode(',', array_map(function ($i) {
+                        return ':i' . ($this->i + $i);
+                    }, array_keys($value))) . '))';
+                    array_map(function ($data, $i) {
+                        $this->params[':i' . ($this->i + $i)] = $data;
+                    }, $value, array_keys($value));
                     $this->i += count($value);
                 } elseif (null === $value) {
-                    $condition = '('.$key.' IS NULL'.')';
+                    $condition = '(' . $key . ' IS NULL' . ')';
                 } else {
-                    $condition = '('.$key.'=:w'.$this->i.')';
-                    $this->params[':w'.$this->i] = $value;
+                    $condition = '(' . $key . '=:w' . $this->i . ')';
+                    $this->params[':w' . $this->i] = $value;
                     ++$this->i;
                 }
 
@@ -485,7 +495,7 @@ class Db
         $operator = ' AND ';
         foreach ($where as $key => $row) {
             if (0 === $key && is_string($row) && in_array(strtolower($row), ['or', 'and'])) {
-                $operator = ' '.strtoupper($row).' ';
+                $operator = ' ' . strtoupper($row) . ' ';
                 $where = array_slice($where, 1);
                 break;
             }
@@ -493,7 +503,7 @@ class Db
         foreach ($where as $key => $value) {
             $conditions[] = $generator($key, $value);
         }
-        $this->where = 'WHERE '.implode($operator, $conditions);
+        $this->where = 'WHERE ' . implode($operator, $conditions);
 
         return $this;
     }
@@ -507,7 +517,7 @@ class Db
      */
     public function orderBy($orderBy)
     {
-        $this->orderBy = 'ORDER BY '.$orderBy;
+        $this->orderBy = 'ORDER BY ' . $orderBy;
 
         return $this;
     }
@@ -521,7 +531,7 @@ class Db
      */
     public function limit($limit)
     {
-        $this->limit = 'LIMIT '.$limit;
+        $this->limit = 'LIMIT ' . $limit;
 
         return $this;
     }
@@ -535,7 +545,7 @@ class Db
      */
     public function offset($offset)
     {
-        $this->offset = 'OFFSET '.$offset;
+        $this->offset = 'OFFSET ' . $offset;
 
         return $this;
     }

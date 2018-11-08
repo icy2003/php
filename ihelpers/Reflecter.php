@@ -6,7 +6,7 @@ use ReflectionClass;
 
 class Reflecter
 {
-    private static $instance;
+    protected static $instance;
 
     private function __construct()
     {
@@ -22,10 +22,10 @@ class Reflecter
      */
     public static function create()
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
         }
-        return self::$instance;
+        return static::$instance;
     }
 
     public function load($object)

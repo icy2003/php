@@ -4,7 +4,7 @@ namespace icy2003\ihelpers;
 
 class Validator
 {
-    private static $instance;
+    protected static $instance;
     private $data = [];
     private $_data = [];
     private $safeField = [];
@@ -24,7 +24,7 @@ class Validator
      */
     public static function create()
     {
-        if (!static::$instance instanceof self) {
+        if (!static::$instance instanceof static) {
             static::$instance = new static();
         }
 

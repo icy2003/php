@@ -6,7 +6,7 @@ use icy2003\BaseI;
 
 class Logger
 {
-    private static $instance;
+    protected static $instance;
     private $config;
 
     private function __construct()
@@ -23,12 +23,12 @@ class Logger
      */
     public static function create($config = [])
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            self::$instance->config = BaseI::config('Logger');
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
+            static::$instance->config = BaseI::config('Logger');
         }
 
-        return self::$instance;
+        return static::$instance;
     }
     public function error()
     {

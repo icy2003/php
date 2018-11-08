@@ -194,7 +194,7 @@ class FileIO
 
     // 读文件
 
-    private static $instance;
+    protected static $instance;
 
     private function __construct()
     {
@@ -210,10 +210,10 @@ class FileIO
      */
     public static function create()
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
         }
-        return self::$instance;
+        return static::$instance;
     }
     /**
      * 加载一个文件

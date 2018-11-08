@@ -4,7 +4,7 @@ namespace icy2003\ihelpers;
 
 class Request
 {
-    private static $instance;
+    protected static $instance;
     private $headers;
     private $rawBody;
 
@@ -22,37 +22,41 @@ class Request
      */
     public static function create()
     {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-            if (null === self::$instance->headers) {
-                // 以 apache 模块方式运行时支持
-                if (function_exists('getallheaders')) {
-                    $headers = getallheaders();
-                    foreach ($headers as $name => $value) {
-                        self::$instance->headers[$name][] = $value;
-                    }
-                } elseif (function_exists('http_get_request_headers')) {
-                    $headers = http_get_request_headers();
-                    foreach ($headers as $name => $value) {
-                        self::$instance->headers[$name][] = $value;
-                    }
-                } else {
-                    foreach ($_SERVER as $name => $value) {
-                        if (0 === strncmp($name, 'HTTP_', 5)) {
-                            $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                            self::$instance->headers[$name][] = $value;
-                        }
+        if (!static::$instance instanceof static) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    public function load()
+    {
+        if (null === $this->headers) {
+            // 以 apache 模块方式运行时支持
+            if (function_exists('getallheaders')) {
+                $headers = getallheaders();
+                foreach ($headers as $name => $value) {
+                    $this->headers[$name][] = $value;
+                }
+            } elseif (function_exists('http_get_request_headers')) {
+                $headers = http_get_request_headers();
+                foreach ($headers as $name => $value) {
+                    $this->headers[$name][] = $value;
+                }
+            } else {
+                foreach ($_SERVER as $name => $value) {
+                    if (0 === strncmp($name, 'HTTP_', 5)) {
+                        $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                        $this->headers[$name][] = $value;
                     }
                 }
             }
-            if (null === self::$instance->rawBody) {
-                self::$instance->rawBody = file_get_contents('php://input');
-            }
-
         }
-
-        return self::$instance;
+        if (null === $this->rawBody) {
+            $this->rawBody = file_get_contents('php://input');
+        }
     }
+
     public function getHeaders()
     {
         return $this->headers;
