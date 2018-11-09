@@ -14,6 +14,6 @@ class Language
         $map = require BaseI::getAlias(trim($basePath, '/') . "/{$language}/{$category}.php");
         return str_replace(array_map(function ($data) {
             return '{' . $data . '}';
-        }, array_keys($params)), array_values($params), Arrays::value($map, $message));
+        }, array_keys($params)), array_values($params), Arrays::value($map, $message, $message));
     }
 }
