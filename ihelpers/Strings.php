@@ -80,12 +80,12 @@ class Strings
     public static function validatePassword($password, $hash)
     {
         if (!is_string($password) || $password === '') {
-            throw new Exception('password 必须是字符串且不能为空');
+            return false;
         }
         if (!preg_match('/^\$2[axy]\$(\d\d)\$[\.\/0-9A-Za-z]{22}/', $hash, $matches)
             || $matches[1] < 4
             || $matches[1] > 30) {
-            throw new Exception('hash 不合法');
+            return false;
         }
         // PHP 5 >= 5.5.0, PHP 7
         if (function_exists('password_verify')) {
