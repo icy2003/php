@@ -8,7 +8,96 @@ class Validator
     private $data = [];
     private $_data = [];
     private $safeField = [];
-    private $message = [];
+    private $messages = [];
+    private $codes = [];
+
+    /**
+     * @var self 验证成功
+     */
+    const CODE_SUCCEEDED = 0;
+    /**
+     * @var self 验证失败
+     */
+    const CODE_VALIDATE_FAILED = -1;
+
+    /**
+     * @var self 必填验证失败
+     */
+    const CODE_VALIDATE_REQUIRED = -2;
+    /**
+     * @var self 范围验证失败
+     */
+    const CODE_VALIDATE_IN = -3;
+    /**
+     * @var self 正则验证失败
+     */
+    const CODE_VALIDATE_MATCH = -4;
+    /**
+     * @var self 手机号格式验证失败
+     */
+    const CODE_VALIDATE_MOBILE = -5;
+    /**
+     * @var self 邮箱格式验证失败
+     */
+    const CODE_VALIDATE_EMAIL = -6;
+    /**
+     * @var self 唯一性验证失败
+     */
+    const CODE_VALIDATE_UNIQUE = -7;
+    /**
+     * @var self 回调验证失败
+     */
+    const CODE_VALIDATE_CALL = -8;
+
+    /**
+     * @var self 必填验证器
+     */
+    const VALIDATOR_REQUIRED = 'required';
+    /**
+     * @var self 范围验证器
+     */
+    const VALIDATOR_IN = 'in';
+    /**
+     * @var self 正则验证器
+     */
+    const VALIDATOR_MATCH = 'match';
+    /**
+     * @var self 手机号格式验证器
+     */
+    const VALIDATOR_MOBILE = 'mobile';
+    /**
+     * @var self 邮箱格式验证器
+     */
+    const VALIDATOR_EMAIL = 'email';
+    /**
+     * @var self 唯一性验证器
+     */
+    const VALIDATOR_UNIQUE = 'unique';
+    /**
+     * @var self 回调验证器
+     */
+    const VALIDATOR_CALL = 'call';
+
+    /**
+     * @var self 默认值过滤器
+     */
+    const FILTER_DEFAULT = 'default';
+    /**
+     * @var self 设置过滤器
+     */
+    const FILTER_SET = 'set';
+    /**
+     * @var self 回调过滤器
+     */
+    const FILTER_FILTER = 'filter';
+    /**
+     * @var self 安全过滤器
+     */
+    const FILTER_SAFE = 'safe';
+    /**
+     * @var self 删除过滤器
+     */
+    const FILTER_UNSET = 'unset';
 
     private function __construct()
     {
@@ -45,7 +134,7 @@ class Validator
 
     protected function clear()
     {
-        $this->message = [];
+        $this->messages = [];
     }
     /**
      * 验证规则
@@ -85,7 +174,8 @@ class Validator
     protected function requiredValidator($data, $field, $rule)
     {
         if ($this->isEmpty(Arrays::value($data, $field))) {
-            $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 必填");
+            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 必填");
+            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
         }
     }
 
@@ -98,7 +188,8 @@ class Validator
         $range = Arrays::value($rule, 'range', []);
         $isStrict = Arrays::value($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
-            $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 不在范围内");
+            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 不在范围内");
+            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_IN);
         }
     }
 
@@ -110,7 +201,8 @@ class Validator
         $value = Arrays::value($data, $field);
         $pattern = Arrays::value($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
-            $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 格式不正确");
+            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 格式不正确");
+            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_MATCH);
         }
     }
 
@@ -118,6 +210,7 @@ class Validator
     {
         $rule['pattern'] = '/^1\\d{10}$/';
         $rule['message'] = Arrays::value($rule, 'message', "{$field} 手机号格式不正确");
+        $rule['code'] = Arrays::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
         $this->matchValidator($data, $field, $rule);
     }
 
@@ -125,6 +218,7 @@ class Validator
     {
         $rule['pattern'] = '/^[\w\-\.]+@[\w\-]+(\.\w+)+$/';
         $rule['message'] = Arrays::value($rule, 'message', "{$field} 邮箱格式不正确");
+        $rule['code'] = Arrays::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
         $this->matchValidator($data, $field, $rule);
     }
 
@@ -139,7 +233,8 @@ class Validator
                 throw new Exception('function error');
             }
             if (!$function($value)) {
-                $this->message[$field][] = Arrays::value($rule, 'message', "{$field} 不唯一");
+                $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 不唯一");
+                $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
             }
         }
     }
@@ -154,7 +249,8 @@ class Validator
             throw new Exception('function call error');
         }
         if (!$function(Arrays::value($data, $field))) {
-            $this->message[$field][] = Arrays::value($rule, 'message', '{$field}验证不通过');
+            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field}验证不通过");
+            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_CALL);
         }
     }
 
@@ -203,9 +299,20 @@ class Validator
         unset($this->data[$field]);
     }
 
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
     public function getMessage()
     {
-        return $this->message;
+        foreach ($this->messages as $field => $messages) {
+            foreach ($messages as $k => $message) {
+                $code = $this->codes[$field][$k];
+                return [$code, $message];
+            }
+        }
+        return [self::CODE_SUCCEEDED, 'success'];
     }
 
     public function data()
