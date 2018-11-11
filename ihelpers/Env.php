@@ -52,7 +52,12 @@ class Env
                     return $defaultValue;
                 }
             } else if (is_object($mixed)) {
-                if (property_exists($mixed, $key)) {
+                $method = 'get' . implode('', array_map(function ($part) {
+                    return ucfirst(strtolower($part));
+                }, explode('_', $key)));
+                if (method_exists($mixed, $method)) {
+                    $mixed = $mixed->$method();
+                } else if (property_exists($mixed, $key)) {
                     $mixed = $mixed->$key;
                 } else {
                     return $defaultValue;
@@ -63,4 +68,5 @@ class Env
         }
         return $mixed;
     }
+
 }
