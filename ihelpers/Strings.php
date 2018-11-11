@@ -134,9 +134,9 @@ class Strings
      */
     public static function underline2camel($string)
     {
-        return preg_replace_callback('/_+([a-z])/', function ($matches) {
-            return strtoupper($matches[1]);
-        }, strtolower($string));
+        return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function ($matches) {
+            return ucfirst($matches[1]);
+        }, strtolower($string)));
     }
 
 }
