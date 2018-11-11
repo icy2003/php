@@ -173,9 +173,9 @@ class Validator
 
     protected function requiredValidator($data, $field, $rule)
     {
-        if ($this->isEmpty(Arrays::value($data, $field))) {
-            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 必填");
-            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
+        if ($this->isEmpty(Env::value($data, $field))) {
+            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 必填");
+            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
         }
     }
 
@@ -184,12 +184,12 @@ class Validator
         if (!Arrays::arrayKeysExists(['range'], $rule)) {
             throw new Exception('range error');
         }
-        $value = Arrays::value($data, $field);
-        $range = Arrays::value($rule, 'range', []);
-        $isStrict = Arrays::value($rule, 'isStrict', false);
+        $value = Env::value($data, $field);
+        $range = Env::value($rule, 'range', []);
+        $isStrict = Env::value($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
-            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 不在范围内");
-            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_IN);
+            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 不在范围内");
+            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_IN);
         }
     }
 
@@ -198,43 +198,43 @@ class Validator
         if (!Arrays::arrayKeysExists(['pattern'], $rule)) {
             throw new Exception('pattern error');
         }
-        $value = Arrays::value($data, $field);
-        $pattern = Arrays::value($rule, 'pattern', '//');
+        $value = Env::value($data, $field);
+        $pattern = Env::value($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
-            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 格式不正确");
-            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_MATCH);
+            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 格式不正确");
+            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_MATCH);
         }
     }
 
     protected function mobileValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^1\\d{10}$/';
-        $rule['message'] = Arrays::value($rule, 'message', "{$field} 手机号格式不正确");
-        $rule['code'] = Arrays::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
+        $rule['message'] = Env::value($rule, 'message', "{$field} 手机号格式不正确");
+        $rule['code'] = Env::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
         $this->matchValidator($data, $field, $rule);
     }
 
     protected function emailValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^[\w\-\.]+@[\w\-]+(\.\w+)+$/';
-        $rule['message'] = Arrays::value($rule, 'message', "{$field} 邮箱格式不正确");
-        $rule['code'] = Arrays::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
+        $rule['message'] = Env::value($rule, 'message', "{$field} 邮箱格式不正确");
+        $rule['code'] = Env::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
         $this->matchValidator($data, $field, $rule);
     }
 
     protected function uniqueValidator($data, $field, $rule)
     {
-        $value = Arrays::value($data, $field);
+        $value = Env::value($data, $field);
         if (Arrays::arrayKeysExists(['model'], $rule)) {
 
         } else {
-            $function = Arrays::value($rule, 'function');
+            $function = Env::value($rule, 'function');
             if (!is_callable($function)) {
                 throw new Exception('function error');
             }
             if (!$function($value)) {
-                $this->messages[$field][] = Arrays::value($rule, 'message', "{$field} 不唯一");
-                $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
+                $this->messages[$field][] = Env::value($rule, 'message', "{$field} 不唯一");
+                $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
             }
         }
     }
@@ -244,13 +244,13 @@ class Validator
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
         }
-        $function = Arrays::value($rule, 'function');
+        $function = Env::value($rule, 'function');
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        if (!$function(Arrays::value($data, $field))) {
-            $this->messages[$field][] = Arrays::value($rule, 'message', "{$field}验证不通过");
-            $this->codes[$field][] = Arrays::value($rule, 'code', self::CODE_VALIDATE_CALL);
+        if (!$function(Env::value($data, $field))) {
+            $this->messages[$field][] = Env::value($rule, 'message', "{$field}验证不通过");
+            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_CALL);
         }
     }
 
@@ -259,11 +259,11 @@ class Validator
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
         }
-        $value = Arrays::value($rule, 'value');
-        $isStrict = Arrays::value($rule, 'isStrict', false);
+        $value = Env::value($rule, 'value');
+        $isStrict = Env::value($rule, 'isStrict', false);
         $defaultValue = is_callable($value) ? $value() : $value;
         if (true === $isStrict) {
-            $this->data[$field] = Arrays::value($data, $field, $defaultValue);
+            $this->data[$field] = Env::value($data, $field, $defaultValue);
         } else {
             $this->data[$field] = !empty($data[$field]) ? $data[$field] : $defaultValue;
         }
@@ -274,7 +274,7 @@ class Validator
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
         }
-        $value = Arrays::value($rule, 'value');
+        $value = Env::value($rule, 'value');
         $this->data[$field] = is_callable($value) ? $value() : $value;
     }
 
@@ -283,11 +283,11 @@ class Validator
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
         }
-        $function = Arrays::value($rule, 'function');
+        $function = Env::value($rule, 'function');
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        $this->data[$field] = $function(Arrays::value($data, $field));
+        $this->data[$field] = $function(Env::value($data, $field));
     }
 
     protected function safeValidator($data, $field, $rule)
