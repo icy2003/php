@@ -4,6 +4,7 @@ namespace icy2003\ihelpers;
 
 use Exception;
 use I;
+use icy2003\BaseI;
 
 /**
  * 文件 IO 类
@@ -178,7 +179,7 @@ class FileIO
         }
         self::createDir($toDir);
         while (false !== ($file = readdir($dirHanlder))) {
-            if ('.' == $file || '..' == $file) {
+            if ('.' === $file || '..' === $file) {
                 continue;
             }
             if (is_dir($fromDir . $file)) {
@@ -221,19 +222,19 @@ class FileIO
      * @param string $fileName
      * @return static
      */
-    public function load($fileName)
+    public function loadFile($fileName)
     {
-        $this->fileInit($fileName);
+        $this->fileInit(BaseI::getAlias($fileName));
         if (!$this->attributes['isExists']) {
             throw new Exception("文件 {$fileName} 不存在");
         }
-        if (!$this->handler = fopen($fileName, 'rb')) {
+        if (!$this->fileHandler = fopen($fileName, 'rb')) {
             throw new Exception('无法打开文件');
         }
         return $this;
     }
 
-    private $handler;
+    private $fileHandler;
     private $attributes = [];
 
     private function fileInit($fileName)
@@ -295,6 +296,8 @@ class FileIO
                 $this->attributes['fileType'] = filetype($fileName);
             }
         }
+        $this->attributes['fileName'] = basename($fileName);
+        $this->attributes['filePath'] = $fileName;
     }
 
     /**
@@ -307,7 +310,7 @@ class FileIO
      */
     public function getAttribute($name, $defaultValue = null)
     {
-        return I::v($this->attributes, $name, $defaultValue);
+        return Env::value($this->attributes, $name, $defaultValue);
     }
 
     /**
@@ -328,12 +331,12 @@ class FileIO
     public function lines()
     {
         try {
-            while ($line = fgets($this->handler)) {
+            while ($line = fgets($this->fileHandler)) {
                 yield $line;
             }
         }
         finally {
-            fclose($this->handler);
+            fclose($this->fileHandler);
         }
     }
 
@@ -363,13 +366,40 @@ class FileIO
     public function data($buffer = 1024)
     {
         try {
-            while (!feof($this->handler) && $this->attributes['fileSize'] > $bufferSize) {
+            while (!feof($this->fileHandler) && $this->attributes['fileSize'] > $bufferSize) {
                 $bufferSize += $buffer;
-                yield fread($this->handler, $buffer);
+                yield fread($this->fileHandler, $buffer);
             }
         }
         finally {
-            fclose($this->handler);
+            fclose($this->fileHandler);
+        }
+    }
+
+    private $dirHandler;
+    private $dir;
+
+    public function loadDir($dir)
+    {
+        $this->dir = BaseI::getAlias($dir);
+        if (!$this->dirHandler = opendir($this->dir)) {
+            throw new Exception('目录不存在');
+        }
+        return $this;
+    }
+
+    public function file()
+    {
+        try {
+            while (false !== ($file = readdir($this->dirHandler))) {
+                if ('.' === $file || '..' === $file) {
+                    continue;
+                }
+                yield trim($this->dir, '/') . '/' . $file;
+            }
+        }
+        finally {
+            closedir($this->dirHandler);
         }
     }
 }
