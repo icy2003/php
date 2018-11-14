@@ -94,7 +94,11 @@ class Logger
             '{line}' => $array[0]['line'],
             '{message}' => static::out(null === $function ? $config['info']['function'] : $function, $message),
         ];
-        $string = str_replace(array_keys($map), array_values($map), $config['infoTemplete']);
+        $level = $config['level'];
+        if (!array_key_exists($templete = $level . 'Templete', $config)) {
+            $templete = "infoTemplete";
+        }
+        $string = str_replace(array_keys($map), array_values($map), $config[$templete]);
         $this->handler($string);
     }
 

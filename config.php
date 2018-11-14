@@ -3,6 +3,8 @@
 return [
     'Logger' => [
         'isLog' => true,
+        'level' => 'info',// info,user
+        'userTemplete' => '{date} [USER] {message}',
         'infoTemplete' => '{date} [INFO] {message} {file}(line:{line})',// 2018-10-27 19:01:21 [INFO] hello world test.php(line:8)
         'errorTemplete' => '{date} [ERROR] {errstr} {errfile}(line:{errline}, errno:{errno})',// 2018-10-27 19:01:21 [ERROR] Undefined variable: var test.php(line:4, errno:8)
         'dateFormat' => 'Y-m-d H:i:s',
