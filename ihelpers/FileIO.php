@@ -388,7 +388,7 @@ class FileIO
         return $this;
     }
 
-    public function file()
+    public function filePath()
     {
         try {
             while (false !== ($file = readdir($this->dirHandler))) {
