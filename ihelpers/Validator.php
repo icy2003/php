@@ -2,14 +2,16 @@
 
 namespace icy2003\ihelpers;
 
+use Exception;
+
 class Validator
 {
-    protected static $instance;
-    private $data = [];
-    private $_data = [];
-    private $safeField = [];
-    private $messages = [];
-    private $codes = [];
+    protected static $_instance;
+    private $__data = [];
+    private $__old_data = [];
+    private $__safeField = [];
+    private $__messages = [];
+    private $__codes = [];
 
     /**
      * @var self 验证成功
@@ -52,52 +54,52 @@ class Validator
     /**
      * @var self 必填验证器
      */
-    const VALIDATOR_REQUIRED = 'required';
+    const VALIDATOR_REQUIRED = '_required';
     /**
      * @var self 范围验证器
      */
-    const VALIDATOR_IN = 'in';
+    const VALIDATOR_IN = '_in';
     /**
      * @var self 正则验证器
      */
-    const VALIDATOR_MATCH = 'match';
+    const VALIDATOR_MATCH = '_match';
     /**
      * @var self 手机号格式验证器
      */
-    const VALIDATOR_MOBILE = 'mobile';
+    const VALIDATOR_MOBILE = '_mobile';
     /**
      * @var self 邮箱格式验证器
      */
-    const VALIDATOR_EMAIL = 'email';
+    const VALIDATOR_EMAIL = '_email';
     /**
      * @var self 唯一性验证器
      */
-    const VALIDATOR_UNIQUE = 'unique';
+    const VALIDATOR_UNIQUE = '_unique';
     /**
      * @var self 回调验证器
      */
-    const VALIDATOR_CALL = 'call';
+    const VALIDATOR_CALL = '_call';
 
     /**
      * @var self 默认值过滤器
      */
-    const FILTER_DEFAULT = 'default';
+    const FILTER_DEFAULT = '_default';
     /**
      * @var self 设置过滤器
      */
-    const FILTER_SET = 'set';
+    const FILTER_SET = '_set';
     /**
      * @var self 回调过滤器
      */
-    const FILTER_FILTER = 'filter';
+    const FILTER_FILTER = '_filter';
     /**
      * @var self 安全过滤器
      */
-    const FILTER_SAFE = 'safe';
+    const FILTER_SAFE = '_safe';
     /**
      * @var self 删除过滤器
      */
-    const FILTER_UNSET = 'unset';
+    const FILTER_UNSET = '_unset';
 
     private function __construct()
     {
@@ -113,11 +115,11 @@ class Validator
      */
     public static function create()
     {
-        if (!static::$instance instanceof static) {
-            static::$instance = new static();
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
         }
 
-        return static::$instance;
+        return static::$_instance;
     }
     /**
      * 预加载数据
@@ -127,14 +129,14 @@ class Validator
      */
     public function load($data)
     {
-        $this->data = $data;
-        $this->_data = $data;
+        $this->__data = $data;
+        $this->__old_data = $data;
         return $this;
     }
 
-    protected function clear()
+    protected function _clear()
     {
-        $this->messages = [];
+        $this->__messages = [];
     }
     /**
      * 验证规则
@@ -144,7 +146,7 @@ class Validator
      */
     public function rules($rules)
     {
-        $this->clear();
+        $this->_clear();
         if (!empty($rules)) {
             foreach ($rules as $rule) {
                 if (!Arrays::arrayKeysExists([0, 1], $rule)) {
@@ -155,10 +157,11 @@ class Validator
                 $method = $ruleName . 'Validator';
                 if (method_exists($this, $method)) {
                     foreach ($fieldArray as $field) {
-                        array_push($this->safeField, $field);
-                        $this->$method($this->_data, $field, $rule);
+                        array_push($this->__safeField, $field);
+                        $this->$method($this->__old_data, $field, $rule);
                     }
                 } else {
+                    echo $method;
                     throw new Exception('method error');
                 }
             }
@@ -166,20 +169,20 @@ class Validator
         return $this;
     }
 
-    protected function isEmpty($data)
+    protected function _isEmpty($data)
     {
         return Env::isEmpty($data);
     }
 
-    protected function requiredValidator($data, $field, $rule)
+    protected function _requiredValidator($data, $field, $rule)
     {
-        if ($this->isEmpty(Env::value($data, $field))) {
-            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 必填");
-            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
+        if (null === Env::value($data, $field)) {
+            $this->__messages[$field][] = Env::value($rule, 'message', "{$field} 必填");
+            $this->__codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
         }
     }
 
-    protected function inValidator($data, $field, $rule)
+    protected function _inValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['range'], $rule)) {
             throw new Exception('range error');
@@ -188,12 +191,12 @@ class Validator
         $range = Env::value($rule, 'range', []);
         $isStrict = Env::value($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
-            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 不在范围内");
-            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_IN);
+            $this->__messages[$field][] = Env::value($rule, 'message', "{$field} 不在范围内");
+            $this->__codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_IN);
         }
     }
 
-    protected function matchValidator($data, $field, $rule)
+    protected function _matchValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['pattern'], $rule)) {
             throw new Exception('pattern error');
@@ -201,28 +204,28 @@ class Validator
         $value = Env::value($data, $field);
         $pattern = Env::value($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
-            $this->messages[$field][] = Env::value($rule, 'message', "{$field} 格式不正确");
-            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_MATCH);
+            $this->__messages[$field][] = Env::value($rule, 'message', "{$field} 格式不正确");
+            $this->__codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_MATCH);
         }
     }
 
-    protected function mobileValidator($data, $field, $rule)
+    protected function _mobileValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^1\\d{10}$/';
         $rule['message'] = Env::value($rule, 'message', "{$field} 手机号格式不正确");
         $rule['code'] = Env::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
-        $this->matchValidator($data, $field, $rule);
+        $this->_matchValidator($data, $field, $rule);
     }
 
-    protected function emailValidator($data, $field, $rule)
+    protected function _emailValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^[\w\-\.]+@[\w\-]+(\.\w+)+$/';
         $rule['message'] = Env::value($rule, 'message', "{$field} 邮箱格式不正确");
         $rule['code'] = Env::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
-        $this->matchValidator($data, $field, $rule);
+        $this->_matchValidator($data, $field, $rule);
     }
 
-    protected function uniqueValidator($data, $field, $rule)
+    protected function _uniqueValidator($data, $field, $rule)
     {
         $value = Env::value($data, $field);
         if (Arrays::arrayKeysExists(['model'], $rule)) {
@@ -233,13 +236,13 @@ class Validator
                 throw new Exception('function error');
             }
             if (!$function($value)) {
-                $this->messages[$field][] = Env::value($rule, 'message', "{$field} 不唯一");
-                $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
+                $this->__messages[$field][] = Env::value($rule, 'message', "{$field} 不唯一");
+                $this->__codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
             }
         }
     }
 
-    protected function callValidator($data, $field, $rule)
+    protected function _callValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
@@ -249,12 +252,12 @@ class Validator
             throw new Exception('function call error');
         }
         if (!$function(Env::value($data, $field))) {
-            $this->messages[$field][] = Env::value($rule, 'message', "{$field}验证不通过");
-            $this->codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_CALL);
+            $this->__messages[$field][] = Env::value($rule, 'message', "{$field}验证不通过");
+            $this->__codes[$field][] = Env::value($rule, 'code', self::CODE_VALIDATE_CALL);
         }
     }
 
-    protected function defaultValidator($data, $field, $rule)
+    protected function _defaultValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
@@ -263,22 +266,22 @@ class Validator
         $isStrict = Env::value($rule, 'isStrict', false);
         $defaultValue = is_callable($value) ? $value() : $value;
         if (true === $isStrict) {
-            $this->data[$field] = Env::value($data, $field, $defaultValue);
+            $this->__data[$field] = Env::value($data, $field, $defaultValue);
         } else {
-            $this->data[$field] = !empty($data[$field]) ? $data[$field] : $defaultValue;
+            $this->__data[$field] = !empty($data[$field]) ? $data[$field] : $defaultValue;
         }
     }
 
-    protected function setValidator($data, $field, $rule)
+    protected function _setValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
         }
         $value = Env::value($rule, 'value');
-        $this->data[$field] = is_callable($value) ? $value() : $value;
+        $this->__data[$field] = is_callable($value) ? $value() : $value;
     }
 
-    protected function filterValidator($data, $field, $rule)
+    protected function _filterValidator($data, $field, $rule)
     {
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
@@ -287,28 +290,28 @@ class Validator
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        $this->data[$field] = $function(Env::value($data, $field));
+        $this->__data[$field] = $function(Env::value($data, $field));
     }
 
-    protected function safeValidator($data, $field, $rule)
+    protected function _safeValidator($data, $field, $rule)
     {
     }
 
-    protected function unsetValidator($data, $field, $rule)
+    protected function _unsetValidator($data, $field, $rule)
     {
-        unset($this->data[$field]);
+        unset($this->__data[$field]);
     }
 
     public function getMessages()
     {
-        return $this->messages;
+        return $this->__messages;
     }
 
     public function getMessage()
     {
-        foreach ($this->messages as $field => $messages) {
+        foreach ($this->__messages as $field => $messages) {
             foreach ($messages as $k => $message) {
-                $code = $this->codes[$field][$k];
+                $code = $this->__codes[$field][$k];
                 return [$code, $message];
             }
         }
@@ -317,7 +320,7 @@ class Validator
 
     public function data()
     {
-        $this->data = array_intersect_key($this->data, array_flip($this->safeField));
-        return $this->data;
+        $this->__data = array_intersect_key($this->__data, array_flip($this->__safeField));
+        return $this->__data;
     }
 }
