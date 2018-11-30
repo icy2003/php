@@ -3,10 +3,13 @@
 namespace icy2003\ihelpers;
 
 /**
- * CURL 类.
+ * CURL 类
+ * 年久失修，已不想维护，如需要 HTTP 相关操作，请转至：https://github.com/guzzle/guzzle
+ * 该项目评星在 `HTTP` 搜索条件下，碾压第二名 wordpress 出的库。大佬的风采也只能 orz
  *
  * @filename Curl.php
  * @encoding UTF-8
+ * @deprecated
  *
  * @author icy2003 <2317216477@qq.com>
  */
