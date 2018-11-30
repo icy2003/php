@@ -3,7 +3,6 @@
 namespace icy2003\ihelpers;
 
 use Exception;
-use I;
 use icy2003\BaseI;
 
 /**
@@ -195,7 +194,7 @@ class FileIO
 
     // 读文件
 
-    protected static $instance;
+    protected static $_instance;
 
     private function __construct()
     {
@@ -211,10 +210,10 @@ class FileIO
      */
     public static function create()
     {
-        if (!static::$instance instanceof static) {
-            static::$instance = new static();
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
         }
-        return static::$instance;
+        return static::$_instance;
     }
     /**
      * 加载一个文件
@@ -224,21 +223,7 @@ class FileIO
      */
     public function loadFile($fileName)
     {
-        $this->fileInit(BaseI::getAlias($fileName));
-        if (!$this->attributes['isExists']) {
-            throw new Exception("文件 {$fileName} 不存在");
-        }
-        if (!$this->fileHandler = fopen($fileName, 'rb')) {
-            throw new Exception('无法打开文件');
-        }
-        return $this;
-    }
-
-    private $fileHandler;
-    private $attributes = [];
-
-    private function fileInit($fileName)
-    {
+        $fileName = BaseI::getAlias($fileName);
         if (preg_match('/^https?:\/\//', $fileName)) {
             if (Env::hasExt('curl')) {
                 $curl = curl_init($fileName);
@@ -246,28 +231,26 @@ class FileIO
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_HEADER, true);
                 $result = curl_exec($curl);
-                $this->attributes['isExists'] = false;
                 if ($result && $info = curl_getinfo($curl)) {
                     if (200 == $info['http_code']) {
-                        $this->attributes['isExists'] = true;
-                        $this->attributes['fileSize'] = $info['download_content_length'];
-                        $this->attributes['fileType'] = $info['content_type'];
+                        $this->__attributes['isExists'] = true;
+                        $this->__attributes['fileSize'] = $info['download_content_length'];
+                        $this->__attributes['fileType'] = $info['content_type'];
                     }
                 }
                 curl_close($curl);
             } elseif (ini_get('allow_url_fopen')) {
                 $headArray = get_headers($fileName, true);
-                $this->attributes['isExists'] = false;
                 if (preg_match('/200/', $headArray[0])) {
-                    $this->attributes['isExists'] = true;
-                    $this->attributes['fileSize'] = $headArray['Content-Length'];
-                    $this->attributes['fileType'] = $headArray['Content-Type'];
+                    $this->__attributes['isExists'] = true;
+                    $this->__attributes['fileSize'] = $headArray['Content-Length'];
+                    $this->__attributes['fileType'] = $headArray['Content-Type'];
                 }
             } else {
                 $url = parse_url($fileName);
                 $host = $url['host'];
-                $path = I::v($url, 'path', '/');
-                $port = I::v($url, 'port', 80);
+                $path = Env::value($url, 'path', '/');
+                $port = Env::value($url, 'port', 80);
                 $fp = fsockopen($host, $port, $errno, $error);
                 if ($fp) {
                     $header = [
@@ -276,32 +259,47 @@ class FileIO
                         'Connection: Close',
                     ];
                     fwrite($fp, implode('\r\n', $header) . "\r\n\r\n");
-                    $this->attributes['isExists'] = false;
                     while (!feof($fp)) {
                         $line = fgets($fp);
                         if ('' == trim($line)) {
                             break;
                         } else {
-                            preg_match('/HTTP.*(\s\d{3}\s)/', $line, $arr) && $this->attributes['isExists'] = true;
-                            preg_match('/Content-Length:(.*)/si', $line, $arr) && $this->attributes['fileSize'] = trim($arr[1]);
-                            preg_match('/Content-Type:(.*)/si', $line, $arr) && $this->attributes['fileType'] = trim($arr[1]);
+                            preg_match('/HTTP.*(\s\d{3}\s)/', $line, $arr) && $this->__attributes['isExists'] = true;
+                            preg_match('/Content-Length:(.*)/si', $line, $arr) && $this->__attributes['fileSize'] = trim($arr[1]);
+                            preg_match('/Content-Type:(.*)/si', $line, $arr) && $this->__attributes['fileType'] = trim($arr[1]);
                         }
                     }
                 }
                 fclose($fp);
             }
         } else {
-            if ($this->attributes['isExists'] = file_exists($fileName)) {
-                $this->attributes['fileSize'] = filesize($fileName);
-                $this->attributes['fileType'] = filetype($fileName);
+            if ($this->__attributes['isExists'] = file_exists($fileName)) {
+                $this->__attributes['fileSize'] = filesize($fileName);
+                $this->__attributes['fileType'] = filetype($fileName);
             }
         }
-        $this->attributes['fileName'] = basename($fileName);
-        $this->attributes['filePath'] = $fileName;
+        $this->__attributes['fileName'] = Env::iBaseName($fileName);
+        $this->__attributes['filePath'] = $fileName;
+        if (!$this->__attributes['isExists']) {
+            throw new Exception("文件 {$fileName} 不存在");
+        }
+        if (!$this->__fileHandler = fopen($fileName, 'rb')) {
+            throw new Exception('无法打开文件');
+        }
+        return $this;
     }
 
+    private $__fileHandler;
+    private $__attributes = [
+        'isExists' => false,
+        'fileSize' => 0,
+        'fileType' => '',
+        'fileName' => '',
+        'filePath' => '',
+    ];
+
     /**
-     * 获取文件属性.
+     * 获取文件属性
      *
      * @param string $name         属性名
      * @param mixed  $defaultValue 默认值
@@ -310,38 +308,37 @@ class FileIO
      */
     public function getAttribute($name, $defaultValue = null)
     {
-        return Env::value($this->attributes, $name, $defaultValue);
+        return Env::value($this->__attributes, $name, $defaultValue);
     }
 
     /**
-     * 获取文件所有属性（目前支持：isExists、fileSize、fileType）.
+     * 获取文件所有属性
      *
      * @return array
      */
     public function getAttributes()
     {
-        return $this->attributes;
+        return $this->__attributes;
     }
 
     /**
-     * 遍历行的生成器.
+     * 遍历行的生成器
      *
      * @return \Generator
      */
     public function lines()
     {
         try {
-            while ($line = fgets($this->fileHandler)) {
+            while ($line = fgets($this->__fileHandler)) {
                 yield $line;
             }
-        }
-        finally {
-            fclose($this->fileHandler);
+        } finally {
+            fclose($this->__fileHandler);
         }
     }
 
     /**
-     * 返回文本的某行，从 0 行开始.
+     * 返回文本的某行，从 0 行开始
      *
      * @param int $num 默认值
      *
@@ -357,7 +354,7 @@ class FileIO
     }
 
     /**
-     * 遍历字节的生成器.
+     * 遍历字节的生成器
      *
      * @param int $buffer 缓冲区长度，默认 1024
      *
@@ -366,23 +363,22 @@ class FileIO
     public function data($buffer = 1024)
     {
         try {
-            while (!feof($this->fileHandler) && $this->attributes['fileSize'] > $bufferSize) {
+            while (!feof($this->__fileHandler) && $this->__attributes['fileSize'] > $bufferSize) {
                 $bufferSize += $buffer;
-                yield fread($this->fileHandler, $buffer);
+                yield fread($this->__fileHandler, $buffer);
             }
-        }
-        finally {
-            fclose($this->fileHandler);
+        } finally {
+            fclose($this->__fileHandler);
         }
     }
 
-    private $dirHandler;
-    private $dir;
+    private $__dirHandler;
+    private $__dir;
 
     public function loadDir($dir)
     {
-        $this->dir = BaseI::getAlias($dir);
-        if (!$this->dirHandler = opendir($this->dir)) {
+        $this->__dir = BaseI::getAlias($dir);
+        if (!$this->__dirHandler = opendir($this->__dir)) {
             throw new Exception('目录不存在');
         }
         return $this;
@@ -391,15 +387,14 @@ class FileIO
     public function filePath()
     {
         try {
-            while (false !== ($file = readdir($this->dirHandler))) {
+            while (false !== ($file = readdir($this->__dirHandler))) {
                 if ('.' === $file || '..' === $file) {
                     continue;
                 }
-                yield trim($this->dir, '/') . '/' . $file;
+                yield rtrim($this->__dir, '/') . '/' . $file;
             }
-        }
-        finally {
-            closedir($this->dirHandler);
+        } finally {
+            closedir($this->__dirHandler);
         }
     }
 }
