@@ -51,13 +51,13 @@ class Env
                 } else {
                     return $defaultValue;
                 }
-            } else if (is_object($mixed)) {
+            } elseif (is_object($mixed)) {
                 $method = 'get' . implode('', array_map(function ($part) {
                     return ucfirst(strtolower($part));
                 }, explode('_', $key)));
                 if (method_exists($mixed, $method)) {
                     $mixed = $mixed->$method();
-                } else if (property_exists($mixed, $key)) {
+                } elseif (property_exists($mixed, $key)) {
                     $mixed = $mixed->$key;
                 } else {
                     return $defaultValue;
@@ -69,4 +69,29 @@ class Env
         return $mixed;
     }
 
+    /**
+     * 原生函数 basename 会在非 windows 系统区分 `/` 和 `\`，该函数并不会
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function iBaseName($path, $suffix = null)
+    {
+        $path = str_replace('\\', '/', $path);
+        return basename($path, $suffix);
+    }
+
+    /**
+     * 原生函数 dirname 会在非 windows 系统区分 `/` 和 `\`，该函数并不会
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function iDirName($path)
+    {
+        $path = str_replace('\\', '/', $path);
+        return dirname($path);
+    }
 }
