@@ -34,13 +34,18 @@ class Worksheet
         ++$maxCol;
         $r = -1;
         for ($row = $minRow; $row <= $maxRow; ++$row) {
+            if (true === $onlyVisible) {
+                $rowVisible = $workSheet->getRowDimension($row)->getVisible();
+                if (!$rowVisible) {
+                    continue;
+                }
+            }
             $rRef = ($returnCellRef) ? $row : ++$r;
             $c = -1;
             for ($col = $minCol; $col != $maxCol; ++$col) {
                 if (true === $onlyVisible) {
-                    $rowVisible = $workSheet->getRowDimension($row)->getVisible();
                     $columnVisible = $workSheet->getColumnDimension($col)->getVisible();
-                    if (!$rowVisible || !$columnVisible) {
+                    if (!$columnVisible) {
                         continue;
                     }
                 }
