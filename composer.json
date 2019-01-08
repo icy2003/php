@@ -9,11 +9,14 @@
     ],
     "minimum-stability": "dev",
     "license": "BSD-2-Clause",
-    "authors": [{
-        "name": "icy2003",
-        "email": "2317216477@qq.com"
-    }],
+    "authors": [
+        {
+            "name": "icy2003",
+            "email": "2317216477@qq.com"
+        }
+    ],
     "require": {
-        "php": ">=5.4"
+        "php": ">=5.4",
+        "guzzlehttp/guzzle": "^6.3"
     }
 }
