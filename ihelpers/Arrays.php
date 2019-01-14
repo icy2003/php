@@ -240,7 +240,7 @@ class Arrays
             for ($i = $start; $i <= $end; $i += $step) {
                 yield $i;
             }
-        } else if ($start > $end) {
+        } elseif ($start > $end) {
             if ($step >= 0) {
                 throw new \LogicException("步长必须小于 0");
             }
@@ -250,5 +250,41 @@ class Arrays
         } else {
             yield $start;
         }
+    }
+
+    /**
+     * 矩阵转置
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function arrayTransposed($array)
+    {
+        $data = [];
+        foreach ($array as $r => $row) {
+            foreach ($row as $c => $col) {
+                $data[$c][$r] = $col;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 找到符合条件的第一项
+     *
+     * @param array $array
+     * @param callback $callback
+     *
+     * @return void
+     */
+    public static function detect($array, $callback)
+    {
+        foreach ($array as $key => $item) {
+            if (Env::trigger($callback, [$item, $key])) {
+                return $item;
+            }
+        }
+        return null;
     }
 }
