@@ -94,4 +94,18 @@ class Env
         $path = str_replace('\\', '/', $path);
         return dirname($path);
     }
+
+    /**
+     * 触发回调事件
+     *
+     * @param callback $callback
+     * @param array $params
+     * @return mixed
+     */
+    public static function trigger($callback, $params = [])
+    {
+        $result = false;
+        is_callable($callback) && $result = call_user_func_array($callback, $params);
+        return $result;
+    }
 }
