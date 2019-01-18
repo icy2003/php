@@ -287,4 +287,46 @@ class Arrays
         }
         return null;
     }
+
+    /**
+     * 返回数组的最后一个元素的键
+     *
+     * 原生函数需要 PHP7.3.0+ 才能支持
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function arrayKeyLast($array)
+    {
+        if (!is_array($array) || empty($array)) {
+            return null;
+        }
+        if (function_exists('array_key_last')) {
+            return array_key_last($array);
+        }
+        end($array);
+        return key($array);
+    }
+
+    /**
+     * 返回数组的第一个元素的键
+     *
+     * 原生函数需要 PHP7.3.0+ 才能支持
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function arrayKeyFirst($array)
+    {
+        if (!is_array($array) || empty($array)) {
+            return null;
+        }
+        if (function_exists('array_key_first')) {
+            return array_key_first($array);
+        }
+        reset($array);
+        return key($array);
+    }
 }
