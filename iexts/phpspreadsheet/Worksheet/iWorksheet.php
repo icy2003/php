@@ -22,7 +22,7 @@ class iWorksheet
      * @param bool $returnCellRef false - 按照索引返回数组，true - 按照真实的行列返回数组
      * @param array $params 额外条件参数
      *                  onlyVisible 是否只返回可见单元格，默认 true
-     *                  fillColor 填充颜色，如："#ff0000"，表示只返回红色背景的数据
+     *                  fillColor 是否按填充颜色返回，如："#ff0000"，表示只返回红色背景的数据，默认 false，表示不限制
      *
      *
      * @return array
