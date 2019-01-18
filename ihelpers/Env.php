@@ -108,4 +108,35 @@ class Env
         is_callable($callback) && $result = call_user_func_array($callback, $params);
         return $result;
     }
+
+    /**
+     * 判断两个回调是否相同
+     * 回调格式：
+     * 1、'trim'
+     * 2、[$a, 'func']
+     * 3、['A', 'func']
+     * 4、匿名函数（直接返回 false）
+     *
+     * @param callback $callback1
+     * @param callback $callback2
+     *
+     * @return boolean
+     */
+    public static function isCallbackEquals($callback1, $callback2)
+    {
+        if (is_string($callback1) && is_string($callback2)) {
+            return $callback1 == $callback2;
+        }
+        if (is_array($callback1) && is_array($callback2)) {
+            if (2 === count($callback1) && 2 === count($callback2)) {
+                if (is_string($callback1[0]) && is_string($callback2[0])) {
+                    return $callback1[0] == $callback2[0] && $callback1[1] == $callback2[1];
+                }
+                if (is_object($callback1[0]) && is_object($callback2[0])) {
+                    return get_class($callback1[0]) == get_class($callback2[0]) && $callback1[1] == $callback2[1];
+                }
+            }
+        }
+        return false;
+    }
 }
