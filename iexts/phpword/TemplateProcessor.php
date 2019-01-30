@@ -8,6 +8,20 @@ use PhpOffice\PhpWord\TemplateProcessor as T;
 
 class TemplateProcessor extends T
 {
+
+    public function __construct($documentTemplate)
+    {
+        parent::__construct($documentTemplate);
+        $this->_tempDocumentSettingPart = $this->readPartWithRels($this->_getSettingName());
+    }
+
+    protected function _getSettingName()
+    {
+        return 'word/settings.xml';
+    }
+
+    protected $_tempDocumentSettingPart = "";
+
     public function getMain()
     {
         return $this->tempDocumentMainPart;
@@ -29,9 +43,58 @@ class TemplateProcessor extends T
         return $this->tempDocumentFooters;
     }
 
+    public function getSettings()
+    {
+        return $this->_tempDocumentSettingPart;
+    }
+
+    /**
+     * 在主文档中搜索
+     *
+     * @param string $search 待搜索的关键字
+     *
+     * @return integer 关键字位置
+     */
     public function tagPos($search)
     {
         return strpos($this->tempDocumentMainPart, $search);
+    }
+
+    /**
+     * 覆盖父类的 save 方法
+     *
+     * @return string
+     */
+    public function save()
+    {
+        foreach ($this->tempDocumentHeaders as $index => $xml) {
+            $this->savePartWithRels($this->getHeaderName($index), $xml);
+        }
+
+        $this->savePartWithRels($this->getMainPartName(), $this->tempDocumentMainPart);
+        $this->savePartWithRels($this->_getSettingName(), $this->_tempDocumentSettingPart);
+
+        foreach ($this->tempDocumentFooters as $index => $xml) {
+            $this->savePartWithRels($this->getFooterName($index), $xml);
+        }
+
+        $this->zipClass->addFromString($this->getDocumentContentTypesName(), $this->tempDocumentContentTypes);
+
+        // Close zip file
+        if (false === $this->zipClass->close()) {
+            throw new Exception('Could not close zip file.'); // @codeCoverageIgnore
+        }
+
+        return $this->tempDocumentFilename;
+    }
+
+    private function __getBodyBlock($string)
+    {
+        if (preg_match('%(?i)(?<=<w:body>)[\s|\S]*?(?=</w:body>)%', $string, $matches)) {
+            return $matches[0];
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -91,12 +154,21 @@ class TemplateProcessor extends T
         $this->replaceBlock($var, $this->__getBodyBlock($xml));
     }
 
-    private function __getBodyBlock($string)
+    /**
+     * 是否强制提示更新字段（用于更新目录）
+     *
+     * @param boolean $isUpdate
+     *
+     * @return void
+     */
+    public function setIsUpdateFields($isUpdate = true)
     {
-        if (preg_match('%(?i)(?<=<w:body>)[\s|\S]*?(?=</w:body>)%', $string, $matches)) {
-            return $matches[0];
+        $string = $isUpdate ? 'true' : 'false';
+        if (preg_match('/<w:updateFields w:val=\"(true|false)\"\/>/', $this->_tempDocumentSettingPart, $matches)) {
+            $this->_tempDocumentSettingPart = str_replace($matches[0], str_replace($matches[1], $string), $this->_tempDocumentSettingPart);
         } else {
-            return '';
+            $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val="' . $string . '"/></w:settings>', $this->_tempDocumentSettingPart);
         }
     }
+
 }
