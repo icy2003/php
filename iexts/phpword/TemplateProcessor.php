@@ -42,6 +42,7 @@ class TemplateProcessor extends T
      * @param array $array 二维数组
      * @param boolean $useCellRef 是否使用单元格引用（例如A3），暂时没用
      *                  格式参考 phpspreadsheet 的 rangeToArray 或者 icy2003/iexts/phpspreadsheet/Worksheet/iWorksheet rangeToArray
+     * @todo 给表格加样式
      *
      * @return void
      */
@@ -63,6 +64,27 @@ class TemplateProcessor extends T
                 // echo $c;
                 $table->addCell()->addText($value);
             }
+        }
+        $objWriter = IOFactory::createWriter($phpWord);
+        $xml = $objWriter->getWriterPart('Document')->write();
+        $this->replaceBlock($var, $this->__getBodyBlock($xml));
+    }
+
+    /**
+     * 将一个 word 模板变量替换成列表
+     *
+     * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
+     * @param array $array 一维数组
+     * @todo 给列表加样式
+     *
+     * @return void
+     */
+    public function setList($var, $array)
+    {
+        $phpWord = new PhpWord();
+        $section = $phpWord->addSection();
+        foreach ($array as $item) {
+            $section->addListItem($item, 0);
         }
         $objWriter = IOFactory::createWriter($phpWord);
         $xml = $objWriter->getWriterPart('Document')->write();
