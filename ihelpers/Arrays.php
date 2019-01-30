@@ -276,7 +276,7 @@ class Arrays
      * @param array $array
      * @param callback $callback
      *
-     * @return void
+     * @return mixed
      */
     public static function detect($array, $callback)
     {
@@ -286,6 +286,30 @@ class Arrays
             }
         }
         return null;
+    }
+
+    /**
+     * 找到符合条件的所有项
+     *
+     * @param array $array
+     * @param callback $callback 条件回调
+     * @param callback $filter 对符合条件的项进行回调处理并返回
+     *
+     * @return array
+     */
+    public static function all($array, $callback, $filter = null)
+    {
+        $all = [];
+        foreach ($array as $key => $item) {
+            if (Env::trigger($callback, [$item, $key])) {
+                if (null !== $filter) {
+                    $all[$key] = Env::trigger($filter, [$item, $key]);
+                } else {
+                    $all[$key] = $item;
+                }
+            }
+        }
+        return $all;
     }
 
     /**
@@ -328,5 +352,17 @@ class Arrays
         }
         reset($array);
         return key($array);
+    }
+
+    /**
+     * 把数组里逗号字符串拆分，并且去掉重复的部分
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function toPart($array)
+    {
+        return array_filter(array_keys(array_flip(explode(',', implode(',', $array)))));
     }
 }
