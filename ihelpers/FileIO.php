@@ -372,29 +372,55 @@ class FileIO
         }
     }
 
+    /**
+     *
+     * @var \DirectoryIterator
+     */
     private $__dirHandler;
     private $__dir;
 
-    public function loadDir($dir)
+    /**
+     * 目录的迭代器
+     *
+     * @param string $dir 目录路径（可使用别名）
+     * @param string $extension 筛选的扩展名
+     * @param string $pattern 自定义模式
+     *
+     * @return static
+     */
+    public function loadDir($dir, $extension = null, $pattern = null)
     {
         $this->__dir = BaseI::getAlias($dir);
-        if (!$this->__dirHandler = opendir($this->__dir)) {
-            throw new Exception('目录不存在');
+        if (null === $pattern) {
+            if (null === $extension) {
+                $this->__dirHandler = new \DirectoryIterator($this->__dir);
+            } else {
+                $this->__dirHandler = new \DirectoryIterator("glob://{$this->__dir}/*.{$extension}");
+            }
+        } else {
+            $this->__dirHandler = new \DirectoryIterator("glob://{$this->__dir}/{$pattern}");
         }
+
         return $this;
     }
 
+    /**
+     * 标准的迭代器
+     *
+     * @return \DirectoryIterator
+     */
+    public function spl()
+    {
+        return $this->__dirHandler;
+    }
+
+    /**
+     * @deprecated 使用标准的迭代器代替，即将废弃
+     *
+     * @return \Generator
+     */
     public function filePath()
     {
-        try {
-            while (false !== ($file = readdir($this->__dirHandler))) {
-                if ('.' === $file || '..' === $file) {
-                    continue;
-                }
-                yield rtrim($this->__dir, '/') . '/' . $file;
-            }
-        } finally {
-            closedir($this->__dirHandler);
-        }
+        yield $this->spl()->getPathname();
     }
 }
