@@ -9,7 +9,7 @@ namespace icy2003\ihelpers;
  */
 class File
 {
-    protected static $instance;
+    protected static $_instance;
 
     private function __construct()
     {
@@ -31,16 +31,16 @@ class File
      */
     public static function create($config = [])
     {
-        if (!static::$instance instanceof static) {
-            static::$instance = new static();
-            !empty($config['formName']) && static::$instance->formName = $config['formName'];
-            !empty($config['sizeLimit']) && static::$instance->sizeLimit = $config['sizeLimit'];
-            $systemLimit = static::$instance->getSizeLimit();
-            static::$instance->sizeLimit = 0 === static::$instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$instance->sizeLimit));
-            !empty($config['extLimit']) && static::$instance->extLimit = $config['extLimit'];
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
+            !empty($config['formName']) && static::$_instance->formName = $config['formName'];
+            !empty($config['sizeLimit']) && static::$_instance->sizeLimit = $config['sizeLimit'];
+            $systemLimit = static::$_instance->getSizeLimit();
+            static::$_instance->sizeLimit = 0 === static::$_instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$_instance->sizeLimit));
+            !empty($config['extLimit']) && static::$_instance->extLimit = $config['extLimit'];
         }
 
-        return static::$instance;
+        return static::$_instance;
     }
 
     /**
@@ -91,7 +91,7 @@ class File
     // 不允许的文件类型
     const ERROR_I_EXT_LIMIT = -3;
 
-    private static $errorMap = [
+    private static $__errorMap = [
         self::ERROR_SUCCESS => '文件上传成功',
         self::ERROR_UPLOAD_MAX_FILESIZE => '上传的文件超过了 php.ini 中 upload_max_filesize 选项限制的值',
         self::ERROR_MAX_FILE_SIZE => '上传文件的大小超过了 HTML 表单中 MAX_FILE_SIZE 选项指定的值',
@@ -104,11 +104,11 @@ class File
         self::ERROR_I_SIZE_LIMIT => '超出自定义的文件上传大小限制',
         self::ERROR_I_EXT_LIMIT => '不允许的文件类型',
     ];
-    private $attributes = [];
-    private $formName = 'file';
-    private $sizeLimit = 0;
-    private $extLimit = [];
-    private $errorCode = 0;
+    private $__attributes = [];
+    private $__formName = 'file';
+    private $__sizeLimit = 0;
+    private $__extLimit = [];
+    private $__errorCode = 0;
 
     /**
      * 文件上传，对上传的文件进行处理，需要用 save() 保存.
@@ -225,7 +225,7 @@ class File
 
     // private
 
-    private function getSizeLimit()
+    private function __getSizeLimit()
     {
         return min(Convert::size(Env::get('upload_max_filesize', 0)), Convert::size(Env::get('post_max_size', 0)));
     }
