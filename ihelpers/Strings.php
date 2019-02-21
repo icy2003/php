@@ -82,6 +82,7 @@ class Strings
         if (!is_string($password) || $password === '') {
             return false;
         }
+        $matches = [];
         if (!preg_match('/^\$2[axy]\$(\d\d)\$[\.\/0-9A-Za-z]{22}/', $hash, $matches)
             || $matches[1] < 4
             || $matches[1] > 30) {
@@ -101,7 +102,6 @@ class Strings
         if (function_exists('hash_equals')) {
             return hash_equals($test, $hash);
         }
-
 
         $test .= "\0";
         $hash .= "\0";
@@ -137,6 +137,57 @@ class Strings
         return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function ($matches) {
             return ucfirst($matches[1]);
         }, strtolower($string)));
+    }
+
+    /**
+     * 格式化成标题格式（每个单词首字母大写）
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function formatAsTitle($string)
+    {
+        return mb_convert_case($string, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    /**
+     * 检查字符串是否以某字符串开头
+     *
+     * @param string $string
+     * @param string $search
+     *
+     * @return boolean
+     */
+    public static function startsWith($string, $search)
+    {
+        return !empty($search) && mb_strpos($string, $search) === 0;
+    }
+
+    /**
+     * 检查字符串是否以某字符串结尾
+     *
+     * @param string $string
+     * @param string $search
+     *
+     * @return boolean
+     */
+    public static function endsWith($string, $search)
+    {
+        return !empty($search) && mb_substr($string, -static::length($search)) === $search;
+    }
+
+    /**
+     * 检查字符串中是否包含某字符串
+     *
+     * @param string $string
+     * @param string $search
+     *
+     * @return boolean
+     */
+    public static function contains($string, $search)
+    {
+        return !empty($search) && mb_strpos($string, $search) !== false;
     }
 
 }
