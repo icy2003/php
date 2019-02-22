@@ -190,4 +190,16 @@ class Strings
         return !empty($search) && mb_strpos($string, $search) !== false;
     }
 
+    /**
+     * 反转字符串，支持中文
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function strSplit($string)
+    {
+        return implode('', array_reverse(preg_split('/(?<!^)(?!$)/u', $string)));
+    }
+
 }
