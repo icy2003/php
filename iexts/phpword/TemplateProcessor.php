@@ -164,8 +164,9 @@ class TemplateProcessor extends T
     public function setIsUpdateFields($isUpdate = true)
     {
         $string = $isUpdate ? 'true' : 'false';
+        $matches = null;
         if (preg_match('/<w:updateFields w:val=\"(true|false)\"\/>/', $this->_tempDocumentSettingPart, $matches)) {
-            $this->_tempDocumentSettingPart = str_replace($matches[0], str_replace($matches[1], $string), $this->_tempDocumentSettingPart);
+            $this->_tempDocumentSettingPart = str_replace($matches[0], '<w:updateFields w:val="' . $string . '"/>', $this->_tempDocumentSettingPart);
         } else {
             $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val="' . $string . '"/></w:settings>', $this->_tempDocumentSettingPart);
         }
