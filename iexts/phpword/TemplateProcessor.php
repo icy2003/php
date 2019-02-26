@@ -57,6 +57,7 @@ class TemplateProcessor extends T
      */
     public function tagPos($search)
     {
+        $search = parent::ensureMacroCompleted($search);
         return strpos($this->tempDocumentMainPart, $search);
     }
 
