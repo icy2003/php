@@ -1,11 +1,11 @@
 {
-    "name": "icy2003/icy2003_php",
+    "name": "icy2003/php",
     "description": "icy2003's php library",
     "type": "library",
     "keywords": [
-        "curl",
-        "工具",
-        "接口"
+        "php",
+        "tool",
+        "工具"
     ],
     "minimum-stability": "dev",
     "license": "BSD-2-Clause",
@@ -18,5 +18,10 @@
     "require": {
         "php": ">=5.4",
         "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "icy2003\\php\\": "icy2003"
+        }
     }
 }
