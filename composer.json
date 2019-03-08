@@ -4,8 +4,7 @@
     "type": "library",
     "keywords": [
         "php",
-        "tool",
-        "工具"
+        "tool"
     ],
     "minimum-stability": "dev",
     "license": "BSD-2-Clause",
