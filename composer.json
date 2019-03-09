@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "icy2003\\php\\": "icy2003/php/"
+            "icy2003\\php\\": "php/"
         }
     }
 }
