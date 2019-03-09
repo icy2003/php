@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 /**
  * 计时器
@@ -12,13 +12,13 @@ namespace icy2003\ihelpers;
  */
 class Timer
 {
-    private static $timers = [];
+    private static $__timers = [];
 
     public static function start($name = '')
     {
         $start = microtime(true);
         if (empty($name)) {
-            $name = md5($start.rand(0, 100));
+            $name = md5($start . rand(0, 100));
         }
         self::$timers[$name] = $start;
 

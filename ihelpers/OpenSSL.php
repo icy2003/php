@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 class OpenSSL
 {
@@ -9,7 +9,7 @@ class OpenSSL
     public $privateKeyPath;
     public $sign;
     public $signType = 'RSA2';
-    private $signConf = [
+    private $__signConf = [
         'RSA' => [
             'private_key_type' => OPENSSL_KEYTYPE_RSA,
         ],
@@ -18,7 +18,7 @@ class OpenSSL
             'private_key_type' => OPENSSL_KEYTYPE_RSA,
         ],
     ];
-    private $signAlg = [
+    private $__signAlg = [
         'RSA' => OPENSSL_ALGO_SHA1,
         'RSA2' => OPENSSL_ALGO_SHA256,
     ];

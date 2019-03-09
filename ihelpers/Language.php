@@ -1,8 +1,8 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
-use icy2003\BaseI;
+use icy2003\php\BaseI;
 
 class Language
 {

@@ -1,9 +1,8 @@
 <?php
 
-namespace icy2003;
+namespace icy2003\php;
 
-use icy2003\ihelpers\Arrays;
-
+use icy2003\php\ihelpers\Arrays;
 
 defined('I_DEBUG') || define('I_DEBUG', false);
 $defaultConfig = '@icy2003/config.php';

@@ -1,8 +1,8 @@
 <?php
 
-use icy2003\BaseI;
+use icy2003\php\BaseI;
 
-require __DIR__.'/BaseI.php';
+require __DIR__ . '/BaseI.php';
 
 /**
  * @namespace

@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 use Exception;
 

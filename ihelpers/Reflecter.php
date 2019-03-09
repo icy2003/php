@@ -1,12 +1,12 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 use ReflectionClass;
 
 class Reflecter
 {
-    protected static $instance;
+    protected static $_instance;
 
     private function __construct()
     {
@@ -22,7 +22,7 @@ class Reflecter
      */
     public static function create()
     {
-        if (!static::$instance instanceof static) {
+        if (!static::$instance instanceof static ) {
             static::$instance = new static();
         }
         return static::$instance;
@@ -38,7 +38,7 @@ class Reflecter
      *
      * @var \ReflectionClass $reflecter
      */
-    private $reflecter;
+    private $__reflecter;
 
     /**
      * @see http://php.net/manual/zh/class.reflectionclass.php

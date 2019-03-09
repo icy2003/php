@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 /**
  * 针对一些特殊数据结构的数组操作类.

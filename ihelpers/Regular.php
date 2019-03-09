@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 /**
  * 一些常用的正则表达式校验

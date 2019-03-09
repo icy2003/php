@@ -10,10 +10,10 @@ return [
         'dateFormat' => 'Y-m-d H:i:s',
         'type' => 'file,print',//file,print,db
         'info' => [
-            'function' => ['\icy2003\ihelpers\Logger', 'iEcho'],// string|callable
+            'function' => ['\icy2003\php\ihelpers\Logger', 'iEcho'],// string|callable
         ],
         'file' => [
-            'filePath' => '@icy2003/logs',
+            'filePath' => '@icy2003/php/logs',
             'fileName' => function () {// string|callable
                 return date('Y-m-d') . '.log';
             },
@@ -22,6 +22,6 @@ return [
     ],
     'Language' => [
         'language' => 'zh-cn',
-        'basePath' => '@icy2003/language'
+        'basePath' => '@icy2003/php/language'
     ]
 ];

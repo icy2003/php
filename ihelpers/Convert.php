@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
 /**
  * 转化类
@@ -18,10 +18,10 @@ class Convert
 {
 
     private static $__N = [
-        '2'=>'01',
-        '8'=>'01234567',
-        '10'=>'0123456789',
-        '16'=>'0123456789ABCDEF',
+        '2' => '01',
+        '8' => '01234567',
+        '10' => '0123456789',
+        '16' => '0123456789ABCDEF',
     ];
 
     public static function size($sizeValue)

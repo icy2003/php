@@ -1,13 +1,13 @@
 <?php
 
-namespace icy2003\ihelpers;
+namespace icy2003\php\ihelpers;
 
-use icy2003\BaseI;
+use icy2003\php\BaseI;
 
 class Logger
 {
-    protected static $instance;
-    private $config;
+    protected static $_instance;
+    private $__config;
 
     private function __construct()
     {
@@ -23,7 +23,7 @@ class Logger
      */
     public static function create($config = [])
     {
-        if (!static::$instance instanceof static) {
+        if (!static::$instance instanceof static ) {
             static::$instance = new static();
             static::$instance->config = BaseI::config('Logger');
         }
@@ -102,7 +102,7 @@ class Logger
         $this->handler($string);
     }
 
-    private function handler($string)
+    private function __handler($string)
     {
         $config = $this->config;
         $typeArray = explode(',', $config['type']);
