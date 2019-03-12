@@ -32,7 +32,7 @@ class OpenSSL
         if (!$this->privateKey) {
             throw new IException('您使用的私钥格式错误，请检查RSA私钥配置');
         }
-        openssl_sign($data, $this->sign, $this->privateKey, $this->signAlg[$this->signType]);
+        openssl_sign($data, $this->sign, $this->privateKey, $this->__signAlg[$this->signType]);
         $this->privateKeyPath && openssl_free_key($this->privateKey);
 
         return $this;
@@ -43,7 +43,7 @@ class OpenSSL
         if (empty($this->confPath)) {
             throw new IException('需要配置 openssl.cnf');
         }
-        $config = $this->signConf[$this->signType];
+        $config = $this->__signConf[$this->signType];
         $config['config'] = $this->confPath;
         $newKeyPair = openssl_pkey_new($config);
         openssl_pkey_export($newKeyPair, $this->privateKey, null, $config);

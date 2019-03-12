@@ -12,7 +12,7 @@ namespace icy2003\php\ihelpers;
  */
 class Timer
 {
-    private static $__timers = [];
+    protected static $_timers = [];
 
     public static function start($name = '')
     {
@@ -20,7 +20,7 @@ class Timer
         if (empty($name)) {
             $name = md5($start . rand(0, 100));
         }
-        self::$timers[$name] = $start;
+        static::$_timers[$name] = $start;
 
         return $name;
     }
@@ -28,9 +28,9 @@ class Timer
     public static function end($name)
     {
         $delta = 0.0;
-        if (isset(self::$timers[$name])) {
-            $delta = microtime(true) - self::$timers[$name];
-            unset(self::$timers[$name]);
+        if (isset(static::$_timers[$name])) {
+            $delta = microtime(true) - static::$_timers[$name];
+            unset(static::$_timers[$name]);
         }
 
         return $delta;

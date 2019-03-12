@@ -6,44 +6,49 @@ use Exception;
 use PDO;
 use PDOException;
 
+/**
+ * 数据库类
+ * @todo 表名的处理目前可能有安全问题（不是条件，问题不大）
+ */
 class Db
 {
-    protected static $instance;
+    protected static $_instance;
 
-    private $conn;
+    private $__conn;
 
     // db config
-    private $dsn;
-    private $db = 'mysql';
-    private $dbName = 'test';
-    private $host = '127.0.0.1';
-    private $user = 'root';
-    private $password = 'root';
-    private $port = '3306';
+    private $__dsn;
+    private $__db = 'mysql';
+    private $__dbName = 'test';
+    private $__host = '127.0.0.1';
+    private $__user = 'root';
+    private $__password = 'root';
+    private $__port = '3306';
 
     // db properties
-    private $select = '*';
-    private $asArray = true;
-    private $where = '';
-    private $orderBy = null;
-    private $limit = null;
-    private $offset = null;
-    private $params = [];
-    private $queryString = '';
-    private $query = null;
-    private $i = 0;
+    private $__select = '*';
+    private $__asArray = true;
+    private $__where = '';
+    private $__orderBy = null;
+    private $__limit = null;
+    private $__offset = null;
+    private $__params = [];
+    private $__queryString = '';
+    private $__query = null;
+    private $__i = 0;
 
-    private function reset()
+    private function __reset()
     {
-        $this->select = '*';
-        $this->asArray = true;
-        $this->where = '';
-        $this->orderBy = null;
-        $this->limit = null;
-        $this->params = [];
-        $this->queryString = '';
-        $this->query = null;
-        $this->i = 0;
+        $this->__select = '*';
+        $this->__asArray = true;
+        $this->__where = '';
+        $this->__orderBy = null;
+        $this->__limit = null;
+        $this->__offset = null;
+        $this->__params = [];
+        $this->__queryString = '';
+        $this->__query = null;
+        $this->__i = 0;
     }
 
     private function __construct()
@@ -70,25 +75,25 @@ class Db
      */
     public static function create($config = [])
     {
-        if (!static::$instance instanceof static) {
-            static::$instance = new static();
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
             if (!empty($config['dsn'])) {
-                static::$instance->dsn = $config['dsn'];
+                static::$_instance->__dsn = Env::value($config, 'dsn', "mysql:dbname=test;host=127.0.0.1;port=3306");
             } else {
-                static::$instance->db = $db = !empty($config['db']) ? $config['db'] : static::$instance->db;
-                static::$instance->dbName = $dbName = !empty($config['dbName']) ? $config['dbName'] : static::$instance->dbName;
-                static::$instance->host = $host = !empty($config['host']) ? $config['host'] : static::$instance->host;
-                static::$instance->port = $port = !empty($config['port']) ? $config['port'] : static::$instance->port;
-                static::$instance->user = !empty($config['user']) ? $config['user'] : static::$instance->user;
-                static::$instance->password = !empty($config['password']) ? $config['password'] : static::$instance->password;
-                static::$instance->dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
+                static::$_instance->__db = $db = Env::value($config, 'db', static::$_instance->__db);
+                static::$_instance->__dbName = $dbName = Env::value($config, 'dbName', static::$_instance->__dbName);
+                static::$_instance->__host = $host = Env::value($config, 'host', static::$_instance->__host);
+                static::$_instance->__port = $port = Env::value($config, 'port', static::$_instance->__port);
+                static::$_instance->__dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
             }
+            static::$_instance->__user = Env::value($config, 'user', static::$_instance->__user);
+            static::$_instance->__password = Env::value($config, 'password', static::$_instance->__password);
             try {
-                static::$instance->conn = new PDO(static::$instance->dsn, static::$instance->user, static::$instance->password, [
+                static::$_instance->__conn = new PDO(static::$_instance->__dsn, static::$_instance->__user, static::$_instance->__password, [
                     PDO::ATTR_PERSISTENT => true,
                 ]);
-                static::$instance->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                static::$instance->conn->exec('set names utf8');
+                static::$_instance->__conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                static::$_instance->__conn->exec('set names utf8');
             } catch (PDOException $e) {
                 switch ($e->getCode()) {
                     case '1049':
@@ -104,7 +109,7 @@ class Db
             }
         }
 
-        return static::$instance;
+        return static::$_instance;
     }
 
     /**
@@ -112,20 +117,19 @@ class Db
      */
     public function close()
     {
-        $this->conn = null;
+        $this->__conn = null;
     }
 
     public function tableExists($table)
     {
-        $result = $this->conn->query("SHOW TABLES LIKE '{$table}'");
+        $result = $this->__conn->query("SHOW TABLES LIKE '{$table}'");
         $rows = $result->fetchAll();
         try {
             if ($isExists = 1 != count($rows)) {
                 throw new Exception("表 {$table} 不存在");
             }
         } catch (Exception $e) {
-            echo $e->getMessage();
-            die;
+            throw new Exception($e->getMessage());
         }
 
         return $isExists;
@@ -146,23 +150,23 @@ class Db
     public function insert($table, $columns)
     {
         $this->tableExists($table);
-        $keys = $values = $params = [];
+        $keys = $values = [];
         $k = 0;
         foreach ($columns as $key => $value) {
             $keys[] = $key;
             $values[] = ':k' . $k;
-            $this->params[':k' . $k] = $value;
+            $this->__params[':k' . $k] = $value;
             ++$k;
         }
         $keysString = implode(',', $keys);
         $valuesString = implode(',', $values);
-        $this->queryString = "INSERT INTO {$table} ($keysString) VALUES ($valuesString)";
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $this->reset();
+        $this->__queryString = "INSERT INTO {$table} ($keysString) VALUES ($valuesString)";
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $this->__reset();
 
-        return $this->conn->lastInsertId();
+        return $this->__conn->lastInsertId();
     }
 
     /**
@@ -177,21 +181,21 @@ class Db
     public function update($table, $columns, $where)
     {
         $this->tableExists($table);
-        $sets = $params = [];
+        $sets = [];
         $k = 0;
         foreach ($columns as $key => $value) {
             $sets[] = $key . '=:k' . $k;
-            $this->params[':k' . $k] = $value;
+            $this->__params[':k' . $k] = $value;
             ++$k;
         }
         $setsString = implode(',', $sets);
         $this->where($where);
-        $this->queryString = "UPDATE {$table} SET {$setsString} {$this->where}";
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $count = $this->query->rowCount();
-        $this->reset();
+        $this->__queryString = "UPDATE {$table} SET {$setsString} {$this->__where}";
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $count = $this->__query->rowCount();
+        $this->__reset();
 
         return $count;
     }
@@ -206,12 +210,12 @@ class Db
     {
         $this->tableExists($table);
         $this->where($where);
-        $this->queryString = "DELETE FROM {$table} {$this->where}";
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $count = $this->query->rowCount();
-        $this->reset();
+        $this->__queryString = "DELETE FROM {$table} {$this->__where}";
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $count = $this->__query->rowCount();
+        $this->__reset();
 
         return $count;
     }
@@ -228,7 +232,7 @@ class Db
     public function find($table)
     {
         $this->tableExists($table);
-        $this->queryString = "SELECT [[select]] FROM {$table}";
+        $this->__queryString = "SELECT [[select]] FROM {$table}";
 
         return $this;
     }
@@ -242,7 +246,7 @@ class Db
      */
     public function select($fields = '*')
     {
-        $this->select = $fields;
+        $this->__select = $fields;
 
         return $this;
     }
@@ -256,7 +260,7 @@ class Db
      */
     public function asArray($asArray = true)
     {
-        $this->asArray = (bool)$asArray;
+        $this->__asArray = (bool)$asArray;
 
         return $this;
     }
@@ -268,12 +272,12 @@ class Db
      */
     public function one()
     {
-        $this->parse();
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $result = $this->query->fetch($this->asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-        $this->reset();
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $result = $this->__query->fetch($this->__asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+        $this->__reset();
 
         return $result;
     }
@@ -285,12 +289,12 @@ class Db
      */
     public function all()
     {
-        $this->parse();
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $results = $this->query->fetchAll($this->asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-        $this->reset();
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchAll($this->__asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+        $this->__reset();
 
         return $results;
     }
@@ -302,12 +306,12 @@ class Db
      */
     public function column()
     {
-        $this->parse();
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $results = $this->query->fetchAll(PDO::FETCH_COLUMN);
-        $this->reset();
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchAll(PDO::FETCH_COLUMN);
+        $this->__reset();
 
         return $results;
     }
@@ -319,12 +323,12 @@ class Db
      */
     public function scalar()
     {
-        $this->parse();
-        $this->query = $this->conn->prepare($this->queryString);
-        $this->bindParams();
-        $this->query->execute();
-        $results = $this->query->fetchColumn();
-        $this->reset();
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchColumn();
+        $this->__reset();
 
         return $results;
     }
@@ -336,7 +340,7 @@ class Db
      */
     public function count()
     {
-        $this->select = 'COUNT(*)';
+        $this->__select = 'COUNT(*)';
 
         return $this->scalar();
     }
@@ -348,9 +352,9 @@ class Db
      */
     public function sql()
     {
-        $this->parse();
-        $sql = $this->queryString;
-        $this->reset();
+        $this->__parse();
+        $sql = $this->__queryString;
+        $this->__reset();
 
         return $sql;
     }
@@ -362,8 +366,8 @@ class Db
      */
     public function params()
     {
-        $params = $this->params;
-        $this->reset();
+        $params = $this->__params;
+        $this->__reset();
 
         return $params;
     }
@@ -375,11 +379,11 @@ class Db
      */
     public function rawSql()
     {
-        $this->parse();
-        $rawSql = str_replace(array_keys($this->params), array_map(function ($data) {
+        $this->__parse();
+        $rawSql = str_replace(array_keys($this->__params), array_map(function ($data) {
             return 'string' == gettype($data) ? "'" . $data . "'" : $data;
-        }, array_values($this->params)), $this->queryString);
-        $this->reset();
+        }, array_values($this->__params)), $this->__queryString);
+        $this->__reset();
 
         return $rawSql;
     }
@@ -434,10 +438,10 @@ class Db
                              * ]
                              * ==>> id > 13
                              */
-                            $this->params[':lc' . $this->i] = $value[2];
+                            $this->__params[':lc' . $this->__i] = $value[2];
 
-                            $condition = '(' . $value[1] . ' ' . strtoupper($value[0]) . ' ' . ':lc' . $this->i . ')';
-                            ++$this->i;
+                            $condition = '(' . $value[1] . ' ' . strtoupper($value[0]) . ' ' . ':lc' . $this->__i . ')';
+                            ++$this->__i;
                             break;
                         case 'in':
                         case 'not in':
@@ -448,13 +452,13 @@ class Db
                              * ==>> id IN (1,2,3)
                              */
                             array_map(function ($data, $i) {
-                                $this->params[':i' . ($this->i + $i)] = $data;
+                                $this->__params[':i' . ($this->__i + $i)] = $data;
                             }, $value[2], array_keys($value[2]));
 
                             $condition = '(' . $value[1] . ' ' . strtoupper($value[0]) . ' (' . implode(',', array_map(function ($i) {
-                                return ':i' . ($this->i + $i);
+                                return ':i' . ($this->__i + $i);
                             }, array_keys($value[2]))) . '))';
-                            $this->i += count($value[2]);
+                            $this->__i += count($value[2]);
                             break;
                         case 'none':
                             /**
@@ -475,18 +479,18 @@ class Db
                 // 关联列
                 if (is_array($value)) {
                     $condition = '(' . $key . ' IN (' . implode(',', array_map(function ($i) {
-                        return ':i' . ($this->i + $i);
+                        return ':i' . ($this->__i + $i);
                     }, array_keys($value))) . '))';
                     array_map(function ($data, $i) {
-                        $this->params[':i' . ($this->i + $i)] = $data;
+                        $this->__params[':i' . ($this->__i + $i)] = $data;
                     }, $value, array_keys($value));
-                    $this->i += count($value);
+                    $this->__i += count($value);
                 } elseif (null === $value) {
                     $condition = '(' . $key . ' IS NULL' . ')';
                 } else {
-                    $condition = '(' . $key . '=:w' . $this->i . ')';
-                    $this->params[':w' . $this->i] = $value;
-                    ++$this->i;
+                    $condition = '(' . $key . '=:w' . $this->__i . ')';
+                    $this->__params[':w' . $this->__i] = $value;
+                    ++$this->__i;
                 }
 
                 return $condition;
@@ -503,7 +507,7 @@ class Db
         foreach ($where as $key => $value) {
             $conditions[] = $generator($key, $value);
         }
-        $this->where = 'WHERE ' . implode($operator, $conditions);
+        $this->__where = 'WHERE ' . implode($operator, $conditions);
 
         return $this;
     }
@@ -517,7 +521,7 @@ class Db
      */
     public function orderBy($orderBy)
     {
-        $this->orderBy = 'ORDER BY ' . $orderBy;
+        $this->__orderBy = 'ORDER BY ' . $orderBy;
 
         return $this;
     }
@@ -531,7 +535,7 @@ class Db
      */
     public function limit($limit)
     {
-        $this->limit = 'LIMIT ' . $limit;
+        $this->__limit = 'LIMIT ' . $limit;
 
         return $this;
     }
@@ -545,7 +549,7 @@ class Db
      */
     public function offset($offset)
     {
-        $this->offset = 'OFFSET ' . $offset;
+        $this->__offset = 'OFFSET ' . $offset;
 
         return $this;
     }
@@ -557,8 +561,8 @@ class Db
      */
     public function beginTransaction()
     {
-        $this->conn->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
-        $this->conn->beginTransaction();
+        $this->__conn->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
+        $this->__conn->beginTransaction();
     }
 
     /**
@@ -567,7 +571,7 @@ class Db
     public function commit()
     {
         //如果数据库类型不支持事务，那有没有这个一点影响都没有，该执行还是执行了
-        $this->conn->commit();
+        $this->__conn->commit();
     }
 
     /**
@@ -575,12 +579,12 @@ class Db
      */
     public function rollback()
     {
-        $this->conn->rollback();
+        $this->__conn->rollback();
     }
 
     // private
 
-    private function getPdoType($data)
+    private function __getPdoType($data)
     {
         static $typeMap = [
             'boolean' => PDO::PARAM_BOOL,
@@ -594,16 +598,16 @@ class Db
         return isset($typeMap[$type]) ? $typeMap[$type] : PDO::PARAM_STR;
     }
 
-    private function parse()
+    private function __parse()
     {
-        $this->queryString = str_replace('[[select]]', $this->select, $this->queryString);
-        $this->queryString = implode(' ', array_filter([$this->queryString, $this->where, $this->orderBy, $this->limit, $this->offset]));
+        $this->__queryString = str_replace('[[select]]', $this->__select, $this->__queryString);
+        $this->__queryString = implode(' ', array_filter([$this->__queryString, $this->__where, $this->__orderBy, $this->__limit, $this->__offset]));
     }
 
-    private function bindParams()
+    private function __bindParams()
     {
-        foreach ($this->params as $p => $q) {
-            $this->query->bindValue($p, $q, $this->getPdoType($q));
+        foreach ($this->__params as $p => $q) {
+            $this->__query->bindValue($p, $q, $this->__getPdoType($q));
         }
     }
 }

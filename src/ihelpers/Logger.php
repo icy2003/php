@@ -21,23 +21,22 @@ class Logger
      *
      * @return static
      */
-    public static function create($config = [])
+    public static function create()
     {
-        if (!static::$instance instanceof static ) {
-            static::$instance = new static();
-            static::$instance->config = BaseI::config('Logger');
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
+            static::$_instance->__config = BaseI::config('Logger');
         }
 
-        return static::$instance;
+        return static::$_instance;
     }
     public function error()
     {
-        $this->config['isLog'] && set_error_handler([$this, 'errorHandler']);
+        $this->__config['isLog'] && set_error_handler([$this, 'errorHandler']);
     }
     public function errorHandler($errno, $errstr, $errfile, $errline)
     {
-        $config = $this->config;
-        $typeArray = explode(',', $config['type']);
+        $config = $this->__config;
         $map = [
             '{date}' => date($config['dateFormat']),
             '{errfile}' => $errfile,
@@ -46,7 +45,7 @@ class Logger
             '{errstr}' => $errstr,
         ];
         $string = str_replace(array_keys($map), array_values($map), $config['errorTemplete']);
-        $this->handler($string);
+        $this->__handler($string);
     }
     /**
      * 让 echo 可以当函数使用
@@ -83,7 +82,7 @@ class Logger
      */
     public function info($message, $function = null)
     {
-        $config = $this->config;
+        $config = $this->__config;
         if (false === $config['isLog']) {
             return;
         }
@@ -99,12 +98,12 @@ class Logger
             $templete = "infoTemplete";
         }
         $string = str_replace(array_keys($map), array_values($map), $config[$templete]);
-        $this->handler($string);
+        $this->__handler($string);
     }
 
     private function __handler($string)
     {
-        $config = $this->config;
+        $config = $this->__config;
         $typeArray = explode(',', $config['type']);
         if (in_array('file', $typeArray)) {
             $logPath = BaseI::getAlias(trim($config['file']['filePath'], '/') . '/');

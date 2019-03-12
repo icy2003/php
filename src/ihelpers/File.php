@@ -33,11 +33,11 @@ class File
     {
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
-            !empty($config['formName']) && static::$_instance->formName = $config['formName'];
-            !empty($config['sizeLimit']) && static::$_instance->sizeLimit = $config['sizeLimit'];
-            $systemLimit = static::$_instance->getSizeLimit();
-            static::$_instance->sizeLimit = 0 === static::$_instance->sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$_instance->sizeLimit));
-            !empty($config['extLimit']) && static::$_instance->extLimit = $config['extLimit'];
+            !empty($config['formName']) && static::$_instance->__formName = $config['formName'];
+            !empty($config['sizeLimit']) && static::$_instance->__sizeLimit = $config['sizeLimit'];
+            $systemLimit = static::$_instance->__getSizeLimit();
+            static::$_instance->__sizeLimit = 0 === static::$_instance->__sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$_instance->__sizeLimit));
+            !empty($config['extLimit']) && static::$_instance->__extLimit = $config['extLimit'];
         }
 
         return static::$_instance;
@@ -117,41 +117,41 @@ class File
      */
     public function upload()
     {
-        if (self::ERROR_SUCCESS === $_FILES[$this->formName]['error']) {
-            if (is_uploaded_file($file = $_FILES[$this->formName]['tmp_name'])) {
-                $fileName = $_FILES[$this->formName]['name'];
+        if (self::ERROR_SUCCESS === $_FILES[$this->__formName]['error']) {
+            if (is_uploaded_file($file = $_FILES[$this->__formName]['tmp_name'])) {
+                $fileName = $_FILES[$this->__formName]['name'];
                 $fileSize = filesize($file);
                 $fileExt = $this->getExt($fileName);
-                if ($fileSize > $this->sizeLimit) {
-                    $this->errorCode = self::ERROR_I_SIZE_LIMIT;
+                if ($fileSize > $this->__sizeLimit) {
+                    $this->__errorCode = self::ERROR_I_SIZE_LIMIT;
 
                     return $this;
                 }
-                if (!empty($this->extLimit) && !in_array($fileExt, $this->extLimit)) {
-                    $this->errorCode = self::ERROR_I_EXT_LIMIT;
+                if (!empty($this->__extLimit) && !in_array($fileExt, $this->__extLimit)) {
+                    $this->__errorCode = self::ERROR_I_EXT_LIMIT;
 
                     return $this;
                 }
-                $this->attributes['md5'] = md5_file($file);
-                $this->attributes['sha1'] = sha1_file($file);
-                $this->attributes['ext'] = $fileExt;
-                $this->attributes['size'] = $fileSize;
-                $this->attributes['filectime'] = filectime($file);
-                $this->attributes['filemtime'] = filemtime($file);
-                $this->attributes['fileatime'] = fileatime($file);
-                $this->attributes['originName'] = $fileName;
-                $this->attributes['fileName'] = $this->randomFileName($fileName);
-                $this->errorCode = self::ERROR_SUCCESS;
+                $this->__attributes['md5'] = md5_file($file);
+                $this->__attributes['sha1'] = sha1_file($file);
+                $this->__attributes['ext'] = $fileExt;
+                $this->__attributes['size'] = $fileSize;
+                $this->__attributes['filectime'] = filectime($file);
+                $this->__attributes['filemtime'] = filemtime($file);
+                $this->__attributes['fileatime'] = fileatime($file);
+                $this->__attributes['originName'] = $fileName;
+                $this->__attributes['fileName'] = $this->randomFileName($fileName);
+                $this->__errorCode = self::ERROR_SUCCESS;
 
                 return $this;
             } else {
-                $this->errorCode = self::ERROR_I_SAVE_FAILED;
+                $this->__errorCode = self::ERROR_I_SAVE_FAILED;
 
                 return $this;
             }
         } else {
             // 其他错误时的处理
-            $this->errorCode = $_FILES[$this->formName]['error'];
+            $this->__errorCode = $_FILES[$this->__formName]['error'];
 
             return $this;
         }
@@ -167,8 +167,8 @@ class File
      */
     public function save($savePath, $fileName = null)
     {
-        $fileName = null === $fileName ? $this->attributes['fileName'] : $fileName;
-        !empty($this->attributes) && move_uploaded_file($_FILES[$this->formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
+        $fileName = null === $fileName ? $this->__attributes['fileName'] : $fileName;
+        !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
 
         return $this;
     }
@@ -190,7 +190,7 @@ class File
      */
     public function getErrorCode()
     {
-        return $this->errorCode;
+        return $this->__errorCode;
     }
 
     /**
@@ -200,7 +200,7 @@ class File
      */
     public function success()
     {
-        return self::ERROR_SUCCESS === $this->errorCode;
+        return self::ERROR_SUCCESS === $this->__errorCode;
     }
 
     /**
@@ -210,7 +210,7 @@ class File
      */
     public function getErrorMessage()
     {
-        return self::$errorMap[$this->errorCode];
+        return self::$__errorMap[$this->__errorCode];
     }
 
     /**
@@ -220,7 +220,7 @@ class File
      */
     public function getAttributes()
     {
-        return $this->attributes;
+        return $this->__attributes;
     }
 
     // private

@@ -22,15 +22,15 @@ class Reflecter
      */
     public static function create()
     {
-        if (!static::$instance instanceof static ) {
-            static::$instance = new static();
+        if (!static::$_instance instanceof static ) {
+            static::$_instance = new static();
         }
-        return static::$instance;
+        return static::$_instance;
     }
 
     public function load($object)
     {
-        $this->reflecter = new ReflectionClass($object);
+        $this->__reflecter = new ReflectionClass($object);
         return $this;
     }
 
@@ -49,7 +49,7 @@ class Reflecter
      */
     public function __call($name, $arguments)
     {
-        return $this->reflecter->$name($arguments);
+        return $this->__reflecter->$name($arguments);
     }
     /**
      * 获取当前类的所有方法
@@ -59,11 +59,11 @@ class Reflecter
      */
     public function getCurrentClassMethods($callback = null)
     {
-        $callback = null === $callback ? function ($name) {
+        $callback = null === $callback ? function () {
             return true;
         } : $callback;
-        $currentClass = $this->reflecter->getName();
-        $methods = $this->reflecter->getMethods();
+        $currentClass = $this->__reflecter->getName();
+        $methods = $this->__reflecter->getMethods();
         $result = [];
         foreach ($methods as $method) {
             if ($currentClass === $method->class && $callback($method->name)) {
