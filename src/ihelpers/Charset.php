@@ -3,7 +3,7 @@
 namespace icy2003\php\ihelpers;
 
 /**
- * 编码转换.
+ * 编码转换
  */
 class Charset
 {

@@ -2,6 +2,9 @@
 
 namespace icy2003\php\ihelpers;
 
+/**
+ * Html 相关
+ */
 class Html
 {
     /**

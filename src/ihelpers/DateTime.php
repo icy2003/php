@@ -2,6 +2,9 @@
 
 namespace icy2003\php\ihelpers;
 
+/**
+ * 日期类
+ */
 class DateTime
 {
 

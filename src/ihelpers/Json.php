@@ -2,6 +2,9 @@
 
 namespace icy2003\php\ihelpers;
 
+/**
+ * Json 类
+ */
 class Json
 {
     public static function encode($value)

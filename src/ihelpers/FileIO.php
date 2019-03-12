@@ -362,6 +362,7 @@ class FileIO
      */
     public function data($buffer = 1024)
     {
+        empty($bufferSize) && $bufferSize = 0;
         try {
             while (!feof($this->__fileHandler) && $this->__attributes['fileSize'] > $bufferSize) {
                 $bufferSize += $buffer;

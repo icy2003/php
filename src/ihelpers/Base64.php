@@ -2,6 +2,9 @@
 
 namespace icy2003\php\ihelpers;
 
+/**
+ * Base64 相关
+ */
 class Base64
 {
     public static function file2Base64($file)
@@ -19,6 +22,6 @@ class Base64
 
     public static function base64ImgTag($base64)
     {
-        return '<img src="data:image/jpg/png/gif;base64,'.$base64.'" >';
+        return '<img src="data:image/jpg/png/gif;base64,' . $base64 . '" >';
     }
 }

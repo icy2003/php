@@ -3,13 +3,7 @@
 namespace icy2003\php\ihelpers;
 
 /**
- * 针对一些特殊数据结构的数组操作类.
- * 该类多用于简化对数据库数据集的操作，如没有特殊说明，数组多为查询出来的二维键值对数组，，“元素”指一行数据，“字段”指字段
- * 示例数组：
- * $array = [
- *      ['id'=>'a', 'name'=>'aa', 'value'=>'aaa'],
- *      ['id'=>'b', 'name'=>'bb', 'value'=>'bbb']
- * ];.
+ * 数组处理
  */
 class Arrays
 {
@@ -20,18 +14,6 @@ class Arrays
      * @param string $index 用来作为键的某字段
      *
      * @return array
-     *
-     * @example
-     * ```php
-     * $result = Arrays::indexBy($array, 'id');
-     * ```
-     * $result
-     * ```php
-     * [
-     *      'a'=>['id'=>'a', 'name'=>'aa', 'value'=>'aaa'],
-     *      'b'=>['id'=>'b', 'name'=>'bb', 'value'=>'bbb']
-     * ]
-     * ```
      */
     public static function indexBy($array, $index, $isMerge = false)
     {
@@ -58,18 +40,6 @@ class Arrays
      * @param int $dimension 维度，默认 2 维数组
      *
      * @return array
-     *
-     * @example
-     * ```php
-     * $result = Arrays::columns($array, ['name','value'], 2);
-     * ```
-     * $result
-     * ```php
-     * [
-     *      ['name'=>'aa','value'=>'aaa'],
-     *      ['name'=>'bb','value'=>'bbb'],
-     * ]
-     * ```
      */
     public static function columns($array, $fields, $dimension = 2)
     {
@@ -125,17 +95,6 @@ class Arrays
      * @param array $array
      *
      * @return boolean
-     *
-     * @example
-     * ```php
-     * $result1 = Arrays::arrayKeysExists(['id','name'], $array);
-     * $result2 = Arrays::arrayKeysExists(['id','id2'], $array);
-     * ```
-     * $result1,$result2:
-     * ```php
-     * true
-     * false
-     * ```
      */
     public static function arrayKeysExists($keys, $array)
     {
@@ -151,19 +110,6 @@ class Arrays
      * @param array $arrays
      *
      * @return array
-     *
-     * @example
-     * ```php
-     * $arrays = [['a1','a2','a3'],['b1','b2','b3']];
-     * $result = Arrays::arrayCombines(['name1','name2','name3'], $arrays);
-     * ```
-     * $result
-     * ```php
-     * [
-     *      ['name1'=>'a1', 'name2'=>'a2', 'name3'=>'a3'],
-     *      ['name1'=>'b1', 'name2'=>'b2', 'name3'=>'b3'],
-     * ]
-     * ```
      */
     public static function arrayCombines($keys, $arrays)
     {

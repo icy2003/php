@@ -22,7 +22,7 @@ class Language
      *
      * @return static
      */
-    public static function create($config = [])
+    public static function create()
     {
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
