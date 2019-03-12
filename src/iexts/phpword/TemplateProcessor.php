@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\iexts\phpword;
+namespace icy2003\php\iexts\phpword;
 
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;

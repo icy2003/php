@@ -1,8 +1,8 @@
 <?php
 
-namespace icy2003\iexts\phpspreadsheet\Worksheet;
+namespace icy2003\php\iexts\phpspreadsheet\Worksheet;
 
-use icy2003\ihelpers\Env;
+use icy2003\php\ihelpers\Env;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
