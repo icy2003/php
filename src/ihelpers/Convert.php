@@ -17,7 +17,7 @@ namespace icy2003\php\ihelpers;
 class Convert
 {
 
-    private static $__N = [
+    protected static $_N = [
         '2' => '01',
         '8' => '01234567',
         '10' => '0123456789',
@@ -100,7 +100,7 @@ class Convert
         if (preg_match('/^f(\d{1,2})t(\d{1,2})$/', $name, $matches)) {
             if (3 === count($matches)) {
                 if (in_array($matches[1], [2, 8, 10, 16]) && in_array($matches[2], [2, 8, 10, 16])) {
-                    return self::baseConvert($arguments[0], static::$__N[$matches[1]], static::$__N[$matches[2]]);
+                    return self::baseConvert($arguments[0], static::$_N[$matches[1]], static::$_N[$matches[2]]);
                 }
             }
         }
