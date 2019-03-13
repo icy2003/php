@@ -17,9 +17,9 @@ class iWorksheet
      * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $workSheet
      * @param string $pRange 单元格范围 (i.e. "A1:B10"), 或者一个单元格 (i.e. "A1")
      * @param mixed $nullValue 单元格内容不存在时返回的值
+     * @param bool $returnCellRef false - 按照索引返回数组，true - 按照真实的行列返回数组
      * @param bool $calculateFormulas 是否计算公式的值？
      * @param bool $formatData 是否应用格式化到该数据
-     * @param bool $returnCellRef false - 按照索引返回数组，true - 按照真实的行列返回数组
      * @param array $params 额外条件参数
      *                  onlyVisible 是否只返回可见单元格，默认 true
      *                  fillColor 是否按填充颜色返回，如："#ff0000"，表示只返回红色背景的数据，默认 false，表示不限制
@@ -27,7 +27,7 @@ class iWorksheet
      *
      * @return array
      */
-    public static function rangeToArray($workSheet, $pRange, $nullValue = null, $calculateFormulas = true, $formatData = true, $returnCellRef = false, $params = [])
+    public static function rangeToArray($workSheet, $pRange, $nullValue = null, $returnCellRef = true, $calculateFormulas = true, $formatData = true, $params = [])
     {
         $returnValue = [];
         list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($pRange);
