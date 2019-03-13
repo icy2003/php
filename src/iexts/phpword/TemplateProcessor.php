@@ -2,6 +2,7 @@
 
 namespace icy2003\php\iexts\phpword;
 
+use icy2003\php\ihelpers\Env;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
@@ -105,15 +106,14 @@ class TemplateProcessor extends T
      * @see https://github.com/PHPOffice/PHPWord/issues/1198 感谢提供思路
      *
      * @param string $var 变量名
-     * @param array $array 二维数组
-     * @param array $mArray 合并单元格的数组，例如：["A1:B1", "C1:C2"]
-     * @param boolean $useCellRef 是否使用单元格引用（例如A3），暂时没用
-     *                  格式参考 phpspreadsheet 的 rangeToArray
+     * @param array $array 二维数组，带行列号的索引
+     * @param array $mergeArray 合并单元格的数组，例如：["A1:B1", "C1:C2"]
+     * @param array $styleArray 对应所有单元格的样式二维数组
      * @todo 给表格加样式
      *
      * @return void
      */
-    public function setTable($var, $array, $mArray = [], $useCellRef = true)
+    public function setTable($var, $array, $mergeArray = [], $styleArray = [])
     {
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
@@ -137,7 +137,7 @@ class TemplateProcessor extends T
                 $colIndex = Coordinate::columnIndexFromString($c);
                 $array = [];
                 $isContinue = false;
-                foreach ($mArray as $range) {
+                foreach ($mergeArray as $range) {
                     // 1,1 : 2,2
                     list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range); // A1:B2
                     if ($rangeEnd[0] > $rangeStart[0]) {
@@ -160,12 +160,14 @@ class TemplateProcessor extends T
                         break;
                     }
                 }
-                $array = array_merge($array, ['valign' => Jc::CENTER]);
+                $array = array_merge($array, ['valign' => Env::value($styleArray, "{$rowIndex}.{$c}.valign", Jc::CENTER)]);
                 if (true === $isContinue) {
                     $isContinue = false;
                     $table->addCell(null, $array);
                 } else {
-                    $table->addCell(null, $array)->addText($value, null, ['alignment' => Jc::CENTER]);
+                    $table->addCell(null, $array)->addText($value, Env::value($styleArray, "{$rowIndex}.{$c}"), [
+                        'alignment' => Env::value($styleArray, "{$rowIndex}.{$c}.alignment", Jc::CENTER),
+                    ]);
                 }
             }
         }
