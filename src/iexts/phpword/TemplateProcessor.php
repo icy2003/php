@@ -141,17 +141,19 @@ class TemplateProcessor extends T
                     // 1,1 : 2,2
                     list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range); // A1:B2
                     if ($rangeEnd[0] > $rangeStart[0]) {
-                        if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0] && $rowIndex <= $rangeStart[1]) {
+                        if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0] && $rowIndex >= $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
                             $array = array_merge($array, ['gridSpan' => $rangeEnd[0] - $rangeStart[0] + 1]);
                             $i = $rangeEnd[0] - $rangeStart[0];
                         }
                     }
-                    if ($rangeEnd[1] > $rangeStart[1] && $colIndex >= $rangeStart[0]) {
-                        if ($rowIndex == $rangeStart[1]) {
-                            $array = array_merge($array, ['vMerge' => 'restart']);
-                        } elseif ($rowIndex > $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
-                            $isContinue = true;
-                            $array = array_merge($array, ['vMerge' => 'continue']);
+                    if ($rangeEnd[1] > $rangeStart[1]) {
+                        if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0]) {
+                            if ($rowIndex == $rangeStart[1]) {
+                                $array = array_merge($array, ['vMerge' => 'restart']);
+                            } elseif ($rowIndex > $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
+                                $isContinue = true;
+                                $array = array_merge($array, ['vMerge' => 'continue']);
+                            }
                         }
                     }
                     if (!empty($array)) {
