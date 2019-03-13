@@ -30,6 +30,7 @@ class iWorksheet
     public static function rangeToArray($workSheet, $pRange, $nullValue = null, $returnCellRef = true, $calculateFormulas = true, $formatData = true, $params = [])
     {
         $returnValue = [];
+        $styleArray = [];
         list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($pRange);
         $minCol = Coordinate::stringFromColumnIndex($rangeStart[0]);
         $minRow = $rangeStart[1];
@@ -60,7 +61,7 @@ class iWorksheet
                 if ($workSheet->getCellCollection()->has($col . $row)) {
                     $cell = $workSheet->getCellCollection()->get($col . $row);
                     if ($fillColor) {
-                        if ($cell->getStyle()->getFill()->getStartColor()->getARGB() != 'FF' . substr(strtoupper($fillColor), 1)) {
+                        if ($cell->getStyle()->getFill()->getStartColor()->getRGB() != substr(strtoupper($fillColor), 1)) {
                             continue;
                         }
                     }
@@ -90,8 +91,21 @@ class iWorksheet
                     } else {
                         $returnValue[$rRef][$cRef] = $nullValue;
                     }
+                    $styleArray[$rRef][$cRef] = [
+                        'color' => $cell->getStyle()->getFont()->getColor()->getRGB(),
+                        'name' => $cell->getStyle()->getFont()->getName(),
+                        'size' => $cell->getStyle()->getFont()->getSize(),
+                        'bold' => $cell->getStyle()->getFont()->getBold(),
+                        'italic' => $cell->getStyle()->getFont()->getItalic(),
+                        'underline' => $cell->getStyle()->getFont()->getUnderline(),
+                        'alignment' => $cell->getStyle()->getAlignment()->getHorizontal(),
+                        'valign' => $cell->getStyle()->getAlignment()->getVertical(),
+                        // 背景图目前有bug
+                        // 'bgcolor' => $cell->getStyle()->getFill()->getStartColor()->getRGB(),
+                    ];
                 } else {
                     $returnValue[$rRef][$cRef] = $nullValue;
+                    $styleArray[$rRef][$cRef] = [];
                 }
             }
         }
@@ -144,6 +158,6 @@ class iWorksheet
             }
         }
 
-        return $data;
+        return [$data, $styleArray];
     }
 }
