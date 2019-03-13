@@ -113,10 +113,21 @@ class iWorksheet
         }
         // 去掉空白行和列
         $data = [];
-        foreach ($returnValue as $rowIndex => $row) {
+        foreach ($returnValue as $r => $row) {
+            // 如果使用索引，那么索引和真实行差1
+            if (false === $returnCellRef) {
+                $rowIndex = $r + 1;
+            } else {
+                $rowIndex = $r;
+            }
             if (!empty(array_filter($row)) || !empty($mergeArray) && $rowIndex <= $rowMax) {
                 foreach ($row as $c => $value) {
-                    $colIndex = Coordinate::columnIndexFromString($c);
+                    // 如果使用索引，那么索引和真实列差1
+                    if (false === $returnCellRef) {
+                        $colIndex = $c + 1;
+                    } else {
+                        $colIndex = Coordinate::columnIndexFromString($c);
+                    }
                     $isEmpty = true;
                     foreach ($returnValue as $d) {
                         // 如果内容不为空，或者在合并单元格中出现，这个单元格不能算成是空
@@ -126,7 +137,8 @@ class iWorksheet
                         }
                     }
                     if (false === $isEmpty) {
-                        $data[$rowIndex][$c] = $value;
+                        // 使用之前的下标
+                        $data[$r][$c] = $value;
                     }
                 }
             }
