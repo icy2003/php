@@ -57,13 +57,13 @@ class iWorksheet
                     }
                 }
                 $cRef = ($returnCellRef) ? $col : ++$c;
-                if ($fillColor) {
-                    if ($cellStyle->getFill()->getStartColor()->getARGB() != 'FF' . substr(strtoupper($fillColor), 1)) {
-                        continue;
-                    }
-                }
                 if ($workSheet->getCellCollection()->has($col . $row)) {
                     $cell = $workSheet->getCellCollection()->get($col . $row);
+                    if ($fillColor) {
+                        if ($cell->getStyle()->getFill()->getStartColor()->getARGB() != 'FF' . substr(strtoupper($fillColor), 1)) {
+                            continue;
+                        }
+                    }
                     if ($cell->getValue() !== null) {
                         if ($cell->getValue() instanceof RichText) {
                             $returnValue[$rRef][$cRef] = $cell->getValue()->getPlainText();
