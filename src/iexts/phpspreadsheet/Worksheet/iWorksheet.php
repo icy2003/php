@@ -96,6 +96,42 @@ class iWorksheet
             }
         }
 
-        return $returnValue;
+        // 过滤空白行列，如果末尾有合并的单元格，因为被合并的单元格本身是空，因此这里会以合并单元格为准，再筛选掉空白行列
+        $mergeArray = array_keys($workSheet->getMergeCells());
+        if (!empty($mergeArray)) {
+            $rowMax = $colMax = 1;
+            foreach ($mergeArray as $range) {
+                // rangeStart 没用，因为肯定不会比 rangeEnd 大
+                list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range);
+                if ($rangeEnd[0] > $colMax) {
+                    $colMax = $rangeEnd[0];
+                }
+                if ($rangeEnd[1] > $rowMax) {
+                    $rowMax = $rangeEnd[1];
+                }
+            }
+        }
+        // 去掉空白行和列
+        $data = [];
+        foreach ($returnValue as $rowIndex => $row) {
+            if (!empty(array_filter($row)) || !empty($mergeArray) && $rowIndex <= $rowMax) {
+                foreach ($row as $c => $value) {
+                    $colIndex = Coordinate::columnIndexFromString($c);
+                    $isEmpty = true;
+                    foreach ($returnValue as $d) {
+                        // 如果内容不为空，或者在合并单元格中出现，这个单元格不能算成是空
+                        if (!empty($d[$c]) || !empty($mergeArray) && $colIndex <= $colMax) {
+                            $isEmpty = false;
+                            break;
+                        }
+                    }
+                    if (false === $isEmpty) {
+                        $data[$rowIndex][$c] = $value;
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 }
