@@ -215,4 +215,30 @@ class TemplateProcessor extends T
         }
     }
 
+    /**
+     * 替换块标签
+     * 注：原方法因为贪婪模式可能无法正确匹配对应的块
+     *
+     * @param string $blockname 变量名
+     * @param string $replacement 替换字符串
+     *
+     * @return void
+     */
+    public function replaceBlock($blockname, $replacement)
+    {
+        preg_match(
+            '/(<\?xml.*?)(<w:p((?!<w:p[ |>]).)*?>\${' . $blockname . '}<\/w:.*?p>)(.*?)(<w:p((?!<w:p[ |>]).)*?\${\/' . $blockname . '}<\/w:.*?p>)/is',
+            $this->tempDocumentMainPart,
+            $matches
+        );
+
+        if (isset($matches[2])) {
+            $this->tempDocumentMainPart = str_replace(
+                $matches[2] . $matches[4] . $matches[5],
+                $replacement,
+                $this->tempDocumentMainPart
+            );
+        }
+    }
+
 }
