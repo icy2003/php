@@ -39,7 +39,7 @@ class Html
      */
     public static function stripTags($html, $allowTags = [])
     {
-        $allowTags = array_map(strtolower, $allowTags);
+        $allowTags = array_map('strtolower', $allowTags);
         return preg_replace_callback('/<\/?([^>\s]+)[^>]*>/i', function ($matches) use (&$allowTags) {
             return in_array(strtolower($matches[1]), $allowTags) ? $matches[0] : '';
         }, $html);
