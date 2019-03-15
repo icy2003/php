@@ -91,8 +91,15 @@ class iWorksheet
                     } else {
                         $returnValue[$rRef][$cRef] = $nullValue;
                     }
+                    $bgColor = $cell->getStyle()->getFill()->getStartColor()->getRGB();
+                    $color = $cell->getStyle()->getFont()->getColor()->getRGB();
+                    if ('FFFFFF' != $color) {
+                        if ('000000' == $bgColor) {
+                            $bgColor = 'FFFFFF';
+                        }
+                    }
                     $styleArray[$rRef][$cRef] = [
-                        'color' => $cell->getStyle()->getFont()->getColor()->getRGB(),
+                        'color' => $color,
                         'name' => $cell->getStyle()->getFont()->getName(),
                         'size' => $cell->getStyle()->getFont()->getSize(),
                         'bold' => $cell->getStyle()->getFont()->getBold(),
@@ -100,8 +107,7 @@ class iWorksheet
                         'underline' => $cell->getStyle()->getFont()->getUnderline(),
                         'alignment' => $cell->getStyle()->getAlignment()->getHorizontal(),
                         'valign' => $cell->getStyle()->getAlignment()->getVertical(),
-                        // 背景图目前有bug
-                        // 'bgcolor' => $cell->getStyle()->getFill()->getStartColor()->getRGB(),
+                        'bgColor' => $bgColor, // 背景图目前有bug
                     ];
                 } else {
                     $returnValue[$rRef][$cRef] = $nullValue;
