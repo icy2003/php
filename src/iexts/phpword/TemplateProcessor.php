@@ -2,6 +2,7 @@
 
 namespace icy2003\php\iexts\phpword;
 
+use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Env;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
@@ -106,15 +107,17 @@ class TemplateProcessor extends T
      * @see https://github.com/PHPOffice/PHPWord/issues/1198 感谢提供思路
      *
      * @param string $var 变量名
-     * @param array $array 二维数组，带行列号的索引
+     * @param array $array 二维数组，支持两种格式：二维索引数组、行列号的二维数组
      * @param array $mergeArray 合并单元格的数组，例如：["A1:B1", "C1:C2"]
      * @param array $styleArray 对应所有单元格的样式二维数组
-     * @todo 给表格加样式
      *
      * @return void
      */
     public function setTable($var, $array, $mergeArray = [], $styleArray = [])
     {
+        if (Arrays::isAssoc($array)) {
+            $array = Arrays::toCellArray($array);
+        }
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         $style = $phpWord->addTableStyle('tableStyle', [
