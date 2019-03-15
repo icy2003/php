@@ -16,7 +16,7 @@ class Migration extends M
 
     public function createTable($table, $columns, $options = null)
     {
-        if ('mysql' === $this->db->getDriverName()) {
+        if ('imysql' === $this->db->getDriverName()) {
             null === $options && $options = [];
             if (is_array($options)) {
                 $tableOptions = [
