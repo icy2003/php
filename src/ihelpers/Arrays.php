@@ -311,4 +311,25 @@ class Arrays
     {
         return array_filter(array_keys(array_flip(explode(',', implode(',', $array)))));
     }
+
+    /**
+     * 普通二维数组转化成 Excel 单元格二维数组
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function toCellArray($array)
+    {
+        $data = [];
+        $rowIndex = 0;
+        foreach ($array as $row) {
+            $rowIndex++;
+            $colIndex = "A";
+            foreach ($row as $col) {
+                $data[$rowIndex][$colIndex++] = $col;
+            }
+        }
+        return $data;
+    }
 }
