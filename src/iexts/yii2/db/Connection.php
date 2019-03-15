@@ -7,7 +7,7 @@ use icy2003\php\iexts\yii2\db\PDO;
 use yii\db\Connection as C;
 
 /**
- * Ê¾Àý db ÅäÖÃ£º
+ * ç¤ºä¾‹ db é…ç½®ï¼š
  * [
  *     'class' => Connection::className(),
  *     'dsn' => 'imysql:host=127.0.0.1;dbname=test',
