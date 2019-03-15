@@ -9,6 +9,7 @@ class Html
 {
     /**
      * htmlspecialchars 简化版
+     * @see http://php.net/manual/zh/function.htmlspecialchars.php
      *
      * @param string $content
      * @param boolean $doubleEncode 是否重复转化
@@ -22,6 +23,7 @@ class Html
 
     /**
      * htmlspecialchars_decode 简化版
+     * @see http://php.net/manual/zh/function.htmlspecialchars-decode.php
      *
      * @param string $content
      * @return string
@@ -31,7 +33,9 @@ class Html
         return htmlspecialchars_decode($content, ENT_QUOTES);
     }
     /**
-     * strip_tags 改良版：不合法/错误的 html 标签也能匹配
+     * strip_tags 从字符串中去除 HTML 和 PHP 标记
+     * 改良：不合法/错误的 html 标签也能匹配
+     * @see http://php.net/manual/zh/function.strip-tags.php
      *
      * @param string $html
      * @param array $allowTags 区别于 strip_tags，例如 a 和 h1 标签，strip_tags 的需要写成'<a><h1>'这里就写 ['a', 'h1']
