@@ -77,7 +77,7 @@ class Arrays
             $result = [];
             foreach ($array as $row) {
                 $data = !empty($row[$column]) ? $row[$column] : null;
-                if (null === $inedx) {
+                if (null === $index) {
                     $result[] = $data;
                 } else {
                     $result[$row[$index]] = $data;
@@ -331,5 +331,45 @@ class Arrays
             }
         }
         return $data;
+    }
+
+    /**
+     * 获取数组的维度
+     *
+     * @param array $array 多维数组
+     *
+     * @return int
+     */
+    public static function dimension($array)
+    {
+        if (!is_array($array)) {
+            return 0;
+        }
+        $max = 1;
+        foreach ($array as $value) {
+            if (is_array($value)) {
+                $d = self::dimension($value) + 1;
+                if ($d > $max) {
+                    $max = $d;
+                }
+            }
+        }
+        return $max;
+    }
+
+    /**
+     * 判断数组是不是索引数组
+     *
+     * @param array $array
+     *
+     * @return boolean
+     */
+    public static function isAssoc($array)
+    {
+        if (is_array($array)) {
+            $keys = array_keys($array);
+            return $keys !== array_keys($keys);
+        }
+        return false;
     }
 }
