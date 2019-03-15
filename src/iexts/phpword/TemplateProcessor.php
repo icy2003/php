@@ -160,7 +160,10 @@ class TemplateProcessor extends T
                         break;
                     }
                 }
-                $array = array_merge($array, ['valign' => Env::value($styleArray, "{$rowIndex}.{$c}.valign", Jc::CENTER)]);
+                $array = array_merge($array, [
+                    'valign' => Env::value($styleArray, "{$rowIndex}.{$c}.valign", Jc::CENTER),
+                    'bgColor' => Env::value($styleArray, "{$rowIndex}.{$c}.bgColor"),
+                ]);
                 if (true === $isContinue) {
                     $isContinue = false;
                     $table->addCell(null, $array);
