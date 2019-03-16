@@ -2,7 +2,6 @@
 
 namespace icy2003\php\iexts\phpword;
 
-use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Env;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
@@ -107,7 +106,7 @@ class TemplateProcessor extends T
      * @see https://github.com/PHPOffice/PHPWord/issues/1198 感谢提供思路
      *
      * @param string $var 变量名
-     * @param array $array 二维数组，支持两种格式：二维索引数组、行列号的二维数组
+     * @param array $array 只支持行列号的二维数组
      * @param array $mergeArray 合并单元格的数组，例如：["A1:B1", "C1:C2"]
      * @param array $styleArray 对应所有单元格的样式二维数组
      *
@@ -115,9 +114,6 @@ class TemplateProcessor extends T
      */
     public function setTable($var, $array, $mergeArray = [], $styleArray = [])
     {
-        if (Arrays::isAssoc($array)) {
-            $array = Arrays::toCellArray($array);
-        }
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         $style = $phpWord->addTableStyle('tableStyle', [
@@ -167,12 +163,18 @@ class TemplateProcessor extends T
                     'valign' => Env::value($styleArray, "{$rowIndex}.{$c}.valign", Jc::CENTER),
                     'bgColor' => Env::value($styleArray, "{$rowIndex}.{$c}.bgColor"),
                 ]);
+                $alignment = Env::value($styleArray, "{$rowIndex}.{$c}.alignment", Jc::CENTER);
+                // 在高版本的 Word 里，不支持 JC::JUSTIFY 呢
+                if (JC::JUSTIFY == $alignment) {
+                    $alignment = JC::BOTH;
+                }
+                $cellStyle = Env::value($styleArray, "{$rowIndex}.{$c}");
                 if (true === $isContinue) {
                     $isContinue = false;
                     $table->addCell(null, $array);
                 } else {
-                    $table->addCell(null, $array)->addText($value, Env::value($styleArray, "{$rowIndex}.{$c}"), [
-                        'alignment' => Env::value($styleArray, "{$rowIndex}.{$c}.alignment", Jc::CENTER),
+                    $table->addCell(null, $array)->addText($value, $cellStyle, [
+                        'alignment' => $alignment,
                     ]);
                 }
             }
