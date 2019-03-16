@@ -133,6 +133,7 @@ class iWorksheet
         }
         // 去掉空白行和列
         $data = [];
+        $style = [];
         foreach ($returnValue as $r => $row) {
             // 如果使用索引，那么索引和真实行差1
             if (false === $returnCellRef) {
@@ -159,11 +160,12 @@ class iWorksheet
                     if (false === $isEmpty) {
                         // 使用之前的下标
                         $data[$r][$c] = $value;
+                        $style[$r][$c] = $styleArray[$r][$c];
                     }
                 }
             }
         }
 
-        return [$data, $styleArray];
+        return [$data, $style];
     }
 }
