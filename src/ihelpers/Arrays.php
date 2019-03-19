@@ -358,7 +358,7 @@ class Arrays
     }
 
     /**
-     * 判断数组是不是索引数组
+     * 判断数组是不是关联数组
      *
      * @param array $array
      *
@@ -371,5 +371,61 @@ class Arrays
             return $keys !== array_keys($keys);
         }
         return false;
+    }
+
+    /**
+     * 判断数组是不是索引数组
+     * ps：索引数组必须是下标从 0 开始的数组，键是数字还是字符串类型的数字无所谓
+     *
+     * @param array $array
+     *
+     * @return boolean
+     */
+    public static function isIndexed($array)
+    {
+        if (is_array($array)) {
+            $keys = array_keys($array);
+            return $keys === array_keys($keys);
+        }
+        return false;
+    }
+
+    /**
+     * 返回数组的顺数第 n 个元素，其中 n >= 1 且为整数
+     *
+     * ps：支持关联数组，超过数组长度会对数组长度求余后查找
+     *
+     * @param array $array
+     * @param int $pos 顺数第 n 个，默认 1
+     *
+     * @return mixed
+     */
+    public static function first($array, $pos = 1)
+    {
+        $p = $pos % count($array);
+        for ($i = 1; $i < $p; $i++) {
+            next($array);
+        }
+        return current($array);
+    }
+
+    /**
+     * 返回数组的倒数第 n 个元素，其中 n >= 1 且为整数
+     *
+     * ps：支持关联数组，超过数组长度会对数组长度求余后查找
+     *
+     * @param array $array
+     * @param int $pos 倒数第 n 个，默认 1
+     *
+     * @return mixed
+     */
+    public static function last($array, $pos = 1)
+    {
+        $p = $pos % count($array);
+        end($array);
+        for ($i = 1; $i < $p; $i++) {
+            prev($array);
+        }
+        return current($array);
     }
 }
