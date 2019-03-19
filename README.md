@@ -9,24 +9,30 @@
 
 ## 安装
 
-**composer**
-
-建议使用 composer 安装，暂时是开发版，所以后面需要带上 `dev-master`
+composer 安装，暂时是开发版，请使用以下命令：
 
 ```cmd
 composer require icy2003/php dev-master
 ```
 
-用 composer 命令 `composer update` 更新
+`composer update` 的时候请选 `y`
 
-**常规**
+## 目录说明
 
-`clone` 至你的项目中
+- `\src` 根目录
 
-## 使用
+- `\src\iexts` 对其他 PHP 库的扩展：
 
-- 直接使用的例子放在 `samples\` 里，需要测试则执行 `run.bat`，将会开启 PHP 内置服务器，浏览器访问 `http://localhost:8000/[PHP 示例]`
+    1. 命名空间为 `icy2003\php\[原库的类的命名空间]`
 
-- 用 composer 可直接使用
+    2. 同名类表示继承于原类
 
-- 非 composer 项目引入 `I.php` 可实现自动加载
+    3. `i` 前缀的类里对应原类的同名方法，功能有所不同（因为原类难以继承，因此直接抽离出来）
+
+- `\src\ihelpers` 一些帮助函数
+
+其他文件和文件夹正在测试中，请不要过度依赖
+
+## 其他
+
+- 私有成员和方法以双下划线（__）开头，保护成员和方法用单下划线（_）开头，对于构造函数等原生 PHP 就带下划线的，视情况而定

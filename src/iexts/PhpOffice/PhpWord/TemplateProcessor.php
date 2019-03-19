@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\php\iexts\phpword;
+namespace icy2003\php\iexts\PhpOffice\PhpWord;
 
 use icy2003\php\ihelpers\Env;
 use icy2003\php\ihelpers\Html;
