@@ -123,6 +123,25 @@ class iWorksheet
             foreach ($mergeArray as $range) {
                 // rangeStart 没用，因为肯定不会比 rangeEnd 大
                 list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range);
+                $startCol = Coordinate::stringFromColumnIndex($rangeStart[0]);
+                $endCol = Coordinate::stringFromColumnIndex($rangeEnd[0]);
+                // 隐藏单元格不拿时，可能会因为隐藏了合并单元格的一部分导致数据拿不到，因此需要做检测
+                if (true === $onlyVisible) {
+                    $s = 0;
+                    for ($i = $startCol; $i <= $endCol; $i++) {
+                        for ($j = $rangeStart[1]; $j <= $rangeEnd[1]; $j++) {
+                            $colVisible = $workSheet->getColumnDimension($i)->getVisible();
+                            $rowVisible = $workSheet->getRowDimension($j)->getVisible();
+                            if (0 === $s++) {
+                                $initVisible = $colVisible && $rowVisible;
+                            }
+                            $pVisible = $colVisible && $rowVisible;
+                            if (true === $initVisible ^ $pVisible) {
+                                throw new \Exception("不允许隐藏合并单元格的一部分，该合并单元格范围是{$range}，其中{$i}{$j}等单元格被隐藏了");
+                            }
+                        }
+                    }
+                }
                 if ($rangeEnd[0] > $colMax) {
                     $colMax = $rangeEnd[0];
                 }
