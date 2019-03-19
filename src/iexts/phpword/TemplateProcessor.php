@@ -3,6 +3,7 @@
 namespace icy2003\php\iexts\phpword;
 
 use icy2003\php\ihelpers\Env;
+use icy2003\php\ihelpers\Html;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
@@ -173,7 +174,7 @@ class TemplateProcessor extends T
                     $isContinue = false;
                     $table->addCell(null, $array);
                 } else {
-                    $table->addCell(null, $array)->addText($value, $cellStyle, [
+                    $table->addCell(null, $array)->addText(Html::encode($value), $cellStyle, [
                         'alignment' => $alignment,
                     ]);
                 }
