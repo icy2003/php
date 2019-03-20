@@ -6,6 +6,13 @@ use Exception;
 
 class Strings
 {
+
+    const STRINGS_RANDOM_NUMBER = '0123456789';
+
+    const STRINGS_RANDOM_LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+
+    const STRINGS_RANDOM_UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
     /**
      * 返回字符串的字节长（一个中文等于 3 字节哦~）
      *
@@ -31,10 +38,10 @@ class Strings
      * 生成随机字符串
      *
      * @param integer $length
-     * @param string $chars 字符列表，默认为 a-z 和 0-9
+     * @param string $chars 字符列表，默认为0-9和大小写字母
      * @return string
      */
-    public static function random($length = 32, $chars = 'abcdefghijklmnopqrstuvwxyz0123456789')
+    public static function random($length = 32, $chars = self::STRINGS_RANDOM_NUMBER . self::STRINGS_RANDOM_LOWERCASE . self::STRINGS_RANDOM_UPPERCASE)
     {
         $str = '';
         for ($i = 0; $i < $length; ++$i) {

@@ -91,6 +91,7 @@ class iWorksheet
                     } else {
                         $returnValue[$rRef][$cRef] = $nullValue;
                     }
+                    // 背景图目前有bug：当背景是白色时，拿到的是黑色，这里可以按文字颜色判断：如果文字不是白色，那黑色背景强制改成白色
                     $bgColor = $cell->getStyle()->getFill()->getStartColor()->getRGB();
                     $color = $cell->getStyle()->getFont()->getColor()->getRGB();
                     if ('FFFFFF' != $color) {
@@ -107,7 +108,7 @@ class iWorksheet
                         'underline' => $cell->getStyle()->getFont()->getUnderline(),
                         'alignment' => $cell->getStyle()->getAlignment()->getHorizontal(),
                         'valign' => $cell->getStyle()->getAlignment()->getVertical(),
-                        'bgColor' => $bgColor, // 背景图目前有bug
+                        'bgColor' => $bgColor,
                     ];
                 } else {
                     $returnValue[$rRef][$cRef] = $nullValue;
