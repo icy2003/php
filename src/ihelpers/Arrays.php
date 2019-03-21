@@ -402,6 +402,9 @@ class Arrays
      */
     public static function first($array, $pos = 1)
     {
+        if (0 === count($array)) {
+            return null;
+        }
         $p = $pos % count($array);
         for ($i = 1; $i < $p; $i++) {
             next($array);
@@ -421,6 +424,9 @@ class Arrays
      */
     public static function last($array, $pos = 1)
     {
+        if (0 === count($array)) {
+            return null;
+        }
         $p = $pos % count($array);
         end($array);
         for ($i = 1; $i < $p; $i++) {
