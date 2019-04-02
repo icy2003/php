@@ -38,6 +38,9 @@ class Migration extends M
 
     public function tableExists($table)
     {
+        if (preg_match("/{{%(.+)}}/", $table, $matches)) {
+            $table = $matches[1];
+        }
         return $this->db->createCommand()->tableExists($table);
     }
 }
