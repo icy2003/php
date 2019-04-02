@@ -6,7 +6,7 @@ use yii\db\Command as C;
 
 class Command extends C
 {
-    public function isTableExists($table)
+    public function tableExists($table)
     {
         $tables = $this->db->getSchema()->getTableNames();
         return in_array($this->db->tablePrefix . $table, $tables);

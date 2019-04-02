@@ -3,7 +3,6 @@
 namespace icy2003\php\iexts\yii2\db;
 
 use icy2003\php\ihelpers\Env;
-use Yii;
 use yii\db\Migration as M;
 
 class Migration extends M
@@ -15,11 +14,10 @@ class Migration extends M
     const OPTION_ENGINE = 'engine';
     const OPTION_COMMENT = 'comment';
 
-    public function createTable($table, $columns, $options = null)
+    public function createTable($table, $columns, $options = [])
     {
-        if (!static::tableExists($table)) {
+        if (false === $this->tableExists($table)) {
             if ('imysql' === $this->db->getDriverName()) {
-                null === $options && $options = [];
                 if (is_array($options)) {
                     $tableOptions = [
                         sprintf('CHARACTER SET %s', Env::value($options, 'character', 'utf8')),
@@ -34,15 +32,12 @@ class Migration extends M
             } else {
                 $optionString = $options;
             }
-
             return parent::createTable($table, $columns, $optionString);
         }
     }
 
-    public static function tableExists($table)
+    public function tableExists($table)
     {
-        $tableNames = Yii::$app->db->getSchema()->getTableNames();
-
-        return in_array(Yii::$app->db->tablePrefix . $table, $tableNames);
+        return $this->db->createCommand()->tableExists($table);
     }
 }
