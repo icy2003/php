@@ -1,11 +1,11 @@
 <?php
 
-namespace icy2003\php\iexts;
+namespace icy2003\php\iexts\yii2;
 
 /**
  * yii2 模型的单元测试断言快捷方式
  */
-class UnitAssert extends \Codeception\Test\Unit
+class PHPUnit extends \Codeception\Test\Unit
 {
     public static function true($model)
     {
