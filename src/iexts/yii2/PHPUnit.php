@@ -19,10 +19,12 @@ class PHPUnit extends \Codeception\Test\Unit
 
     public static function checkAttribute($model, $attribute, $array)
     {
-        if (2 === count($array) && isset($array[0]) && isset($array[1])) {
+        if (2 >= count($array) && isset($array[0])) {
             $model->$attribute = $array[0];
             static::false($model, $attribute);
-            $model->$attribute = $array[1];
+            if (isset($array[1])) {
+                $model->$attribute = $array[1];
+            }
         } else {
             throw new \Exception('数组 0 位元素表示错误的属性值，1 位元素表示正确的属性值');
         }
