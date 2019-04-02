@@ -3,6 +3,7 @@
 namespace icy2003\php\iexts\yii2\db;
 
 use icy2003\php\ihelpers\Env;
+use Yii;
 use yii\db\Migration as M;
 
 class Migration extends M
@@ -16,23 +17,32 @@ class Migration extends M
 
     public function createTable($table, $columns, $options = null)
     {
-        if ('imysql' === $this->db->getDriverName()) {
-            null === $options && $options = [];
-            if (is_array($options)) {
-                $tableOptions = [
-                    sprintf('CHARACTER SET %s', Env::value($options, 'character', 'utf8')),
-                    sprintf('COLLATE %s', Env::value($options, 'collate', 'utf8_unicode_ci')),
-                    sprintf('ENGINE=%s', Env::value($options, 'engine', 'InnoDB')),
-                    sprintf('COMMENT = "%s"', Env::value($options, 'comment', '')),
-                ];
-                $optionString = implode(' ', $tableOptions);
+        if (!static::tableExists($table)) {
+            if ('imysql' === $this->db->getDriverName()) {
+                null === $options && $options = [];
+                if (is_array($options)) {
+                    $tableOptions = [
+                        sprintf('CHARACTER SET %s', Env::value($options, 'character', 'utf8')),
+                        sprintf('COLLATE %s', Env::value($options, 'collate', 'utf8_unicode_ci')),
+                        sprintf('ENGINE=%s', Env::value($options, 'engine', 'InnoDB')),
+                        sprintf('COMMENT = "%s"', Env::value($options, 'comment', '')),
+                    ];
+                    $optionString = implode(' ', $tableOptions);
+                } else {
+                    $optionString = $options;
+                }
             } else {
                 $optionString = $options;
             }
-        } else {
-            $optionString = $options;
-        }
 
-        return parent::createTable($table, $columns, $optionString);
+            return parent::createTable($table, $columns, $optionString);
+        }
+    }
+
+    public static function tableExists($table)
+    {
+        $tableNames = Yii::$app->db->getSchema()->getTableNames();
+
+        return in_array(Yii::$app->db->tablePrefix . $table, $tableNames);
     }
 }
