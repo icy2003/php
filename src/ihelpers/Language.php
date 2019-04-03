@@ -35,8 +35,8 @@ class Language
     public function t($category, $message, $params = [], $language = 'zh-cn')
     {
         $config = $this->__config;
-        $language = !empty($language) ? $language : Arrays::value($config, 'language');
-        $basePath = Arrays::value($config, 'basePath');
+        $language = !empty($language) ? $language : Env::value($config, 'language');
+        $basePath = Env::value($config, 'basePath');
         if (empty($this->__categories[$category . '_' . $language])) {
             $map = include BaseI::getAlias(trim($basePath, '/') . "/{$language}/{$category}.php");
             $this->__categories[$category . '_' . $language] = $map;
@@ -45,6 +45,6 @@ class Language
         }
         return str_replace(array_map(function ($data) {
             return '{' . $data . '}';
-        }, array_keys($params)), array_values($params), Arrays::value($map, $message, $message));
+        }, array_keys($params)), array_values($params), Env::value($map, $message, $message));
     }
 }

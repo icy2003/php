@@ -153,20 +153,6 @@ class Arrays
     }
 
     /**
-     * 获取数组某个值，以点代替数组层级
-     *
-     * @param array $array
-     * @param string $keyString
-     * @param mixed $defaultValue
-     *
-     * @return mixed
-     */
-    public static function value($array, $keyString, $defaultValue = null)
-    {
-        return Env::value($array, $keyString, $defaultValue);
-    }
-
-    /**
      *  range 的优化版
      * @see http://php.net/manual/zh/language.generators.overview.php
      *
@@ -309,7 +295,15 @@ class Arrays
      */
     public static function toPart($array)
     {
-        return array_filter(array_keys(array_flip(explode(',', implode(',', $array)))));
+        return array_values(
+            array_filter(
+                array_keys(
+                    array_flip(
+                        explode(',', implode(',', $array))
+                    )
+                )
+            )
+        );
     }
 
     /**
@@ -406,6 +400,9 @@ class Arrays
             return null;
         }
         $p = $pos % count($array);
+        if (0 === $p) {
+            $p = count($array);
+        }
         for ($i = 1; $i < $p; $i++) {
             next($array);
         }
@@ -428,6 +425,9 @@ class Arrays
             return null;
         }
         $p = $pos % count($array);
+        if (0 === $p) {
+            $p = count($array);
+        }
         end($array);
         for ($i = 1; $i < $p; $i++) {
             prev($array);

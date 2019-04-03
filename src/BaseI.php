@@ -2,7 +2,7 @@
 
 namespace icy2003\php;
 
-use icy2003\php\ihelpers\Arrays;
+use icy2003\php\ihelpers\Env;
 
 defined('I_DEBUG') || define('I_DEBUG', false);
 $defaultConfig = '@icy2003/config.php';
@@ -107,7 +107,7 @@ class BaseI
 
     public static function config($name)
     {
-        return Arrays::value(Arrays::arrayMergeRecursive(require static::getAlias(I_DEFAULT_CONFIG_FILE), require static::getAlias(I_CONFIG_FILE)), $name);
+        return Env::value(Arrays::arrayMergeRecursive(require static::getAlias(I_DEFAULT_CONFIG_FILE), require static::getAlias(I_CONFIG_FILE)), $name);
     }
 
     /**
