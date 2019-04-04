@@ -139,4 +139,17 @@ class Env
         }
         return false;
     }
+
+    /**
+     * 定义一个常量
+     *
+     * @param string $constant 常量名
+     * @param mixed $value 值
+     *
+     * @return void
+     */
+    public static function def($constant, $value)
+    {
+        defined($constant) || define($constant, $value);
+    }
 }
