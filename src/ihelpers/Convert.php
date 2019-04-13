@@ -1,18 +1,25 @@
 <?php
+/**
+ * @link https://www.icy2003.com/
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
 /**
  * 转化类
- * Convert::f2t8($number) 二进制转八进制
- * Convert::f2t10($number) 二进制转十进制
- * Convert::f2t16($number) 二进制转十六进制
- * Convert::f8t2($number) 八进制转二进制
- * Convert::f8t10($number) 八进制转十进制
- * Convert::f8t16($number) 八进制转十六进制
- * Convert::f16t2($number) 十六进制转二进制
- * Convert::f16t8($number) 十六进制转八进制
- * Convert::f16t10($number) 十六进制转十进制
+ *
+ * @author icy2003 <2317216477@qq.com>
+ *
+ * @method string Convert::f2t8(string $number) 从二进制转到八进制
+ * @method string Convert::f2t10(string $number) 从二进制转到十进制
+ * @method string Convert::f2t16(string $number) 从二进制转到十六进制
+ * @method string Convert::f8t2(string $number) 从八进制转到二进制
+ * @method string Convert::f8t10(string $number) 从八进制转到十进制
+ * @method string Convert::f8t16(string $number) 从八进制转到十六进制
+ * @method string Convert::f16t2(string $number) 从十六进制转到二进制
+ * @method string Convert::f16t8(string $number) 从十六进制转到八进制
+ * @method string Convert::f16t10(string $number) 从十六进制转到十进制
  */
 class Convert
 {
@@ -24,6 +31,13 @@ class Convert
         '16' => '0123456789ABCDEF',
     ];
 
+    /**
+     * 其他数量转化为字节数
+     *
+     * @param string $sizeValue 大小。例如：10m、10M、10Tb、10kB 等
+     *
+     * @return string
+     */
     public static function size($sizeValue)
     {
         $callback = function ($matches) {
@@ -91,6 +105,14 @@ class Convert
         return $retval;
     }
 
+    /**
+     * 2、8、10、16 进制转化的魔术方法
+     *
+     * @param string $name 静态方法名
+     * @param array $arguments 参数
+     *
+     * @return string
+     */
     public static function __callStatic($name, $arguments)
     {
         if (1 !== count($arguments)) {

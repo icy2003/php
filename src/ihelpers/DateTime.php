@@ -1,9 +1,15 @@
 <?php
+/**
+ * @link https://www.icy2003.com/
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
 /**
  * 日期类
+ *
+ * @author icy2003 <2317216477@qq.com>
  */
 class DateTime
 {
