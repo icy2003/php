@@ -1,9 +1,15 @@
 <?php
+/**
+ * @link https://www.icy2003.com/
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
 /**
  * 编码转换
+ *
+ * @author icy2003 <2317216477@qq.com>
  */
 class Charset
 {
@@ -33,7 +39,7 @@ class Charset
      *
      * @return string 转码后的字符串
      */
-    public static function convert2utf($string, $charset = '')
+    public static function toUtf($string, $charset = '')
     {
         $charset = $charset ?: static::detect($string);
         $converted = @iconv($charset, 'UTF-8//TRANSLIT//IGNORE', $string);
@@ -51,7 +57,7 @@ class Charset
      *
      * @return string 转码后的字符串
      */
-    public static function convert2cn($string, $charset = '')
+    public static function toCn($string, $charset = '')
     {
         $charset = $charset ?: static::detect($string);
         $converted = @iconv($charset, 'EUC-CN//TRANSLIT//IGNORE', $string);
@@ -62,6 +68,13 @@ class Charset
         return $converted;
     }
 
+    /**
+     * 判断字符串是否是 UTF-8 编码
+     *
+     * @param string $string 待检测的字符串
+     *
+     * @return boolean
+     */
     public static function isUtf8($string)
     {
         return 'UTF-8' === static::detect($string);
