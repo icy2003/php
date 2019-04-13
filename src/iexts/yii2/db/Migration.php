@@ -2,7 +2,7 @@
 
 namespace icy2003\php\iexts\yii2\db;
 
-use icy2003\php\ihelpers\Env;
+use icy2003\php\I;
 use yii\db\Migration as M;
 
 class Migration extends M
@@ -20,10 +20,10 @@ class Migration extends M
             if ('imysql' === $this->db->getDriverName()) {
                 if (is_array($options)) {
                     $tableOptions = [
-                        sprintf('CHARACTER SET %s', Env::value($options, 'character', 'utf8')),
-                        sprintf('COLLATE %s', Env::value($options, 'collate', 'utf8_unicode_ci')),
-                        sprintf('ENGINE=%s', Env::value($options, 'engine', 'InnoDB')),
-                        sprintf('COMMENT = "%s"', Env::value($options, 'comment', '')),
+                        sprintf('CHARACTER SET %s', I::value($options, 'character', 'utf8')),
+                        sprintf('COLLATE %s', I::value($options, 'collate', 'utf8_unicode_ci')),
+                        sprintf('ENGINE=%s', I::value($options, 'engine', 'InnoDB')),
+                        sprintf('COMMENT = "%s"', I::value($options, 'comment', '')),
                     ];
                     $optionString = implode(' ', $tableOptions);
                 } else {

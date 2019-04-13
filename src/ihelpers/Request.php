@@ -2,6 +2,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * @see https://github.com/yiisoft/yii2/blob/master/framework/web/Request.php
  */
@@ -50,7 +52,7 @@ class Request
         if (isset($_POST[$this->__methodParam]) && !in_array($method = strtoupper($_POST[$this->__methodParam]), ['GET', 'HEAD', 'OPTIONS'])) {
             return $method;
         }
-        if ($method = Env::value($this->getHeaders(), 'x-http-method-override')) {
+        if ($method = I::value($this->getHeaders(), 'x-http-method-override')) {
             return strtoupper($method);
         }
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -96,7 +98,7 @@ class Request
 
     public function getIsAjax()
     {
-        return 'XMLHttpRequest' === Arrays::first(Env::value($this->getHeaders(), 'x-requested-with'));
+        return 'XMLHttpRequest' === Arrays::first(I::value($this->getHeaders(), 'x-requested-with'));
     }
 
     private $__rawBody;
@@ -139,7 +141,7 @@ class Request
 
     public function getBodyParam($name, $defaultValue = null)
     {
-        return Env::value($this->getBodyParams(), $name, $defaultValue);
+        return I::value($this->getBodyParams(), $name, $defaultValue);
     }
 
     public function post($name = null, $defaultValue = null)
@@ -162,7 +164,7 @@ class Request
 
     public function getQueryParam($name, $defaultValue = null)
     {
-        return Env::value($this->getQueryParams(), $name, $defaultValue);
+        return I::value($this->getQueryParams(), $name, $defaultValue);
     }
 
     public function get($name = null, $defaultValue = null)
@@ -180,10 +182,10 @@ class Request
         if (null === $this->__hostInfo) {
             $secure = $this->getIsSecureConnection();
             $http = $secure ? 'https' : 'http';
-            if (Env::value($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim(Arrays::first(explode(',', Arrays::first(Env::value($this->getHeaders(), 'x-forward-host')))));
-            } elseif (Env::value($this->getHeaders(), 'host')) {
-                $this->__hostInfo = $http . '://' . Arrays::first(Env::value($this->getHeaders(), 'host'));
+            if (I::value($this->getHeaders(), 'x-forwarded-host')) {
+                $this->__hostInfo = $http . '://' . trim(Arrays::first(explode(',', Arrays::first(I::value($this->getHeaders(), 'x-forward-host')))));
+            } elseif (I::value($this->getHeaders(), 'host')) {
+                $this->__hostInfo = $http . '://' . Arrays::first(I::value($this->getHeaders(), 'host'));
             } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->__hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();
@@ -229,7 +231,7 @@ class Request
 
     public function getQueryString()
     {
-        return Env::value($_SERVER, 'QUERY_STRING', '');
+        return I::value($_SERVER, 'QUERY_STRING', '');
     }
 
     public function getIsSecureConnection()
@@ -238,7 +240,7 @@ class Request
             return true;
         }
         foreach ($this->__secureProtocolHeaders as $header => $values) {
-            if (($headerValue = Env::value($this->getHeaders(), $header)) !== null) {
+            if (($headerValue = I::value($this->getHeaders(), $header)) !== null) {
                 foreach ($values as $value) {
                     if (strcasecmp($headerValue, $value) === 0) {
                         return true;
@@ -252,34 +254,34 @@ class Request
 
     public function getServerName()
     {
-        return Env::value($_SERVER, 'SERVER_NAME');
+        return I::value($_SERVER, 'SERVER_NAME');
     }
 
     public function getServerPort()
     {
-        return Env::value($_SERVER, 'SERVER_PORT');
+        return I::value($_SERVER, 'SERVER_PORT');
     }
 
     public function getReferrer()
     {
-        return Arrays::first(Env::value($this->getHeaders(), 'referer'));
+        return Arrays::first(I::value($this->getHeaders(), 'referer'));
     }
 
     public function getOrigin()
     {
-        return Arrays::first(Env::value($this->getHeaders(), 'origin'));
+        return Arrays::first(I::value($this->getHeaders(), 'origin'));
     }
 
     public function getUserAgent()
     {
-        return Arrays::first(Env::value($this->getHeaders(), 'user-agent'));
+        return Arrays::first(I::value($this->getHeaders(), 'user-agent'));
     }
 
     public function getUserIP()
     {
         foreach ($this->__ipHeaders as $ipHeader) {
-            if (Env::value($this->getHeaders(), $ipHeader)) {
-                return trim(Arrays::first(explode(',', Arrays::first(Env::value($this->getHeaders(), $ipHeader)))));
+            if (I::value($this->getHeaders(), $ipHeader)) {
+                return trim(Arrays::first(explode(',', Arrays::first(I::value($this->getHeaders(), $ipHeader)))));
             }
         }
         return $this->getRemoteIP();
@@ -300,7 +302,7 @@ class Request
         if (isset($_SERVER['CONTENT_TYPE'])) {
             return $_SERVER['CONTENT_TYPE'];
         }
-        return Arrays::first(Env::value($this->getHeaders(), 'content-type'));
+        return Arrays::first(I::value($this->getHeaders(), 'content-type'));
     }
 
 }

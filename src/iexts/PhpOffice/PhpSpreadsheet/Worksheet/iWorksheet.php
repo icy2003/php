@@ -2,7 +2,7 @@
 
 namespace icy2003\php\iexts\PhpOffice\PhpSpreadsheet\Worksheet;
 
-use icy2003\php\ihelpers\Env;
+use icy2003\php\I;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
@@ -39,8 +39,8 @@ class iWorksheet
 
         ++$maxCol;
         $r = -1;
-        $onlyVisible = Env::value($params, 'onlyVisible', true);
-        $fillColor = Env::value($params, 'fillColor', false);
+        $onlyVisible = I::value($params, 'onlyVisible', true);
+        $fillColor = I::value($params, 'fillColor', false);
         for ($row = $minRow; $row <= $maxRow; ++$row) {
             if (true === $onlyVisible) {
                 $rowVisible = $workSheet->getRowDimension($row)->getVisible();

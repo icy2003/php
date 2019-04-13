@@ -1,9 +1,17 @@
 <?php
+/**
+ * @link https://www.icy2003.com/
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
- * 数组处理
+ * 数组类：常见数组格式的拼装和处理
+ *
+ * @author icy2003 <2317216477@qq.com>
  */
 class Arrays
 {
@@ -99,7 +107,7 @@ class Arrays
     public static function arrayKeysExists($keys, $array)
     {
 
-        return Env::isEmpty(array_diff($keys, array_keys($array)));
+        return I::isEmpty(array_diff($keys, array_keys($array)));
     }
 
     /**
@@ -213,7 +221,7 @@ class Arrays
     public static function detect($array, $callback)
     {
         foreach ($array as $key => $item) {
-            if (Env::trigger($callback, [$item, $key])) {
+            if (I::trigger($callback, [$item, $key])) {
                 return $item;
             }
         }
@@ -233,9 +241,9 @@ class Arrays
     {
         $all = [];
         foreach ($array as $key => $item) {
-            if (Env::trigger($callback, [$item, $key])) {
+            if (I::trigger($callback, [$item, $key])) {
                 if (null !== $filter) {
-                    $all[$key] = Env::trigger($filter, [$item, $key]);
+                    $all[$key] = I::trigger($filter, [$item, $key]);
                 } else {
                     $all[$key] = $item;
                 }
