@@ -22,6 +22,6 @@ return [
     ],
     'Language' => [
         'language' => 'zh-cn',
-        'basePath' => '@icy2003/php/language'
+        'basePath' => '@icy2003/php/languages'
     ]
 ];
