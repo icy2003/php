@@ -1,4 +1,4 @@
-<?php namespace tests\ihelpers;
+<?php namespace icy2003\php\tests\ihelpers;
 
 use icy2003\php\ihelpers\Arrays;
 
