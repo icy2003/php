@@ -22,6 +22,8 @@ class Arrays
      * @param string $index 用来作为键的某字段
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testIndexBy
      */
     public static function indexBy($array, $index, $isMerge = false)
     {
@@ -48,6 +50,8 @@ class Arrays
      * @param int $dimension 维度，默认 2 维数组
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testColumns
      */
     public static function columns($array, $fields, $dimension = 2)
     {
@@ -70,12 +74,16 @@ class Arrays
     /**
      * array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
      * 如果需要取某几项，建议使用 Arrays::columns
+     *
      * @see http://php.net/array_column
      *
      * @param array $array
      * @param string $column
      * @param string $index
+     *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayColumn
      */
     public static function arrayColumn($array, $column, $index = null)
     {
@@ -103,6 +111,8 @@ class Arrays
      * @param array $array
      *
      * @return boolean
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyExists
      */
     public static function arrayKeysExists($keys, $array)
     {
@@ -112,12 +122,15 @@ class Arrays
 
     /**
      * 参照 PHP 的 array_combine 函数，array_combine 得到的是一行记录的格式，该函数得到多行
+     *
      * @see http://php.net/array_combine
      *
      * @param array $keys
      * @param array $arrays
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayCombines
      */
     public static function arrayCombines($keys, $arrays)
     {
@@ -130,12 +143,15 @@ class Arrays
     }
     /**
      * 递归地合并多个数组，区别于 array_merge_recursive，如果有相同的键，后者会覆盖前者
+     *
      * @see http://php.net/array_merge_recursive
      *
      * @param array $a
      * @param array $b
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayMergeRecursive
      */
     public static function arrayMergeRecursive($a, $b)
     {
@@ -162,14 +178,17 @@ class Arrays
 
     /**
      *  range 的优化版
+     *
      * @see http://php.net/manual/zh/language.generators.overview.php
+     * @version PHP >= 5.5
      *
      * @param integer $start
      * @param integer $end
      * @param integer $step
-     * @version PHP >= 5.5
      *
      * @return \Generator
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testRange
      */
     public static function range($start, $end, $step = 1)
     {
@@ -198,6 +217,8 @@ class Arrays
      * @param array $array
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayTransposed
      */
     public static function arrayTransposed($array)
     {
@@ -217,6 +238,8 @@ class Arrays
      * @param callback $callback
      *
      * @return mixed
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testDetect
      */
     public static function detect($array, $callback)
     {
@@ -236,6 +259,8 @@ class Arrays
      * @param callback $filter 对符合条件的项进行回调处理并返回
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testAll
      */
     public static function all($array, $callback, $filter = null)
     {
@@ -260,6 +285,8 @@ class Arrays
      * @param array $array
      *
      * @return string
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyLast
      */
     public static function arrayKeyLast($array)
     {
@@ -281,6 +308,8 @@ class Arrays
      * @param array $array
      *
      * @return string
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyFirst
      */
     public static function arrayKeyFirst($array)
     {
@@ -300,6 +329,8 @@ class Arrays
      * @param array $array
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testToPart
      */
     public static function toPart($array)
     {
@@ -320,6 +351,8 @@ class Arrays
      * @param array $array
      *
      * @return array
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testToCellArray
      */
     public static function toCellArray($array)
     {
@@ -341,6 +374,8 @@ class Arrays
      * @param array $array 多维数组
      *
      * @return int
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testDimension
      */
     public static function dimension($array)
     {
@@ -365,6 +400,8 @@ class Arrays
      * @param array $array
      *
      * @return boolean
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testIsAssoc
      */
     public static function isAssoc($array)
     {
@@ -377,11 +414,14 @@ class Arrays
 
     /**
      * 判断数组是不是索引数组
-     * ps：索引数组必须是下标从 0 开始的数组，键是数字还是字符串类型的数字无所谓
+     *
+     * 索引数组必须是下标从 0 开始的数组，键是数字还是字符串类型的数字无所谓
      *
      * @param array $array
      *
      * @return boolean
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testIsIndexed
      */
     public static function isIndexed($array)
     {
@@ -395,12 +435,14 @@ class Arrays
     /**
      * 返回数组的顺数第 n 个元素，其中 n >= 1 且为整数
      *
-     * ps：支持关联数组，超过数组长度会对数组长度求余后查找
+     * 支持关联数组，超过数组长度会对数组长度求余后查找
      *
      * @param array $array
      * @param int $pos 顺数第 n 个，默认 1
      *
      * @return mixed
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testFirst
      */
     public static function first($array, $pos = 1)
     {
@@ -420,12 +462,14 @@ class Arrays
     /**
      * 返回数组的倒数第 n 个元素，其中 n >= 1 且为整数
      *
-     * ps：支持关联数组，超过数组长度会对数组长度求余后查找
+     * 支持关联数组，超过数组长度会对数组长度求余后查找
      *
      * @param array $array
      * @param int $pos 倒数第 n 个，默认 1
      *
      * @return mixed
+     *
+     * @test icy2003\php\tests\ihelpers\ArraysTest::testLast
      */
     public static function last($array, $pos = 1)
     {
