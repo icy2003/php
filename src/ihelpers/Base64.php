@@ -1,27 +1,55 @@
 <?php
+/**
+ * @link https://www.icy2003.com/
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
 /**
  * Base64 相关
+ *
+ * @author icy2003 <2317216477@qq.com>
  */
 class Base64
 {
-    public static function file2Base64($file)
+
+    /**
+     * 判断字符串是否是 base64 字符串
+     *
+     * @param string $string
+     *
+     * @return boolean
+     */
+    public static function isBase64($string)
     {
-        $base64 = null;
-        if ($fp = fopen($file, 'rb', 0)) {
-            $gambar = fread($fp, filesize($file));
-            fclose($fp);
+        return $string == base64_encode(base64_decode($string));
+    }
 
-            $base64 = chunk_split(base64_encode($gambar));
-        }
-
+    /**
+     * 文件转成 base64 字符串
+     *
+     * @param string $file 文件路径
+     *
+     * @return string
+     */
+    public static function fromFile($file)
+    {
+        $base64 = false;
+        File::fileExists($file) && $base64 = base64_encode(file_get_contents($file));
         return $base64;
     }
 
-    public static function base64ImgTag($base64)
+    /**
+     * base64 字符串转成文件
+     *
+     * @param string $string base64 字符串
+     * @param string $file 文件路径
+     *
+     * @return boolean
+     */
+    public static function toFile($string, $file = '')
     {
-        return '<img src="data:image/jpg/png/gif;base64,' . $base64 . '" >';
+        return (bool)file_put_contents($file, base64_decode($string));
     }
 }
