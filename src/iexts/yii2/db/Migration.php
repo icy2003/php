@@ -1,19 +1,52 @@
 <?php
+/**
+ * Class Migration
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\iexts\yii2\db;
 
 use icy2003\php\I;
 use yii\db\Migration as M;
 
+/**
+ * Migration 扩展
+ */
 class Migration extends M
 {
     use iSchemaBuilderTrait;
 
+    /**
+     * character 设置
+     */
     const OPTION_CHARACTER = 'character';
+    /**
+     * collate 设置
+     */
     const OPTION_COLLATE = 'collate';
+
+    /**
+     * engine 设置
+     */
     const OPTION_ENGINE = 'engine';
+
+    /**
+     * comment 设置
+     */
     const OPTION_COMMENT = 'comment';
 
+    /**
+     * 创建一个表
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $options
+     *
+     * @return void
+     */
     public function createTable($table, $columns, $options = [])
     {
         if (false === $this->tableExists($table)) {
@@ -36,6 +69,15 @@ class Migration extends M
         }
     }
 
+    /**
+     * 判断表是否存在
+     *
+     * 支持 yii2 的 {{}} 格式
+     *
+     * @param string $table
+     *
+     * @return boolean
+     */
     public function tableExists($table)
     {
         if (preg_match("/{{%(.+)}}/", $table, $matches)) {

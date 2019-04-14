@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class File
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -10,8 +13,6 @@ use icy2003\php\I;
 
 /**
  * 文件类
- *
- * @author icy2003 <2317216477@qq.com>
  *
  * @todo create 单例会有两次请求，一次获取文件属性，一次用于读取文件
  */
@@ -241,17 +242,33 @@ class File
 
     // 读文件
 
+    /**
+     * 单例对象
+     *
+     * @var static
+     */
     protected static $_instance;
 
+    /**
+     * 构造函数
+     *
+     * @return void
+     */
     private function __construct()
     {
     }
 
+    /**
+     * 克隆函数
+     *
+     * @return void
+     */
     private function __clone()
     {
     }
 
     /**
+     * 创建单例
      *
      * @return static
      */
@@ -281,6 +298,12 @@ class File
      * @var \SplTempFileObject
      */
     private $__tempFileObjectHandler;
+
+    /**
+     * 属性列表
+     *
+     * @var array
+     */
     private $__attributes = [
         'isExists' => false,
         'fileSize' => 0,

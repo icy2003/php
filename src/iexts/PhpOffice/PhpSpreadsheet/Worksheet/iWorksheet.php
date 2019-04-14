@@ -1,4 +1,11 @@
 <?php
+/**
+ * Class iWorksheet
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\iexts\PhpOffice\PhpSpreadsheet\Worksheet;
 
@@ -7,6 +14,9 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+/**
+ * Worksheet 扩展
+ */
 class iWorksheet
 {
     /**

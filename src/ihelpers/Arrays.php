@@ -12,8 +12,9 @@ namespace icy2003\php\ihelpers;
 use icy2003\php\I;
 
 /**
- * 数组类：常见数组格式的拼装和处理
- * @filesource Arrays.php
+ * 数组类
+ *
+ * 常见数组格式的拼装和处理
  */
 class Arrays
 {

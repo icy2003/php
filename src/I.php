@@ -10,7 +10,7 @@
 namespace icy2003\php;
 
 /**
- * I
+ * I 类
  */
 class I
 {

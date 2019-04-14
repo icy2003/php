@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class Http
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -12,8 +15,6 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * 用 guzzlehttp 封装的简单的方法，更复杂的请使用 guzzlehttp
- *
- * @author icy2003 <2317216477@qq.com>
  */
 class Http
 {

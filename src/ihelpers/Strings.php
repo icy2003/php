@@ -1,22 +1,42 @@
 <?php
+/**
+ * Class Strings
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
-use Exception;
+use icy2003\php\I;
 
+/**
+ * 字符串类
+ */
 class Strings
 {
 
+    /**
+     * 随机数种子（数字）
+     */
     const STRINGS_RANDOM_NUMBER = '0123456789';
 
+    /**
+     * 随机数种子（小写字母）
+     */
     const STRINGS_RANDOM_LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
 
+    /**
+     * 随机数种子（大写字母）
+     */
     const STRINGS_RANDOM_UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
      * 返回字符串的字节长（一个中文等于 3 字节哦~）
      *
      * @param string $string
+     *
      * @return int
      */
     public static function byteLength($string)
@@ -27,6 +47,7 @@ class Strings
      * 返回字符个数（一个中文就是 1 个啦~）
      *
      * @param string $string
+     *
      * @return int
      */
     public static function length($string)
@@ -39,6 +60,7 @@ class Strings
      *
      * @param integer $length
      * @param string $chars 字符列表，默认为0-9和大小写字母
+     *
      * @return string
      */
     public static function random($length = 32, $chars = self::STRINGS_RANDOM_NUMBER . self::STRINGS_RANDOM_LOWERCASE . self::STRINGS_RANDOM_UPPERCASE)
@@ -54,8 +76,9 @@ class Strings
     /**
      * 生成密码 hash
      *
-     * @param string $password
+     * @param string $password 原始密码
      * @param int $cost
+     *
      * @return string
      */
     public static function generatePasswordHash($password, $cost = null)
@@ -66,13 +89,13 @@ class Strings
             return password_hash($password, PASSWORD_DEFAULT, ['cost' => $cost]);
         }
         if ($cost < 4 || $cost > 31) {
-            throw new Exception('cost 必须大于等于 4，小于等于 31');
+            throw new \Exception('cost 必须大于等于 4，小于等于 31');
         }
         $salt = sprintf('$2y$%02d$', $cost);
         $salt .= str_replace('+', '.', substr(base64_encode(static::random(20)), 0, 22));
         $hash = crypt($password, $salt);
         if (!is_string($hash) || strlen($hash) !== 60) {
-            throw new Exception('未知错误');
+            throw new \Exception('未知错误');
         }
         return $hash;
     }
@@ -80,8 +103,9 @@ class Strings
     /**
      * 验证密码
      *
-     * @param string $password
+     * @param string $password 原始密码
      * @param string $hash
+     *
      * @return boolean
      */
     public static function validatePassword($password, $hash)
@@ -126,6 +150,7 @@ class Strings
      * 小驼峰转化成下划线（如需要大写下划线，用 strtoupper 转化即可）
      *
      * @param string $string
+     *
      * @return string
      */
     public static function camel2underline($string)
@@ -137,6 +162,7 @@ class Strings
      * 下划线转化为小驼峰（如需要大驼峰，用 ucfirst 转化即可）
      *
      * @param string $string
+     *
      * @return string
      */
     public static function underline2camel($string)
@@ -162,39 +188,39 @@ class Strings
      * 检查字符串是否以某字符串开头
      *
      * @param string $string
-     * @param string $search
+     * @param string $search 待搜索子字符串
      *
      * @return boolean
      */
     public static function startsWith($string, $search)
     {
-        return !empty($search) && mb_strpos($string, $search) === 0;
+        return !I::isEmpty($search) && mb_strpos($string, $search) === 0;
     }
 
     /**
      * 检查字符串是否以某字符串结尾
      *
      * @param string $string
-     * @param string $search
+     * @param string $search 待搜索子字符串
      *
      * @return boolean
      */
     public static function endsWith($string, $search)
     {
-        return !empty($search) && mb_substr($string, -static::length($search)) === $search;
+        return !I::isEmpty($search) && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
      * 检查字符串中是否包含某字符串
      *
      * @param string $string
-     * @param string $search
+     * @param string $search 待搜索子字符串
      *
      * @return boolean
      */
     public static function contains($string, $search)
     {
-        return !empty($search) && mb_strpos($string, $search) !== false;
+        return !I::isEmpty($search) && mb_strpos($string, $search) !== false;
     }
 
     /**

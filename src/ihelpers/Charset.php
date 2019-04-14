@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class Charset
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -8,8 +11,6 @@ namespace icy2003\php\ihelpers;
 
 /**
  * 编码转换
- *
- * @author icy2003 <2317216477@qq.com>
  */
 class Charset
 {
@@ -36,6 +37,7 @@ class Charset
      * 将任意编码的字符串转成 UTF-8.
      *
      * @param string $string
+     * @param string $charset 原编码，默认会自动判断
      *
      * @return string 转码后的字符串
      */
@@ -54,6 +56,7 @@ class Charset
      * 将任意编码的字符串转成中文编码.
      *
      * @param string $string
+     * @param string $charset 原编码，默认会自动判断
      *
      * @return string 转码后的字符串
      */

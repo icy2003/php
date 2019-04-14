@@ -1,4 +1,11 @@
 <?php
+/**
+ * Config config.php
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 return [
     'Logger' => [

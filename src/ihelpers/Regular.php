@@ -1,18 +1,28 @@
 <?php
+/**
+ * Class Regular
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
 /**
- * 一些常用的正则表达式校验
+ * 正则相关
+ *
+ * 常用的正则表达式校验
  */
 class Regular
 {
 
     /**
      * 验证邮箱
+     *
      * @see http://www.regular-expressions.info/email.html
      *
-     * @param string $email
+     * @param string $email 邮箱
      *
      * @return boolean
      */
@@ -23,9 +33,10 @@ class Regular
 
     /**
      * 验证 IP
+     *
      * @see https://www.regular-expressions.info/ip.html
      *
-     * @param string $ip
+     * @param string $ip IP
      *
      * @return boolean
      */
@@ -37,7 +48,7 @@ class Regular
     /**
      * 验证手机
      *
-     * @param string $mobile
+     * @param string $mobile 手机号
      *
      * @return boolean
      */
@@ -49,7 +60,7 @@ class Regular
     /**
      * 验证身份证号
      *
-     * @param string $idCard
+     * @param string $idCard 身份证号
      *
      * @return boolean
      */

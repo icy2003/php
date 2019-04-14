@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class Convert
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -8,8 +11,6 @@ namespace icy2003\php\ihelpers;
 
 /**
  * 转化类
- *
- * @author icy2003 <2317216477@qq.com>
  *
  * @method string Convert::f2t8(string $number) 从二进制转到八进制
  * @method string Convert::f2t10(string $number) 从二进制转到十进制
@@ -24,6 +25,11 @@ namespace icy2003\php\ihelpers;
 class Convert
 {
 
+    /**
+     * 默认支持的进制转化配置
+     *
+     * @var array
+     */
     protected static $_N = [
         '2' => '01',
         '8' => '01234567',

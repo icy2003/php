@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class Html
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -8,8 +11,6 @@ namespace icy2003\php\ihelpers;
 
 /**
  * Html 相关
- *
- * @author icy2003 <2317216477@qq.com>
  */
 class Html
 {

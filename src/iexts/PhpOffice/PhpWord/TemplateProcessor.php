@@ -1,4 +1,11 @@
 <?php
+/**
+ * Class TemplateProcessor
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\iexts\PhpOffice\PhpWord;
 
@@ -10,43 +17,88 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\TemplateProcessor as T;
 
+/**
+ * TemplateProcessor 扩展
+ */
 class TemplateProcessor extends T
 {
 
+    /**
+     * TemplateProcessor 构造器
+     *
+     * @param string $documentTemplate Word 文件路径
+     */
     public function __construct($documentTemplate)
     {
         parent::__construct($documentTemplate);
         $this->_tempDocumentSettingPart = $this->readPartWithRels($this->_getSettingName());
     }
 
+    /**
+     * 获取 Word 的设置文件名
+     *
+     * @return string
+     */
     protected function _getSettingName()
     {
         return 'word/settings.xml';
     }
 
+    /**
+     * Word 的设置部分
+     *
+     * @var string
+     */
     protected $_tempDocumentSettingPart = "";
 
+    /**
+     * Word 的主体部分
+     *
+     * @return string
+     */
     public function getMain()
     {
         return $this->tempDocumentMainPart;
     }
 
+    /**
+     * 设置主体代码
+     *
+     * @param string $main
+     *
+     * @return static
+     */
     public function setMain($main)
     {
         $this->tempDocumentMainPart = $main;
         return $this;
     }
 
+    /**
+     * 获取头部
+     *
+     * @return string
+     */
     public function getHeaders()
     {
         return $this->tempDocumentHeaders;
     }
 
+    /**
+     * 获取脚部
+     *
+     * @return string
+     */
     public function getFooters()
     {
         return $this->tempDocumentFooters;
     }
 
+    /**
+     * 获取设置
+     *
+     * @return string
+     */
     public function getSettings()
     {
         return $this->_tempDocumentSettingPart;
@@ -93,6 +145,13 @@ class TemplateProcessor extends T
         return $this->tempDocumentFilename;
     }
 
+    /**
+     * 获取块
+     *
+     * @param string $string
+     *
+     * @return string
+     */
     private function __getBodyBlock($string)
     {
         if (preg_match('%(?i)(?<=<w:body>)[\s|\S]*?(?=</w:body>)%', $string, $matches)) {
