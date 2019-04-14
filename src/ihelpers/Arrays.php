@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class Arrays
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -10,8 +13,7 @@ use icy2003\php\I;
 
 /**
  * 数组类：常见数组格式的拼装和处理
- *
- * @author icy2003 <2317216477@qq.com>
+ * @filesource Arrays.php
  */
 class Arrays
 {
@@ -20,6 +22,7 @@ class Arrays
      *
      * @param array  $array
      * @param string $index 用来作为键的某字段
+     * @param boolean $isMerge 是否合并相同键的项到数组，默认否（也就是后者覆盖前者）
      *
      * @return array
      *
@@ -78,8 +81,8 @@ class Arrays
      * @see http://php.net/array_column
      *
      * @param array $array
-     * @param string $column
-     * @param string $index
+     * @param string $column 需要被取出来的字段
+     * @param string $index 作为 index 的字段
      *
      * @return array
      *
@@ -107,7 +110,7 @@ class Arrays
     /**
      * 检测数组里是否有某些键.
      *
-     * @param array $keys
+     * @param array $keys 被检测的键
      * @param array $array
      *
      * @return boolean
@@ -125,7 +128,7 @@ class Arrays
      *
      * @see http://php.net/array_combine
      *
-     * @param array $keys
+     * @param array $keys 作为键的字段
      * @param array $arrays
      *
      * @return array
@@ -146,8 +149,8 @@ class Arrays
      *
      * @see http://php.net/array_merge_recursive
      *
-     * @param array $a
-     * @param array $b
+     * @param array $a 数组1
+     * @param array $b 数组2（可以任意个数组）
      *
      * @return array
      *
@@ -182,9 +185,9 @@ class Arrays
      * @see http://php.net/manual/zh/language.generators.overview.php
      * @version PHP >= 5.5
      *
-     * @param integer $start
-     * @param integer $end
-     * @param integer $step
+     * @param integer $start 开始
+     * @param integer $end 结束
+     * @param integer $step 步长
      *
      * @return \Generator
      *
@@ -214,7 +217,7 @@ class Arrays
     /**
      * 矩阵转置
      *
-     * @param array $array
+     * @param array $array 待转置的矩阵
      *
      * @return array
      *
@@ -235,7 +238,7 @@ class Arrays
      * 找到符合条件的第一项
      *
      * @param array $array
-     * @param callback $callback
+     * @param callback $callback 条件回调，结果为 true 的第一项会被取出
      *
      * @return mixed
      *
@@ -244,7 +247,7 @@ class Arrays
     public static function detect($array, $callback)
     {
         foreach ($array as $key => $item) {
-            if (I::trigger($callback, [$item, $key])) {
+            if (true === I::trigger($callback, [$item, $key])) {
                 return $item;
             }
         }
@@ -255,7 +258,7 @@ class Arrays
      * 找到符合条件的所有项
      *
      * @param array $array
-     * @param callback $callback 条件回调
+     * @param callback $callback 条件回调，结果为 true 的所有项会被取出
      * @param callback $filter 对符合条件的项进行回调处理并返回
      *
      * @return array
@@ -266,7 +269,7 @@ class Arrays
     {
         $all = [];
         foreach ($array as $key => $item) {
-            if (I::trigger($callback, [$item, $key])) {
+            if (true === I::trigger($callback, [$item, $key])) {
                 if (null !== $filter) {
                     $all[$key] = I::trigger($filter, [$item, $key]);
                 } else {
@@ -433,7 +436,7 @@ class Arrays
     }
 
     /**
-     * 返回数组的顺数第 n 个元素，其中 n >= 1 且为整数
+     * 返回数组的顺数第 n 个元素，其中 n >= 1 且为整数，空数组直接返回 null
      *
      * 支持关联数组，超过数组长度会对数组长度求余后查找
      *
@@ -460,7 +463,7 @@ class Arrays
     }
 
     /**
-     * 返回数组的倒数第 n 个元素，其中 n >= 1 且为整数
+     * 返回数组的倒数第 n 个元素，其中 n >= 1 且为整数，空数组直接返回 null
      *
      * 支持关联数组，超过数组长度会对数组长度求余后查找
      *
