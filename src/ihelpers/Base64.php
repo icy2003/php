@@ -20,6 +20,8 @@ class Base64
      * @param string $string
      *
      * @return boolean
+     *
+     * @test icy2003\php\tests\ihelpers\Base64Test::testIsBase64
      */
     public static function isBase64($string)
     {
@@ -32,6 +34,8 @@ class Base64
      * @param string $file 文件路径
      *
      * @return string
+     *
+     * @test icy2003\php\tests\ihelpers\Base64Test::testFromFile
      */
     public static function fromFile($file)
     {
@@ -47,6 +51,8 @@ class Base64
      * @param string $file 文件路径
      *
      * @return boolean
+     *
+     * @test icy2003\php\tests\ihelpers\Base64Test::testToFile
      */
     public static function toFile($string, $file = '')
     {
