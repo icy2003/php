@@ -31,8 +31,6 @@ composer require icy2003/php dev-master
 
 - `\src\ihelpers` 一些帮助函数
 
-其他文件和文件夹正在测试中，请不要过度依赖
+## 文档生成
 
-## 其他
-
-- 私有成员和方法以双下划线（__）开头，保护成员和方法用单下划线（_）开头，对于构造函数等原生 PHP 就带下划线的，视情况而定
+用 [phpdocumentor](https://www.phpdoc.org/) 生成文档，记得 `docs/.htaccess` 要替换掉
