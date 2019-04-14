@@ -1,6 +1,9 @@
 <?php
 /**
+ * Class I
+ *
  * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
 
@@ -8,7 +11,6 @@ namespace icy2003\php;
 
 /**
  * I
- * @author icy2003 <2317216477@qq.com>
  */
 class I
 {
@@ -54,8 +56,8 @@ class I
     /**
      * 触发回调
      *
-     * @param callback $callback
-     * @param array $params
+     * @param callback $callback 回调函数
+     * @param array $params 回调参数
      * @return mixed
      */
     public static function trigger($callback, $params = [])
@@ -80,6 +82,8 @@ class I
 
     /**
      * 让 empty 支持函数调用
+     *
+     * 注意：此函数并不比 empty 好，只是更方用在回调里。例如：empty($array[0]) 就不能用此函数代替
      * @see http://php.net/manual/zh/function.empty.php
      *
      * @param mixed $data
@@ -104,6 +108,11 @@ class I
         return null === $result ? $default : $result;
     }
 
+    /**
+     * 别名列表
+     *
+     * @var array
+     */
     public static $aliases = [
         '@icy2003/php' => __DIR__,
     ];
