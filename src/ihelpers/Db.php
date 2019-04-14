@@ -1,60 +1,223 @@
 <?php
+/**
+ * Class Db
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\ihelpers;
 
-use Exception;
-use PDO;
-use PDOException;
+use icy2003\php\I;
 
 /**
- * 数据库类
+ * 数据库类：只是一个简单的实现
+ *
  * @todo 表名的处理目前可能有安全问题（不是条件，问题不大）
  */
 class Db
 {
+    /**
+     * Db 单例
+     *
+     * @var stati
+     */
     protected static $_instance;
 
+    /**
+     * 数据库连接
+     *
+     * @var \PDO
+     */
     private $__conn;
 
-    // db config
+    /**
+     * DSN
+     *
+     * @var string
+     */
     private $__dsn;
+
+    /**
+     * 数据库类型
+     *
+     * @var string
+     */
     private $__db = 'mysql';
+
+    /**
+     * 数据库名
+     *
+     * @var string
+     */
     private $__dbName = 'test';
+
+    /**
+     * 主机地址
+     *
+     * @var string
+     */
     private $__host = '127.0.0.1';
+
+    /**
+     * 用户名
+     *
+     * @var string
+     */
     private $__user = 'root';
+
+    /**
+     * 密码
+     *
+     * @var string
+     */
     private $__password = 'root';
+
+    /**
+     * 端口
+     *
+     * @var string
+     */
     private $__port = '3306';
 
-    // db properties
+    /**
+     * 表前缀
+     *
+     * @var string
+     */
+    private $__tablePrefix = '';
+
+    /**
+     * 查询中的表和它们别名的关联
+     *
+     * @var array
+     */
+    private $__tablesMap = [];
+
+    /**
+     * SELECT
+     *
+     * @var string
+     */
     private $__select = '*';
-    private $__asArray = true;
+
+    /**
+     * FROM
+     *
+     * @var string
+     */
+    private $__from = '';
+
+    /**
+     * JOIN
+     *
+     * @var array
+     */
+    private $__join = [];
+    /**
+     * WHERE
+     *
+     * @var mixed
+     */
     private $__where = '';
-    private $__orderBy = null;
-    private $__limit = null;
-    private $__offset = null;
+
+    /**
+     * GROUP BY
+     *
+     * @var string
+     */
+    private $__groupBy = '';
+
+    /**
+     * ORDER BY
+     *
+     * @var string
+     */
+    private $__orderBy = '';
+
+    /**
+     * LIMIT
+     *
+     * @var string
+     */
+    private $__limit = '';
+
+    /**
+     * OFFSET
+     *
+     * @var string
+     */
+    private $__offset = '';
+
+    /**
+     * 结果集是否返回数组
+     *
+     * @var boolean
+     */
+    private $__asArray = true;
+
+    /**
+     * 绑定参数列表
+     *
+     * @var array
+     */
     private $__params = [];
+
+    /**
+     * 绑定参数形式的 SQL 字符串
+     *
+     * @var string
+     */
     private $__queryString = '';
+    /**
+     * query
+     *
+     * @var \PDOStatement
+     */
     private $__query = null;
+
+    /**
+     * 内部计数器
+     *
+     * @var integer
+     */
     private $__i = 0;
 
+    /**
+     * 重置所有属性值
+     *
+     * @return void
+     */
     private function __reset()
     {
         $this->__select = '*';
-        $this->__asArray = true;
+        $this->__from = '';
+        $this->__join = [];
         $this->__where = '';
-        $this->__orderBy = null;
-        $this->__limit = null;
-        $this->__offset = null;
+        $this->__groupBy = '';
+        $this->__orderBy = '';
+        $this->__limit = '';
+        $this->__offset = '';
+        $this->__asArray = true;
         $this->__params = [];
         $this->__queryString = '';
         $this->__query = null;
         $this->__i = 0;
     }
 
+    /**
+     * 构造函数
+     */
     private function __construct()
     {
     }
 
+    /**
+     * 克隆函数
+     *
+     * @return void
+     */
     private function __clone()
     {
     }
@@ -78,34 +241,35 @@ class Db
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
             if (!empty($config['dsn'])) {
-                static::$_instance->__dsn = Env::value($config, 'dsn', "mysql:dbname=test;host=127.0.0.1;port=3306");
+                $dbName = 'test';
+                static::$_instance->__dsn = $dsn = I::value($config, 'dsn', "mysql:dbname={$dbName};host=127.0.0.1;port=3306");
             } else {
-                static::$_instance->__db = $db = Env::value($config, 'db', static::$_instance->__db);
-                static::$_instance->__dbName = $dbName = Env::value($config, 'dbName', static::$_instance->__dbName);
-                static::$_instance->__host = $host = Env::value($config, 'host', static::$_instance->__host);
-                static::$_instance->__port = $port = Env::value($config, 'port', static::$_instance->__port);
-                static::$_instance->__dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
+                static::$_instance->__db = $db = I::value($config, 'db', 'mysql');
+                static::$_instance->__dbName = $dbName = I::value($config, 'dbName', 'test');
+                static::$_instance->__host = $host = I::value($config, 'host', '127.0.0.1');
+                static::$_instance->__port = $port = I::value($config, 'port', '3306');
+                static::$_instance->__dsn = $dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
             }
-            static::$_instance->__user = Env::value($config, 'user', static::$_instance->__user);
-            static::$_instance->__password = Env::value($config, 'password', static::$_instance->__password);
+            static::$_instance->__user = $user = I::value($config, 'user', 'root');
+            static::$_instance->__password = $password = I::value($config, 'password', 'root');
             try {
-                static::$_instance->__conn = new PDO(static::$_instance->__dsn, static::$_instance->__user, static::$_instance->__password, [
-                    PDO::ATTR_PERSISTENT => true,
+                static::$_instance->__conn = new \PDO($dsn, $user, $password, [
+                    \PDO::ATTR_PERSISTENT => true,
                 ]);
-                static::$_instance->__conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                static::$_instance->__conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 static::$_instance->__conn->exec('set names utf8');
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 switch ($e->getCode()) {
                     case '1049':
                         $message = "数据库 {$dbName} 不存在";
                         break;
                     case '2002':
-                        $message = "连接失败，请检查数据库连接设置";
+                        $message = '连接失败，请检查数据库连接设置';
                         break;
                     default:
                         $message = $e->getMessage();
                 }
-                throw new Exception($message);
+                throw new \PDOException($message);
             }
         }
 
@@ -120,19 +284,66 @@ class Db
         $this->__conn = null;
     }
 
+    /**
+     * 设置表前缀
+     *
+     * @param string $prefix
+     *
+     * @return void
+     */
+    public function setTablePrefix($prefix)
+    {
+        $this->__tablePrefix = $prefix;
+    }
+
+    /**
+     * 获取表前缀
+     *
+     * @return string
+     */
+    public function getTablePrefix()
+    {
+        return $this->__tablePrefix;
+    }
+
+    /**
+     * 判断表是否存在
+     *
+     * @todo 处理表名
+     *
+     * @param string $table 表名
+     *
+     * @return boolean
+     */
     public function tableExists($table)
     {
-        $result = $this->__conn->query("SHOW TABLES LIKE '{$table}'");
-        $rows = $result->fetchAll();
         try {
-            if ($isExists = 1 != count($rows)) {
-                throw new Exception("表 {$table} 不存在");
+            $result = $this->__conn->query("SHOW TABLES LIKE '{$table}'");
+            $rows = $result->fetchAll();
+            if (count($rows) > 0) {
+                return true;
             }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            throw new \Exception("{$table}表不存在");
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
 
-        return $isExists;
+        return false;
+    }
+
+    /**
+     * 预处理表名
+     *
+     * @param string $table
+     * @param string $alias 别名
+     *
+     * @return void
+     */
+    private function __table($table, $alias = '')
+    {
+        $table = "%pre%" . str_replace('%pre%', '', $table);
+        $this->__tablesMap[$table] = $alias;
+        return implode(' ', array_filter([$table, $alias]));
     }
 
     // base operations
@@ -149,7 +360,7 @@ class Db
      */
     public function insert($table, $columns)
     {
-        $this->tableExists($table);
+        $table = $this->__table($table);
         $keys = $values = [];
         $k = 0;
         foreach ($columns as $key => $value) {
@@ -160,7 +371,13 @@ class Db
         }
         $keysString = implode(',', $keys);
         $valuesString = implode(',', $values);
-        $this->__queryString = "INSERT INTO {$table} ($keysString) VALUES ($valuesString)";
+        $this->__queryString = implode(' ', array_filter([
+            "INSERT INTO",
+            $table,
+            "({$keysString})",
+            'VALUES',
+            "({$valuesString})",
+        ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
@@ -178,9 +395,9 @@ class Db
      *
      * @return int 修改的记录条数
      */
-    public function update($table, $columns, $where)
+    public function update($table, $columns, $where = [])
     {
-        $this->tableExists($table);
+        $table = $this->__table($table);
         $sets = [];
         $k = 0;
         foreach ($columns as $key => $value) {
@@ -189,8 +406,14 @@ class Db
             ++$k;
         }
         $setsString = implode(',', $sets);
-        $this->where($where);
-        $this->__queryString = "UPDATE {$table} SET {$setsString} {$this->__where}";
+        $where && $this->where($where);
+        $this->__queryString = implode(' ', array_filter([
+            "UPDATE",
+            $table,
+            "SET",
+            $setsString,
+            "WHERE {$this->__where}",
+        ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
@@ -206,11 +429,15 @@ class Db
      * @param string $table 表名
      * @param array  $where 参考 where 函数
      */
-    public function delete($table, $where)
+    public function delete($table, $where = [])
     {
-        $this->tableExists($table);
-        $this->where($where);
-        $this->__queryString = "DELETE FROM {$table} {$this->__where}";
+        $table = $this->__table($table);
+        $where && $this->where($where);
+        $this->__queryString = implode(" ", array_filter([
+            "DELETE FROM",
+            $table,
+            "WHERE {$this->__where}",
+        ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
@@ -220,176 +447,83 @@ class Db
         return $count;
     }
 
-    // 链式操作
+    /**
+     * 链式操作：SELECT
+     *
+     * @param string $fields
+     * @param string $prefix 字段前缀
+     *
+     * @return static
+     */
+    public function select($fields = '*', $prefix = '')
+    {
+        $fieldArray = [];
+        foreach (explode(',', $fields) as $field) {
+            $fieldArray[] = implode('.', array_filter([$prefix, $field]));
+        }
+
+        $this->__select = implode(',', $fieldArray);
+
+        return $this;
+    }
 
     /**
-     * 链式操作：FROM.
+     * 链式操作：FROM
      *
      * @param string $table
      *
      * @return static
      */
-    public function find($table)
+    public function from($table, $alias = '')
     {
-        $this->tableExists($table);
-        $this->__queryString = "SELECT [[select]] FROM {$table}";
-
+        $table = $this->__table($table, $alias);
+        $this->__from = $table;
         return $this;
     }
 
     /**
-     * 链式操作：SELECT.
+     * LEFT JOIN
+     */
+    const JOIN_LEFT = 'LEFT JOIN';
+
+    /**
+     * RIGHT JOIN
+     */
+    const JOIN_RIGHT = 'RIGHT JOIN';
+
+    /**
+     * INNER JOIN
+     */
+    const JOIN_INNER = 'INNER JOIN';
+
+    /**
+     * 链式操作：JOIN
      *
-     * @param string $fields
+     * @todo 同名字段无法处理
+     *
+     * @param string $table
+     * @param array $on [id1, id2, table]，id1 为副表，id2 为主表或指定的 table
+     * @param string $join
      *
      * @return static
      */
-    public function select($fields = '*')
+    public function join($table, $on, $join = self::JOIN_LEFT)
     {
-        $this->__select = $fields;
-
+        if (empty($on[0]) || empty($on[1])) {
+            throw new \Exception("on 格式应该为：[id1, id2, table]");
+        }
+        $alias = "t" . (count($this->__join) + 1);
+        $this->select("{$this->__select}", 't0');
+        $this->__select = "{$this->__select},{$alias}.*";
+        $this->from($this->__from, 't0');
+        $table = $this->__table($table, $alias);
+        $table0 = !empty($on[2]) ? I::value($this->__tablesMap, $on[2]) : 't0';
+        $this->__join[] = implode(' ', [$join, $table, "ON {$alias}.{$on[0]} = {$table0}.{$on[1]}"]);
         return $this;
     }
 
     /**
-     * 链式操作：生成为数组.
-     *
-     * @param bool $asArray 默认 true
-     *
-     * @return static
-     */
-    public function asArray($asArray = true)
-    {
-        $this->__asArray = (bool)$asArray;
-
-        return $this;
-    }
-
-    /**
-     * 链式操作：查询一条.
-     *
-     * @return object
-     */
-    public function one()
-    {
-        $this->__parse();
-        $this->__query = $this->__conn->prepare($this->__queryString);
-        $this->__bindParams();
-        $this->__query->execute();
-        $result = $this->__query->fetch($this->__asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-        $this->__reset();
-
-        return $result;
-    }
-
-    /**
-     * 链式操作：查询多条.
-     *
-     * @return object
-     */
-    public function all()
-    {
-        $this->__parse();
-        $this->__query = $this->__conn->prepare($this->__queryString);
-        $this->__bindParams();
-        $this->__query->execute();
-        $results = $this->__query->fetchAll($this->__asArray ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-        $this->__reset();
-
-        return $results;
-    }
-
-    /**
-     * 链式操作：查询字段.
-     *
-     * @return object
-     */
-    public function column()
-    {
-        $this->__parse();
-        $this->__query = $this->__conn->prepare($this->__queryString);
-        $this->__bindParams();
-        $this->__query->execute();
-        $results = $this->__query->fetchAll(PDO::FETCH_COLUMN);
-        $this->__reset();
-
-        return $results;
-    }
-
-    /**
-     * 链式操作：查询单个.
-     *
-     * @return object
-     */
-    public function scalar()
-    {
-        $this->__parse();
-        $this->__query = $this->__conn->prepare($this->__queryString);
-        $this->__bindParams();
-        $this->__query->execute();
-        $results = $this->__query->fetchColumn();
-        $this->__reset();
-
-        return $results;
-    }
-
-    /**
-     * 链式操作：COUNT(*).
-     *
-     * @return object
-     */
-    public function count()
-    {
-        $this->__select = 'COUNT(*)';
-
-        return $this->scalar();
-    }
-
-    /**
-     * 链式操作：返回绑定参数前的 SQL.
-     *
-     * @return string
-     */
-    public function sql()
-    {
-        $this->__parse();
-        $sql = $this->__queryString;
-        $this->__reset();
-
-        return $sql;
-    }
-
-    /**
-     * 链式操作：返回绑定参数.
-     *
-     * @return array
-     */
-    public function params()
-    {
-        $params = $this->__params;
-        $this->__reset();
-
-        return $params;
-    }
-
-    /**
-     * 链式操作：返回最终 SQL（只做参考）.
-     *
-     * @return string
-     */
-    public function rawSql()
-    {
-        $this->__parse();
-        $rawSql = str_replace(array_keys($this->__params), array_map(function ($data) {
-            return 'string' == gettype($data) ? "'" . $data . "'" : $data;
-        }, array_values($this->__params)), $this->__queryString);
-        $this->__reset();
-
-        return $rawSql;
-    }
-
-    /**
-     * 链式操作：WHERE.
+     * 链式操作：WHERE
      *
      * @param array $where
      *
@@ -404,10 +538,13 @@ class Db
      */
     public function where($where)
     {
+        if (I::isEmpty($where)) {
+            return '';
+        }
         $generator = function ($key, $value) use (&$generator) {
             // 索引列
             if (is_numeric($key)) {
-                if (is_array($value) && !empty($value)) {
+                if (is_array($value) && !I::isEmpty($value)) {
                     // 0 操作符 1 字段 2 值
                     $array = array_slice($value, 1);
                     switch (strtolower($value[0])) {
@@ -507,27 +644,53 @@ class Db
         foreach ($where as $key => $value) {
             $conditions[] = $generator($key, $value);
         }
-        $this->__where = 'WHERE ' . implode($operator, $conditions);
+        $this->__where = implode($operator, $conditions);
 
         return $this;
     }
 
     /**
-     * 链式操作：ORDER BY.
+     * 链式操作：GROUP BY
      *
-     * @param string $orderBy
+     * @param string $field 分组字段
      *
      * @return static
      */
-    public function orderBy($orderBy)
+    public function groupBy($field)
     {
-        $this->__orderBy = 'ORDER BY ' . $orderBy;
+        $this->__groupBy = $field;
 
         return $this;
     }
 
     /**
-     * 链式操作：LIMIT.
+     * 顺序
+     */
+    const SORT_ASC = 'ASC';
+
+    /**
+     * 倒序
+     */
+    const SORT_DESC = 'DESC';
+
+    /**
+     * 链式操作：ORDER BY
+     *
+     * @param array $orderBys 键值对，[字段 => 顺（倒）序]
+     *
+     * @return static
+     */
+    public function orderBy($orderBys)
+    {
+        $this->__orderBy = array_map(function ($sort, $field) {
+            return "{$field} {$sort}";
+        }, array_values($orderBys), array_keys($orderBys));
+
+        return $this;
+    }
+
+    /**
+     * 链式操作：LIMIT
      *
      * @param string $limit
      *
@@ -535,13 +698,13 @@ class Db
      */
     public function limit($limit)
     {
-        $this->__limit = 'LIMIT ' . $limit;
+        $this->__limit = $limit;
 
         return $this;
     }
 
     /**
-     * 链式操作：OFFSET.
+     * 链式操作：OFFSET
      *
      * @param string $offset
      *
@@ -549,19 +712,154 @@ class Db
      */
     public function offset($offset)
     {
-        $this->__offset = 'OFFSET ' . $offset;
+        $this->__offset = $offset;
 
         return $this;
     }
 
-    // 事务
+    /**
+     * 链式操作：生成为数组
+     *
+     * @param bool $asArray 默认 true
+     *
+     * @return static
+     */
+    public function asArray($asArray = true)
+    {
+        $this->__asArray = (bool)$asArray;
+
+        return $this;
+    }
+
+    /**
+     * 链式操作：查询一条
+     *
+     * @return object
+     */
+    public function one()
+    {
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $result = $this->__query->fetch($this->__asArray ? \PDO::FETCH_ASSOC : \PDO::FETCH_OBJ);
+        $this->__reset();
+
+        return $result;
+    }
+
+    /**
+     * 链式操作：查询多条
+     *
+     * @return object
+     */
+    public function all()
+    {
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchAll($this->__asArray ? \PDO::FETCH_ASSOC : \PDO::FETCH_OBJ);
+        $this->__reset();
+
+        return $results;
+    }
+
+    /**
+     * 链式操作：查询字段
+     *
+     * @return object
+     */
+    public function column()
+    {
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchAll(\PDO::FETCH_COLUMN);
+        $this->__reset();
+
+        return $results;
+    }
+
+    /**
+     * 链式操作：查询单个
+     *
+     * @return object
+     */
+    public function scalar()
+    {
+        $this->__parse();
+        $this->__query = $this->__conn->prepare($this->__queryString);
+        $this->__bindParams();
+        $this->__query->execute();
+        $results = $this->__query->fetchColumn();
+        $this->__reset();
+
+        return $results;
+    }
+
+    /**
+     * 链式操作：COUNT(*)
+     *
+     * @return object
+     */
+    public function count()
+    {
+        $this->__select = 'COUNT(*)';
+
+        return $this->scalar();
+    }
+
+    /**
+     * 链式操作：返回绑定参数前的 SQL
+     *
+     * @return string
+     */
+    public function sql()
+    {
+        $this->__parse();
+        $sql = $this->__queryString;
+        $this->__reset();
+
+        return $sql;
+    }
+
+    /**
+     * 链式操作：返回绑定参数
+     *
+     * @return array
+     */
+    public function params()
+    {
+        $params = $this->__params;
+        $this->__reset();
+
+        return $params;
+    }
+
+    /**
+     * 链式操作：返回最终 SQL（只做参考）
+     *
+     * @return string
+     */
+    public function rawSql()
+    {
+        $this->__parse();
+        $rawSql = str_replace(array_keys($this->__params), array_map(function ($data) {
+            return 'string' == gettype($data) ? "'" . $data . "'" : $data;
+        }, array_values($this->__params)), $this->__queryString);
+        $this->__reset();
+
+        return $rawSql;
+    }
 
     /**
      * 开启事务
      */
     public function beginTransaction()
     {
-        $this->__conn->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
+        $this->__conn->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
         $this->__conn->beginTransaction();
     }
 
@@ -570,40 +868,64 @@ class Db
      */
     public function commit()
     {
-        //如果数据库类型不支持事务，那有没有这个一点影响都没有，该执行还是执行了
         $this->__conn->commit();
     }
 
     /**
-     * 回滚.
+     * 回滚
      */
     public function rollback()
     {
         $this->__conn->rollback();
     }
 
-    // private
-
+    /**
+     * 获取数据的 PDO 类型
+     *
+     * @param mixed $data 数据
+     *
+     * @return string
+     */
     private function __getPdoType($data)
     {
         static $typeMap = [
-            'boolean' => PDO::PARAM_BOOL,
-            'integer' => PDO::PARAM_INT,
-            'string' => PDO::PARAM_STR,
-            'resource' => PDO::PARAM_LOB,
-            'NULL' => PDO::PARAM_NULL,
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'resource' => \PDO::PARAM_LOB,
+            'NULL' => \PDO::PARAM_NULL,
         ];
         $type = gettype($data);
 
-        return isset($typeMap[$type]) ? $typeMap[$type] : PDO::PARAM_STR;
+        return I::value($typeMap, $type, \PDO::PARAM_STR);
     }
 
+    /**
+     * 解析 SQL 字符串
+     *
+     * @return void
+     */
     private function __parse()
     {
-        $this->__queryString = str_replace('[[select]]', $this->__select, $this->__queryString);
-        $this->__queryString = implode(' ', array_filter([$this->__queryString, $this->__where, $this->__orderBy, $this->__limit, $this->__offset]));
+
+        $this->__queryString = implode(' ', array_filter([
+            "SELECT {$this->__select}",
+            "FROM {$this->__from}",
+            empty($this->__join) ? '' : implode(' ', $this->__join),
+            empty($this->__where) ? '' : "WHERE {$this->__where}",
+            empty($this->__groupBy) ? '' : "GROUP BY {$this->__groupBy}",
+            empty($this->__orderBy) ? '' : "ORDER BY {$this->__orderBy}",
+            empty($this->__limit) ? '' : "LIMIT {$this->__limit}",
+            empty($this->__offset) ? '' : "OFFSET {$this->__offset}",
+        ]));
+        $this->__queryString = str_replace('%pre%', $this->getTablePrefix(), $this->__queryString);
     }
 
+    /**
+     * 参数绑定
+     *
+     * @return void
+     */
     private function __bindParams()
     {
         foreach ($this->__params as $p => $q) {
