@@ -1,20 +1,9 @@
 <?php
-/**
- * @link https://www.icy2003.com/
- * @copyright Copyright (c) 2017, icy2003
- */
 
 namespace icy2003\php\tests\ihelpers;
 
 use icy2003\php\ihelpers\Arrays;
 
-/**
- * 测试用例
- *
- * @api icy2003\php\ihelpers\Arrays
- *
- * @author icy2003 <2317216477@qq.com>
- */
 class ArraysTest extends \Codeception\Test\Unit
 {
 
