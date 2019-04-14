@@ -114,6 +114,7 @@ class I
      * @var array
      */
     public static $aliases = [
+        '@icy2003/php_tests' => __DIR__. '/../tests',
         '@icy2003/php' => __DIR__,
     ];
 
