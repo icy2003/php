@@ -110,7 +110,7 @@ class File
         // glob 函数拿不到隐藏文件
         $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
-            is_dir("{$dir}/{$file}") ? self::deleteDir("{$dir}/{$file}") : self::deleteFile("{$dir}/{$file}");
+            is_dir($dir . '/' . $file) ? self::deleteDir($dir . '/' . $file) : self::deleteFile($dir . '/' . $file);
         }
 
         return rmdir($dir);
@@ -310,6 +310,7 @@ class File
         'fileType' => '',
         'fileName' => '',
         'filePath' => '',
+        'isLocal' => true,
     ];
 
     /**
@@ -322,6 +323,7 @@ class File
     {
         $fileName = I::getAlias($fileName);
         if (preg_match('/^https?:\/\//', $fileName)) {
+            $this->__attributes['isLocal'] = false;
             // 加载网络文件
             if (extension_loaded('curl')) {
                 $curl = curl_init($fileName);
@@ -352,11 +354,11 @@ class File
                 $fp = fsockopen($host, $port, $errno, $error);
                 if ($fp) {
                     $header = [
-                        "GET {$path} HTTP/1.0",
-                        "HOST: {$host}:{$port}",
+                        'GET ' . $path . ' HTTP/1.0',
+                        'HOST: ' . $host . ':' . $port,
                         'Connection: Close',
                     ];
-                    fwrite($fp, implode('\r\n', $header) . "\r\n\r\n");
+                    fwrite($fp, implode('\r\n', $header) . '\r\n\r\n');
                     while (!feof($fp)) {
                         $line = fgets($fp);
                         if ('' == trim($line)) {
@@ -379,7 +381,7 @@ class File
         $this->__attributes['fileName'] = static::basename($fileName);
         $this->__attributes['filePath'] = $fileName;
         if (false === $this->__attributes['isExists']) {
-            throw new \Exception("文件 {$fileName} 不存在");
+            throw new \Exception('文件 ' . $fileName . ' 不存在');
         }
         $this->__fileInfoHandler = \SplFileInfo($fileName);
         $this->__fileObjectHandler = \SplFileObject($fileName);
@@ -408,6 +410,16 @@ class File
     public function getAttributes()
     {
         return $this->__attributes;
+    }
+
+    /**
+     * 是否是本地文件
+     *
+     * @return boolean
+     */
+    public function isLocal()
+    {
+        return (bool)$this->getAttribute('isLocal');
     }
 
     /**
@@ -531,10 +543,10 @@ class File
             if (null === $extension) {
                 $this->__dirHandler = new \DirectoryIterator($dir);
             } else {
-                $this->__dirHandler = new \DirectoryIterator("glob://{$dir}/*.{$extension}");
+                $this->__dirHandler = new \DirectoryIterator('glob://' . $dir . '/*.' . $extension);
             }
         } else {
-            $this->__dirHandler = new \DirectoryIterator("glob://{$dir}/{$pattern}");
+            $this->__dirHandler = new \DirectoryIterator('glob://' . $dir . '/' . $pattern);
         }
 
         return $this;
