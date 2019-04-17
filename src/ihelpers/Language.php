@@ -78,6 +78,13 @@ class Language
         return $this->__config;
     }
 
+    /**
+     * 设置配置数组
+     *
+     * @param array $config
+     *
+     * @return void
+     */
     public function setConfig($config)
     {
         $this->__config = $config;
