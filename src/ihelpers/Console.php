@@ -8,6 +8,9 @@
  */
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+use Symfony\Component\Process\Process;
+
 /**
  * 控制台类
  *
@@ -16,36 +19,117 @@ namespace icy2003\php\ihelpers;
 class Console
 {
 
-    // 字体颜色控制码
+    /**
+     * 字体颜色控制码：黑色
+     */
     const FG_BLACK = 30;
+    /**
+     * 字体颜色控制码：红色
+     */
     const FG_RED = 31;
+    /**
+     * 字体颜色控制码：绿色
+     */
     const FG_GREEN = 32;
+    /**
+     * 字体颜色控制码：黄色
+     */
     const FG_YELLOW = 33;
+    /**
+     * 字体颜色控制码：蓝色
+     */
     const FG_BLUE = 34;
+    /**
+     * 字体颜色控制码：紫色
+     */
     const FG_PURPLE = 35;
+    /**
+     * 字体颜色控制码：青色
+     */
     const FG_CYAN = 36;
+    /**
+     * 字体颜色控制码：灰色
+     */
     const FG_GREY = 37;
-    // 背景色控制码
+    /**
+     * 背景色控制码：黑色
+     */
     const BG_BLACK = 40;
+    /**
+     * 背景色控制码：红色
+     */
     const BG_RED = 41;
+    /**
+     * 背景色控制码：绿色
+     */
     const BG_GREEN = 42;
+    /**
+     * 背景色控制码：黄色
+     */
     const BG_YELLOW = 43;
+    /**
+     * 背景色控制码：蓝色
+     */
     const BG_BLUE = 44;
+    /**
+     * 背景色控制码：紫色
+     */
     const BG_PURPLE = 45;
+    /**
+     * 背景色控制码：青色
+     */
     const BG_CYAN = 46;
+    /**
+     * 背景色控制码：灰色
+     */
     const BG_GREY = 47;
-    // 字体样式控制码
+    /**
+     * 字体样式控制码：重置
+     */
     const RESET = 0;
+    /**
+     * 字体样式控制码：普通
+     */
     const NORMAL = 0;
+    /**
+     * 字体样式控制码：加粗
+     */
     const BOLD = 1;
+    /**
+     * 字体样式控制码：斜体
+     */
     const ITALIC = 3;
+    /**
+     * 字体样式控制码：下划线
+     */
     const UNDERLINE = 4;
+    /**
+     * 字体样式控制码：闪烁
+     */
     const BLINK = 5;
+    /**
+     * 字体样式控制码：
+     */
     const NEGATIVE = 7;
+    /**
+     * 字体样式控制码：隐藏
+     */
     const CONCEALED = 8;
+    /**
+     * 字体样式控制码：交叉输出
+     */
     const CROSSED_OUT = 9;
+    /**
+     * 字体样式控制码：边框
+     */
     const FRAMED = 51;
+    /**
+     * 字体样式控制码：环绕
+     */
     const ENCIRCLED = 52;
+    /**
+     * 字体样式控制码：
+     */
     const OVERLINED = 53;
 
     /**
@@ -57,7 +141,7 @@ class Console
      */
     public static function stdout($string)
     {
-        fwrite(STDOUT, $string);
+        fwrite(\STDOUT, $string);
     }
 
     /**
@@ -67,7 +151,7 @@ class Console
      */
     public static function stdin()
     {
-        return fgets(STDIN);
+        return fgets(\STDIN);
     }
 
     /**
@@ -79,7 +163,7 @@ class Console
      */
     public static function stderr($string)
     {
-        return fwrite(STDERR, $string);
+        return fwrite(\STDERR, $string);
     }
 
     /**
@@ -122,9 +206,9 @@ class Console
     {
         $code = trim(implode(';', $format));
         if (!empty($code)) {
-            $code = "\033[{$code}m";
+            $code = '\033[' . $code . 'm';
         }
-        return "\033[0m{$code}{$string}\033[0m";
+        return '\033[0m' . $code . $string . '\033[0m';
     }
 
     /**
@@ -138,7 +222,7 @@ class Console
      */
     public static function moveCursorUp($rows = 1)
     {
-        echo "\033[" . (int)$rows . 'A';
+        echo '\033[' . (int)$rows . 'A';
     }
 
     /**
@@ -152,7 +236,7 @@ class Console
      */
     public static function moveCursorDown($rows = 1)
     {
-        echo "\033[" . (int)$rows . 'B';
+        echo '\033[' . (int)$rows . 'B';
     }
 
     /**
@@ -166,7 +250,7 @@ class Console
      */
     public static function moveCursorForward($steps = 1)
     {
-        echo "\033[" . (int)$steps . 'C';
+        echo '\033[' . (int)$steps . 'C';
     }
 
     /**
@@ -180,7 +264,7 @@ class Console
      */
     public static function moveCursorBackward($steps = 1)
     {
-        echo "\033[" . (int)$steps . 'D';
+        echo '\033[' . (int)$steps . 'D';
     }
 
     /**
@@ -192,7 +276,7 @@ class Console
      */
     public static function moveCursorNextLine($lines = 1)
     {
-        echo "\033[" . (int)$lines . 'E';
+        echo '\033[' . (int)$lines . 'E';
     }
 
     /**
@@ -204,7 +288,7 @@ class Console
      */
     public static function moveCursorPrevLine($lines = 1)
     {
-        echo "\033[" . (int)$lines . 'F';
+        echo '\033[' . (int)$lines . 'F';
     }
 
     /**
@@ -218,9 +302,9 @@ class Console
     public static function moveCursorTo($column, $row = null)
     {
         if ($row === null) {
-            echo "\033[" . (int)$column . 'G';
+            echo '\033[' . (int)$column . 'G';
         } else {
-            echo "\033[" . (int)$row . ';' . (int)$column . 'H';
+            echo '\033[' . (int)$row . ';' . (int)$column . 'H';
         }
     }
 
@@ -235,7 +319,7 @@ class Console
      */
     public static function scrollUp($lines = 1)
     {
-        echo "\033[" . (int)$lines . 'S';
+        echo '\033[' . (int)$lines . 'S';
     }
 
     /**
@@ -249,7 +333,7 @@ class Console
      */
     public static function scrollDown($lines = 1)
     {
-        echo "\033[" . (int)$lines . 'T';
+        echo '\033[' . (int)$lines . 'T';
     }
 
     /**
@@ -261,7 +345,7 @@ class Console
      */
     public static function saveCursorPosition()
     {
-        echo "\033[s";
+        echo '\033[s';
     }
 
     /**
@@ -271,7 +355,7 @@ class Console
      */
     public static function restoreCursorPosition()
     {
-        echo "\033[u";
+        echo '\033[u';
     }
 
     /**
@@ -285,7 +369,7 @@ class Console
      */
     public static function hideCursor()
     {
-        echo "\033[?25l";
+        echo '\033[?25l';
     }
 
     /**
@@ -295,7 +379,7 @@ class Console
      */
     public static function showCursor()
     {
-        echo "\033[?25h";
+        echo '\033[?25h';
     }
 
     /**
@@ -309,7 +393,7 @@ class Console
      */
     public static function clearScreen()
     {
-        echo "\033[2J";
+        echo '\033[2J';
     }
 
     /**
@@ -321,7 +405,7 @@ class Console
      */
     public static function clearScreenBeforeCursor()
     {
-        echo "\033[1J";
+        echo '\033[1J';
     }
 
     /**
@@ -333,7 +417,7 @@ class Console
      */
     public static function clearScreenAfterCursor()
     {
-        echo "\033[0J";
+        echo '\033[0J';
     }
 
     /**
@@ -345,7 +429,7 @@ class Console
      */
     public static function clearLine()
     {
-        echo "\033[2K";
+        echo '\033[2K';
     }
 
     /**
@@ -357,7 +441,7 @@ class Console
      */
     public static function clearLineBeforeCursor()
     {
-        echo "\033[1K";
+        echo '\033[1K';
     }
 
     /**
@@ -369,7 +453,7 @@ class Console
      */
     public static function clearLineAfterCursor()
     {
-        echo "\033[0K";
+        echo '\033[0K';
     }
 
     /**
@@ -394,5 +478,33 @@ class Console
     public static function ansiStrlen($string)
     {
         return Strings::length(static::stripAnsiFormat($string));
+    }
+
+    /**
+     * CLI 下获取命令参数
+     *
+     * @return array
+     */
+    public static function get()
+    {
+        global $argv;
+        return array_slice($argv, 1);
+    }
+
+    /**
+     * 语法检查某个 php 文件
+     *
+     * @param string $file 文件路径或别名
+     * @param string $message 输出结果
+     *
+     * @return boolean 是否有语法错误
+     */
+    public static function syntaxCheckFile($file, &$message = '')
+    {
+        $file = I::getAlias($file);
+        $process = new Process('php -l ' . $file);
+        $process->run();
+        $message = $process->getOutput();
+        return $process->isSuccessful();
     }
 }
