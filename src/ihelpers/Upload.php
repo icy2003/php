@@ -1,24 +1,39 @@
 <?php
-
+/**
+ * Class Upload
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
 
 /**
  * 文件类上传类
- *
- * 处理上传下载
- * Upload::download($fileName) 静态方法
- * Upload::create() 创建一个用于接收上传的单例对象，可用方法：upload、save、success、getAttributes、getErrorCode、getErrorMessage.
  */
 class Upload
 {
+    /**
+     * 单例对象
+     *
+     * @var static
+     */
     protected static $_instance;
 
+    /**
+     * 构造函数
+     */
     private function __construct()
     {
     }
 
+    /**
+     * 克隆函数
+     *
+     * @return void
+     */
     private function __clone()
     {
     }
@@ -37,18 +52,16 @@ class Upload
     {
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
-            !empty($config['formName']) && static::$_instance->__formName = $config['formName'];
-            !empty($config['sizeLimit']) && static::$_instance->__sizeLimit = $config['sizeLimit'];
-            $systemLimit = static::$_instance->__getSizeLimit();
-            static::$_instance->__sizeLimit = 0 === static::$_instance->__sizeLimit ? $systemLimit : min($systemLimit, Convert::size(static::$_instance->__sizeLimit));
-            !empty($config['extLimit']) && static::$_instance->__extLimit = $config['extLimit'];
+            static::$_instance->__formName = I::value($config, 'formName', 'file');
+            static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::value($config, 'sizeLimit', 0));
+            static::$_instance->__extLimit = I::value($config, 'extLimit', []);
         }
 
         return static::$_instance;
     }
 
     /**
-     * 下载一个文件.
+     * 下载一个文件
      *
      * @param string $fileName
      *
@@ -60,41 +73,68 @@ class Upload
             if ($file = File::create($fileName)) {
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Accept-Length:' . $file->getAttribute('fileSize'));
-                header('Content-Disposition: attachment; filename=' . Charset::convert2cn(basename($fileName)));
+                header('Accept-Length:' . $file->splFileInfo()->getSize());
+                header('Content-Disposition: attachment; filename=' . Charset::toCn(File::basename($fileName)));
                 foreach ($file->data() as $data) {
                     echo $data;
                 }
             }
         } catch (\Exception $e) {
-            Http::code(404, '找不到页面');
+            header('HTTP/1.1 404 Not Found');
             echo $e->getMessage();
         }
     }
 
-    // 成功
+    /**
+     * 成功
+     */
     const ERROR_SUCCESS = 0;
-    // 超出 upload_max_filesize 选项限制
+    /**
+     * 超出 upload_max_filesize 选项限制
+     */
     const ERROR_UPLOAD_MAX_FILESIZE = 1;
-    // 超出表单中 MAX_FILE_SIZE 选项的值
+    /**
+     * 超出表单中 MAX_FILE_SIZE 选项的值
+     */
     const ERROR_MAX_FILE_SIZE = 2;
-    // 文件只有部分被上传
+    /**
+     * 文件只有部分被上传
+     */
     const ERROR_PART_UPLOAD = 3;
-    // 没有文件被上传
+    /**
+     * 没有文件被上传
+     */
     const ERROR_FILE_NOT_FOUND = 4;
-    // 找不到临时文件夹
+    /**
+     * 找不到临时文件夹
+     */
     const ERROR_TEMP_DIR_NOT_FOUND = 6;
-    // 文件写入失败
+    /**
+     * 文件写入失败
+     */
     const ERROR_WRITE_FAILED = 7;
-    // 文件扩展没有打开
+    /**
+     * 文件扩展没有打开
+     */
     const ERROR_EXT_CLOSE = 8;
-    // 文件保存失败
-    const ERROR_I_SAVE_FAILED = -1;
-    // 超出文件大小限制
-    const ERROR_I_SIZE_LIMIT = -2;
-    // 不允许的文件类型
-    const ERROR_I_EXT_LIMIT = -3;
+    /**
+     * 文件保存失败
+     */
+    const ERROR_SAVE_FAILED = -1;
+    /**
+     * 超出文件大小限制
+     */
+    const ERROR_SIZE_LIMIT = -2;
+    /**
+     * 不允许的文件类型
+     */
+    const ERROR_EXT_LIMIT = -3;
 
+    /**
+     * 错误信息列表
+     *
+     * @var array
+     */
     private static $__errorMap = [
         self::ERROR_SUCCESS => '文件上传成功',
         self::ERROR_UPLOAD_MAX_FILESIZE => '上传的文件超过了 php.ini 中 upload_max_filesize 选项限制的值',
@@ -104,14 +144,40 @@ class Upload
         self::ERROR_TEMP_DIR_NOT_FOUND => '找不到临时文件夹',
         self::ERROR_WRITE_FAILED => '文件写入失败',
         self::ERROR_EXT_CLOSE => ' php 文件上传扩展 file 没有打开',
-        self::ERROR_I_SAVE_FAILED => '文件保存失败',
-        self::ERROR_I_SIZE_LIMIT => '超出自定义的文件上传大小限制',
-        self::ERROR_I_EXT_LIMIT => '不允许的文件类型',
+        self::ERROR_SAVE_FAILED => '文件保存失败',
+        self::ERROR_SIZE_LIMIT => '超出自定义的文件上传大小限制',
+        self::ERROR_EXT_LIMIT => '不允许的文件类型',
     ];
+
+    /**
+     * 属性列表
+     *
+     * @var array
+     */
     private $__attributes = [];
+    /**
+     * 默认的上传表单字段名
+     *
+     * @var string
+     */
     private $__formName = 'file';
+    /**
+     * 默认上传限制
+     *
+     * @var integer
+     */
     private $__sizeLimit = 0;
+    /**
+     * 默认扩展限制
+     *
+     * @var array
+     */
     private $__extLimit = [];
+    /**
+     * 错误代码
+     *
+     * @var integer
+     */
     private $__errorCode = 0;
 
     /**
@@ -123,16 +189,17 @@ class Upload
     {
         if (self::ERROR_SUCCESS === $_FILES[$this->__formName]['error']) {
             if (is_uploaded_file($file = $_FILES[$this->__formName]['tmp_name'])) {
+                $f = File::create()->loadFile($file);
                 $fileName = $_FILES[$this->__formName]['name'];
-                $fileSize = filesize($file);
-                $fileExt = $this->getExt($fileName);
+                $fileSize = $f->splFileInfo()->getSize();
+                $fileExt = $f->splFileInfo()->getExtension();
                 if ($fileSize > $this->__sizeLimit) {
-                    $this->__errorCode = self::ERROR_I_SIZE_LIMIT;
+                    $this->__errorCode = self::ERROR_SIZE_LIMIT;
 
                     return $this;
                 }
                 if (!empty($this->__extLimit) && !in_array($fileExt, $this->__extLimit)) {
-                    $this->__errorCode = self::ERROR_I_EXT_LIMIT;
+                    $this->__errorCode = self::ERROR_EXT_LIMIT;
 
                     return $this;
                 }
@@ -140,16 +207,16 @@ class Upload
                 $this->__attributes['sha1'] = sha1_file($file);
                 $this->__attributes['ext'] = $fileExt;
                 $this->__attributes['size'] = $fileSize;
-                $this->__attributes['filectime'] = filectime($file);
-                $this->__attributes['filemtime'] = filemtime($file);
-                $this->__attributes['fileatime'] = fileatime($file);
+                $this->__attributes['filectime'] = $f->splFileInfo()->getCTime();
+                $this->__attributes['filemtime'] = $f->splFileInfo()->getMTime();
+                $this->__attributes['fileatime'] = $f->splFileInfo()->getATime();
                 $this->__attributes['originName'] = $fileName;
-                $this->__attributes['fileName'] = $this->randomFileName($fileName);
+                $this->__attributes['fileName'] = date('YmdHis') . Strings::random(10) . '.' . $fileExt;
                 $this->__errorCode = self::ERROR_SUCCESS;
 
                 return $this;
             } else {
-                $this->__errorCode = self::ERROR_I_SAVE_FAILED;
+                $this->__errorCode = self::ERROR_SAVE_FAILED;
 
                 return $this;
             }
@@ -175,16 +242,6 @@ class Upload
         !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
 
         return $this;
-    }
-
-    public function randomFileName($fileName)
-    {
-        return date('YmdHis') . Strings::random(10) . '.' . $this->getExt($fileName);
-    }
-
-    public function getExt($fileName)
-    {
-        return pathinfo($fileName, PATHINFO_EXTENSION);
     }
 
     /**
@@ -227,10 +284,20 @@ class Upload
         return $this->__attributes;
     }
 
-    // private
-
-    private function __getSizeLimit()
+    /**
+     * 结合系统限制，找出文件大小限制
+     *
+     * @param string $configLimit
+     *
+     * @return string
+     */
+    private function __getSizeLimit($configLimit)
     {
-        return min(Convert::size(I::phpini('upload_max_filesize', 0)), Convert::size(I::phpini('post_max_size', 0)));
+        $array = [
+            Convert::size(I::phpini('upload_max_filesize', 0)),
+            Convert::size(I::phpini('post_max_size', 0)),
+            Convert::size($configLimit),
+        ];
+        return min(array_filter($array));
     }
 }
