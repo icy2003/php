@@ -23,7 +23,7 @@ class Json
      */
     public static function encode($value)
     {
-        return json_encode($value, JSON_UNESCAPED_UNICODE);
+        return json_encode($value, JSON_PRETTY_PRINT ^ JSON_UNESCAPED_UNICODE);
     }
 
     /**
