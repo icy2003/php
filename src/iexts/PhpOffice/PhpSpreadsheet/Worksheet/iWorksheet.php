@@ -25,14 +25,14 @@ class iWorksheet
      * ps：作者表示不修车
      *
      * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $workSheet
-     * @param string $pRange 单元格范围 (i.e. "A1:B10"), 或者一个单元格 (i.e. "A1")
+     * @param string $pRange 单元格范围 (i.e. 'A1:B10'), 或者一个单元格 (i.e. 'A1')
      * @param mixed $nullValue 单元格内容不存在时返回的值
      * @param bool $returnCellRef false - 按照索引返回数组，true - 按照真实的行列返回数组
      * @param bool $calculateFormulas 是否计算公式的值？
      * @param bool $formatData 是否应用格式化到该数据
      * @param array $params 额外条件参数
      *                  onlyVisible 是否只返回可见单元格，默认 true
-     *                  fillColor 是否按填充颜色返回，如："#ff0000"，表示只返回红色背景的数据，默认 false，表示不限制
+     *                  fillColor 是否按填充颜色返回，如：'#ff0000'，表示只返回红色背景的数据，默认 false，表示不限制
      *
      *
      * @return array
@@ -81,7 +81,7 @@ class iWorksheet
                         } else {
                             if ($calculateFormulas) {
                                 // fix
-                                if (false !== strpos(strtoupper($cell->getValue()), "NUMBERSTRING")) {
+                                if (false !== strpos(strtoupper($cell->getValue()), 'NUMBERSTRING')) {
                                     $returnValue[$rRef][$cRef] = $cell->getOldCalculatedValue();
                                 } else {
                                     $returnValue[$rRef][$cRef] = $cell->getCalculatedValue();
@@ -148,7 +148,7 @@ class iWorksheet
                             }
                             $pVisible = $colVisible && $rowVisible;
                             if (true === $initVisible ^ $pVisible) {
-                                throw new \Exception("不允许隐藏合并单元格的一部分，该合并单元格范围是{$range}，其中{$i}{$j}等单元格被隐藏了");
+                                throw new \Exception('不允许隐藏合并单元格的一部分，该合并单元格范围是 ' . $range . '，其中 ' . $i . $j . ' 等单元格被隐藏了');
                             }
                         }
                     }

@@ -21,7 +21,7 @@ class Db
     /**
      * Db 单例
      *
-     * @var stati
+     * @var static
      */
     protected static $_instance;
 
@@ -235,6 +235,7 @@ class Db
      *                      password    密码，默认 'root'
      *
      * @return static
+     * @throws \PDOException
      */
     public static function create($config = [])
     {
@@ -242,13 +243,13 @@ class Db
             static::$_instance = new static();
             if (!empty($config['dsn'])) {
                 $dbName = 'test';
-                static::$_instance->__dsn = $dsn = I::value($config, 'dsn', "mysql:dbname={$dbName};host=127.0.0.1;port=3306");
+                static::$_instance->__dsn = $dsn = I::value($config, 'dsn', 'mysql:dbname=' . $dbName . ';host=127.0.0.1;port=3306');
             } else {
                 static::$_instance->__db = $db = I::value($config, 'db', 'mysql');
                 static::$_instance->__dbName = $dbName = I::value($config, 'dbName', 'test');
                 static::$_instance->__host = $host = I::value($config, 'host', '127.0.0.1');
                 static::$_instance->__port = $port = I::value($config, 'port', '3306');
-                static::$_instance->__dsn = $dsn = "{$db}:dbname={$dbName};host={$host};port={$port}";
+                static::$_instance->__dsn = $dsn = $db . ':dbname=' . $dbName . ';host=' . $host . ';port=' . $port;
             }
             static::$_instance->__user = $user = I::value($config, 'user', 'root');
             static::$_instance->__password = $password = I::value($config, 'password', 'root');
@@ -256,12 +257,16 @@ class Db
                 static::$_instance->__conn = new \PDO($dsn, $user, $password, [
                     \PDO::ATTR_PERSISTENT => true,
                 ]);
+                // 抛出异常
                 static::$_instance->__conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                // 查出来的数据不强制转成字符串，不过 decimal 类型依旧是字符串
+                static::$_instance->__conn->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+                static::$_instance->__conn->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
                 static::$_instance->__conn->exec('set names utf8');
             } catch (\PDOException $e) {
                 switch ($e->getCode()) {
                     case '1049':
-                        $message = "数据库 {$dbName} 不存在";
+                        $message = '数据库 ' . $dbName . ' 不存在';
                         break;
                     case '2002':
                         $message = '连接失败，请检查数据库连接设置';
@@ -314,21 +319,20 @@ class Db
      * @param string $table 表名
      *
      * @return boolean
+     * @throws \Exception
      */
     public function tableExists($table)
     {
         try {
-            $result = $this->__conn->query("SHOW TABLES LIKE '{$table}'");
+            $result = $this->__conn->query('SHOW TABLES LIKE \'' . $table . '\'');
             $rows = $result->fetchAll();
             if (count($rows) > 0) {
                 return true;
             }
-            throw new \Exception("{$table}表不存在");
+            throw new \Exception($table . ' 表不存在');
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-
-        return false;
     }
 
     /**
@@ -341,7 +345,7 @@ class Db
      */
     private function __table($table, $alias = '')
     {
-        $table = "%pre%" . str_replace('%pre%', '', $table);
+        $table = '%pre%' . str_replace('%pre%', '', $table);
         $this->__tablesMap[$table] = $alias;
         return implode(' ', array_filter([$table, $alias]));
     }
@@ -372,11 +376,11 @@ class Db
         $keysString = implode(',', $keys);
         $valuesString = implode(',', $values);
         $this->__queryString = implode(' ', array_filter([
-            "INSERT INTO",
+            'INSERT INTO',
             $table,
-            "({$keysString})",
+            '(' . $keysString . ')',
             'VALUES',
-            "({$valuesString})",
+            '(' . $valuesString . ')',
         ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
@@ -408,11 +412,11 @@ class Db
         $setsString = implode(',', $sets);
         $where && $this->where($where);
         $this->__queryString = implode(' ', array_filter([
-            "UPDATE",
+            'UPDATE',
             $table,
-            "SET",
+            'SET',
             $setsString,
-            "WHERE {$this->__where}",
+            'WHERE ' . $this->__where,
         ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
@@ -433,10 +437,10 @@ class Db
     {
         $table = $this->__table($table);
         $where && $this->where($where);
-        $this->__queryString = implode(" ", array_filter([
-            "DELETE FROM",
+        $this->__queryString = implode(' ', array_filter([
+            'DELETE FROM',
             $table,
-            "WHERE {$this->__where}",
+            'WHERE ' . $this->__where,
         ]));
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
@@ -471,6 +475,7 @@ class Db
      * 链式操作：FROM
      *
      * @param string $table
+     * @param string $alias 别名
      *
      * @return static
      */
@@ -506,19 +511,20 @@ class Db
      * @param string $join
      *
      * @return static
+     * @throws \Exception
      */
     public function join($table, $on, $join = self::JOIN_LEFT)
     {
         if (empty($on[0]) || empty($on[1])) {
-            throw new \Exception("on 格式应该为：[id1, id2, table]");
+            throw new \Exception('on 格式应该为：[id1, id2, table]');
         }
-        $alias = "t" . (count($this->__join) + 1);
-        $this->select("{$this->__select}", 't0');
-        $this->__select = "{$this->__select},{$alias}.*";
+        $alias = 't' . (count($this->__join) + 1);
+        $this->select($this->__select, 't0');
+        $this->__select = $this->__select . ',' . $alias . '.*';
         $this->from($this->__from, 't0');
         $table = $this->__table($table, $alias);
         $table0 = !empty($on[2]) ? I::value($this->__tablesMap, $on[2]) : 't0';
-        $this->__join[] = implode(' ', [$join, $table, "ON {$alias}.{$on[0]} = {$table0}.{$on[1]}"]);
+        $this->__join[] = implode(' ', [$join, $table, 'ON ' . $alias . '.' . $on[0] . ' = ' . $table0 . '.' . $on[1]]);
         return $this;
     }
 
@@ -538,13 +544,13 @@ class Db
      */
     public function where($where)
     {
-        if (I::isEmpty($where)) {
+        if (empty($where)) {
             return '';
         }
         $generator = function ($key, $value) use (&$generator) {
             // 索引列
             if (is_numeric($key)) {
-                if (is_array($value) && !I::isEmpty($value)) {
+                if (is_array($value) && !empty($value)) {
                     // 0 操作符 1 字段 2 值
                     $array = array_slice($value, 1);
                     switch (strtolower($value[0])) {
@@ -683,7 +689,7 @@ class Db
     public function orderBy($orderBys)
     {
         $this->__orderBy = array_map(function ($sort, $field) {
-            return "{$field} {$sort}";
+            return $field . ' ' . $sort;
         }, array_values($orderBys), array_keys($orderBys));
 
         return $this;
@@ -847,7 +853,7 @@ class Db
     {
         $this->__parse();
         $rawSql = str_replace(array_keys($this->__params), array_map(function ($data) {
-            return 'string' == gettype($data) ? "'" . $data . "'" : $data;
+            return 'string' == gettype($data) ? '\'' . $data . '\'' : $data;
         }, array_values($this->__params)), $this->__queryString);
         $this->__reset();
 
@@ -909,14 +915,14 @@ class Db
     {
 
         $this->__queryString = implode(' ', array_filter([
-            "SELECT {$this->__select}",
-            "FROM {$this->__from}",
+            'SELECT ' . $this->__select,
+            'FROM ' . $this->__from,
             empty($this->__join) ? '' : implode(' ', $this->__join),
-            empty($this->__where) ? '' : "WHERE {$this->__where}",
-            empty($this->__groupBy) ? '' : "GROUP BY {$this->__groupBy}",
-            empty($this->__orderBy) ? '' : "ORDER BY {$this->__orderBy}",
-            empty($this->__limit) ? '' : "LIMIT {$this->__limit}",
-            empty($this->__offset) ? '' : "OFFSET {$this->__offset}",
+            empty($this->__where) ? '' : 'WHERE ' . $this->__where,
+            empty($this->__groupBy) ? '' : 'GROUP BY ' . $this->__groupBy,
+            empty($this->__orderBy) ? '' : 'ORDER BY ' . $this->__orderBy,
+            empty($this->__limit) ? '' : 'LIMIT ' . $this->__limit,
+            empty($this->__offset) ? '' : 'OFFSET ' . $this->__offset,
         ]));
         $this->__queryString = str_replace('%pre%', $this->getTablePrefix(), $this->__queryString);
     }

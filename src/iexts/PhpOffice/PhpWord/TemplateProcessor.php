@@ -49,7 +49,7 @@ class TemplateProcessor extends T
      *
      * @var string
      */
-    protected $_tempDocumentSettingPart = "";
+    protected $_tempDocumentSettingPart = '';
 
     /**
      * Word 的主体部分
@@ -167,7 +167,7 @@ class TemplateProcessor extends T
      *
      * @param string $var 变量名
      * @param array $array 只支持行列号的二维数组
-     * @param array $mergeArray 合并单元格的数组，例如：["A1:B1", "C1:C2"]
+     * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
      * @param array $styleArray 对应所有单元格的样式二维数组
      *
      * @return void
@@ -220,15 +220,15 @@ class TemplateProcessor extends T
                     }
                 }
                 $array = array_merge($array, [
-                    'valign' => I::value($styleArray, "{$rowIndex}.{$c}.valign", Jc::CENTER),
-                    'bgColor' => I::value($styleArray, "{$rowIndex}.{$c}.bgColor"),
+                    'valign' => I::value($styleArray, $rowIndex . '.' . $c . '.valign', Jc::CENTER),
+                    'bgColor' => I::value($styleArray, $rowIndex . '.' . $c . '.bgColor'),
                 ]);
-                $alignment = I::value($styleArray, "{$rowIndex}.{$c}.alignment", Jc::CENTER);
+                $alignment = I::value($styleArray, $rowIndex . '.' . $c . '.alignment', Jc::CENTER);
                 // 在高版本的 Word 里，不支持 JC::JUSTIFY 呢
                 if (JC::JUSTIFY == $alignment) {
                     $alignment = JC::BOTH;
                 }
-                $cellStyle = I::value($styleArray, "{$rowIndex}.{$c}");
+                $cellStyle = I::value($styleArray, $rowIndex . '.' . $c);
                 if (true === $isContinue) {
                     $isContinue = false;
                     $table->addCell(null, $array);
@@ -278,9 +278,9 @@ class TemplateProcessor extends T
             $string = $isUpdate ? 'true' : 'false';
             $matches = null;
             if (preg_match('/<w:updateFields w:val=\"(true|false)\"\/>/', $this->_tempDocumentSettingPart, $matches)) {
-                $this->_tempDocumentSettingPart = str_replace($matches[0], '<w:updateFields w:val="' . $string . '"/>', $this->_tempDocumentSettingPart);
+                $this->_tempDocumentSettingPart = str_replace($matches[0], '<w:updateFields w:val=\"' . $string . '\"/>', $this->_tempDocumentSettingPart);
             } else {
-                $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val="' . $string . '"/></w:settings>', $this->_tempDocumentSettingPart);
+                $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val=\"' . $string . '\"/></w:settings>', $this->_tempDocumentSettingPart);
             }
         }
     }

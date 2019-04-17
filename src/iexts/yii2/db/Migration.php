@@ -56,7 +56,7 @@ class Migration extends M
                         sprintf('CHARACTER SET %s', I::value($options, 'character', 'utf8')),
                         sprintf('COLLATE %s', I::value($options, 'collate', 'utf8_unicode_ci')),
                         sprintf('ENGINE=%s', I::value($options, 'engine', 'InnoDB')),
-                        sprintf('COMMENT = "%s"', I::value($options, 'comment', '')),
+                        sprintf('COMMENT = \"%s\"', I::value($options, 'comment', '')),
                     ];
                     $optionString = implode(' ', $tableOptions);
                 } else {
@@ -80,7 +80,7 @@ class Migration extends M
      */
     public function tableExists($table)
     {
-        if (preg_match("/{{%(.+)}}/", $table, $matches)) {
+        if (preg_match('/{{%(.+)}}/', $table, $matches)) {
             $table = $matches[1];
         }
         return $this->db->createCommand()->tableExists($table);

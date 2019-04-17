@@ -172,13 +172,13 @@ class Validator
 
     protected function _isEmpty($data)
     {
-        return I::isEmpty($data);
+        return empty($data);
     }
 
     protected function _requiredValidator($data, $field, $rule)
     {
         if (null === I::value($data, $field)) {
-            $this->__messages[$field][] = I::value($rule, 'message', "{$field} 必填");
+            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 必填');
             $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
         }
     }
@@ -192,7 +192,7 @@ class Validator
         $range = I::value($rule, 'range', []);
         $isStrict = I::value($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
-            $this->__messages[$field][] = I::value($rule, 'message', "{$field} 不在范围内");
+            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 不在范围内');
             $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_IN);
         }
     }
@@ -205,7 +205,7 @@ class Validator
         $value = I::value($data, $field);
         $pattern = I::value($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
-            $this->__messages[$field][] = I::value($rule, 'message', "{$field} 格式不正确");
+            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 格式不正确');
             $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_MATCH);
         }
     }
@@ -213,7 +213,7 @@ class Validator
     protected function _mobileValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^1\\d{10}$/';
-        $rule['message'] = I::value($rule, 'message', "{$field} 手机号格式不正确");
+        $rule['message'] = I::value($rule, 'message', $field . ' 手机号格式不正确');
         $rule['code'] = I::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
         $this->_matchValidator($data, $field, $rule);
     }
@@ -221,7 +221,7 @@ class Validator
     protected function _emailValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^[\w\-\.]+@[\w\-]+(\.\w+)+$/';
-        $rule['message'] = I::value($rule, 'message', "{$field} 邮箱格式不正确");
+        $rule['message'] = I::value($rule, 'message', $field . ' 邮箱格式不正确');
         $rule['code'] = I::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
         $this->_matchValidator($data, $field, $rule);
     }
@@ -237,7 +237,7 @@ class Validator
                 throw new Exception('function error');
             }
             if (!$function($value)) {
-                $this->__messages[$field][] = I::value($rule, 'message', "{$field} 不唯一");
+                $this->__messages[$field][] = I::value($rule, 'message', $field . ' 不唯一');
                 $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
             }
         }
@@ -253,7 +253,7 @@ class Validator
             throw new Exception('function call error');
         }
         if (!$function(I::value($data, $field))) {
-            $this->__messages[$field][] = I::value($rule, 'message', "{$field}验证不通过");
+            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 验证不通过');
             $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_CALL);
         }
     }

@@ -9,8 +9,6 @@
 
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\I;
-
 /**
  * 字符串类
  */
@@ -134,8 +132,8 @@ class Strings
             return hash_equals($test, $hash);
         }
 
-        $test .= "\0";
-        $hash .= "\0";
+        $test .= '\0';
+        $hash .= '\0';
         $expectedLength = static::byteLength($test);
         $actualLength = static::byteLength($hash);
         $diff = $expectedLength - $actualLength;
@@ -194,7 +192,7 @@ class Strings
      */
     public static function startsWith($string, $search)
     {
-        return !I::isEmpty($search) && mb_strpos($string, $search) === 0;
+        return !empty($search) && mb_strpos($string, $search) === 0;
     }
 
     /**
@@ -207,7 +205,7 @@ class Strings
      */
     public static function endsWith($string, $search)
     {
-        return !I::isEmpty($search) && mb_substr($string, -static::length($search)) === $search;
+        return !empty($search) && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
@@ -220,7 +218,7 @@ class Strings
      */
     public static function contains($string, $search)
     {
-        return !I::isEmpty($search) && mb_strpos($string, $search) !== false;
+        return !empty($search) && mb_strpos($string, $search) !== false;
     }
 
     /**

@@ -38,7 +38,7 @@ class Html extends H
         if ($formName === '' && $prefix === '') {
             return $attribute . $suffix;
         } elseif ($formName !== '') {
-            return $formName . $prefix . "[$attribute]" . $suffix;
+            return $formName . $prefix . '[' . $attribute . ']' . $suffix;
         }
 
         throw new InvalidArgumentException(get_class($model) . '::formName() cannot be empty for tabular inputs.');

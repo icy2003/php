@@ -25,7 +25,7 @@ class Html
      *
      * @return string
      */
-    public static function encode($content, $doubleEncode = true, $encoding = "UTF-8")
+    public static function encode($content, $doubleEncode = true, $encoding = 'UTF-8')
     {
         return htmlspecialchars($content, ENT_QUOTES | ENT_SUBSTITUTE, $encoding, $doubleEncode);
     }

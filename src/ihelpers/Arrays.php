@@ -121,7 +121,7 @@ class Arrays
     public static function arrayKeysExists($keys, $array)
     {
 
-        return I::isEmpty(array_diff($keys, array_keys($array)));
+        return empty(array_diff($keys, array_keys($array)));
     }
 
     /**
@@ -191,6 +191,7 @@ class Arrays
      * @param integer $step 步长
      *
      * @return \Generator
+     * @throws \LogicException
      *
      * @test icy2003\php\tests\ihelpers\ArraysTest::testRange
      */
@@ -198,14 +199,14 @@ class Arrays
     {
         if ($start < $end) {
             if ($step <= 0) {
-                throw new \LogicException("步长必须大于 0 ");
+                throw new \LogicException('步长必须大于 0');
             }
             for ($i = $start; $i <= $end; $i += $step) {
                 yield $i;
             }
         } elseif ($start > $end) {
             if ($step >= 0) {
-                throw new \LogicException("步长必须小于 0");
+                throw new \LogicException('步长必须小于 0');
             }
             for ($i = $start; $i >= $end; $i += $step) {
                 yield $i;
@@ -364,7 +365,7 @@ class Arrays
         $rowIndex = 0;
         foreach ($array as $row) {
             $rowIndex++;
-            $colIndex = "A";
+            $colIndex = 'A';
             foreach ($row as $col) {
                 $data[$rowIndex][$colIndex++] = $col;
             }

@@ -65,8 +65,8 @@ class DateTime
     {
         $timestamp = time();
         return [
-            strtotime(date('Y-m-d', strtotime("+0 week Monday", $timestamp))),
-            strtotime(date('Y-m-d', strtotime("+0 week Sunday", $timestamp))) + 24 * 3600 - 1,
+            strtotime(date('Y-m-d', strtotime('+0 week Monday', $timestamp))),
+            strtotime(date('Y-m-d', strtotime('+0 week Sunday', $timestamp))) + 24 * 3600 - 1,
         ];
     }
 
@@ -79,8 +79,8 @@ class DateTime
     {
         $timestamp = time();
         return [
-            strtotime(date('Y-m-d', strtotime("last week Monday", $timestamp))),
-            strtotime(date('Y-m-d', strtotime("last week Sunday", $timestamp))) + 24 * 3600 - 1,
+            strtotime(date('Y-m-d', strtotime('last week Monday', $timestamp))),
+            strtotime(date('Y-m-d', strtotime('last week Sunday', $timestamp))) + 24 * 3600 - 1,
         ];
     }
 
@@ -93,8 +93,8 @@ class DateTime
     {
         $timestamp = time();
         return [
-            strtotime(date('Y-m-d', strtotime("next week Monday", $timestamp))),
-            strtotime(date('Y-m-d', strtotime("next week Sunday", $timestamp))) + 24 * 3600 - 1,
+            strtotime(date('Y-m-d', strtotime('next week Monday', $timestamp))),
+            strtotime(date('Y-m-d', strtotime('next week Sunday', $timestamp))) + 24 * 3600 - 1,
         ];
     }
 
