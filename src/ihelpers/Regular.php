@@ -28,7 +28,7 @@ class Regular
      */
     public static function email($email)
     {
-        return preg_match('/^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/', $email);
+        return (bool)preg_match('/^[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&\'*+\\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/', $email);
     }
 
     /**
@@ -42,7 +42,7 @@ class Regular
      */
     public static function ip($ip)
     {
-        return preg_match('/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/', $ip);
+        return (bool)preg_match('/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/', $ip);
     }
 
     /**
@@ -54,7 +54,7 @@ class Regular
      */
     public static function mobile($mobile)
     {
-        return preg_match('/^1[3-9][0-9]\d{8}$/', $mobile);
+        return (bool)preg_match('/^1[3-9][0-9]\d{8}$/', $mobile);
     }
 
     /**
@@ -66,7 +66,7 @@ class Regular
      */
     public static function idCard($idCard)
     {
-        return preg_match('/(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/', $idCard);
+        return (bool)preg_match('/(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/', $idCard);
     }
 
     /**
@@ -78,6 +78,19 @@ class Regular
      */
     public static function url($url)
     {
-        return preg_match('/^https?:\/\//', $url);
+        return (bool)preg_match('/^https?:\/\//', $url);
+    }
+
+    /**
+     * 判断是否是中文
+     *
+     * @param string $chinese 中文字符
+     *
+     * @return boolean
+     */
+    public static function isChinese($chinese)
+    {
+        $chinese = Charset::toUtf($chinese);
+        return (bool)preg_match('/[\x{4e00}-\x{9fa5}]+/u', $chinese);
     }
 }
