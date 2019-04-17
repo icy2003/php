@@ -27,7 +27,7 @@ class I
      */
     public static function value($mixed, $keyString, $defaultValue = null)
     {
-        $keyArray = explode(".", $keyString);
+        $keyArray = explode('.', $keyString);
         foreach ($keyArray as $key) {
             if (is_array($mixed)) {
                 if (array_key_exists($key, $mixed)) {
@@ -83,7 +83,8 @@ class I
     /**
      * 让 empty 支持函数调用
      *
-     * 注意：此函数并不比 empty 好，只是更方用在回调里。例如：empty($array[0]) 就不能用此函数代替
+     * 注意：此函数并不比 empty 好，只是更方用在回调里
+     * 例如：empty($array[0]) 就不能用此函数代替，另外，empty 是语法结构，性能明显比函数高
      * @see http://php.net/manual/zh/function.empty.php
      *
      * @param mixed $data
@@ -92,6 +93,21 @@ class I
     public static function isEmpty($data)
     {
         return empty($data);
+    }
+
+    /**
+     * 原生函数 count 在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
+     *
+     * @param array $array 数组
+     *
+     * @return int
+     */
+    public static function count($array)
+    {
+        if (is_array($array)) {
+            return count($array);
+        }
+        return 0;
     }
 
     /**
@@ -114,7 +130,7 @@ class I
      * @var array
      */
     public static $aliases = [
-        '@icy2003/php_tests' => __DIR__. '/../tests',
+        '@icy2003/php_tests' => __DIR__ . '/../tests',
         '@icy2003/php' => __DIR__,
     ];
 
