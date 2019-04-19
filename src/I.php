@@ -138,10 +138,11 @@ class I
      * 用别名获取真实路径
      *
      * @param string $alias 别名
+     * @param bool $loadNew 是否加载新别名到 I 里，默认否
      *
      * @return string
      */
-    public static function getAlias($alias)
+    public static function getAlias($alias, $loadNew = false)
     {
         if (strncmp($alias, '@', 1)) {
             return $alias;
@@ -152,20 +153,27 @@ class I
             $pos = strpos($alias, '/', $pos);
             $root = $pos === false ? $alias : substr($alias, 0, $pos);
             if (isset(static::$aliases[$root])) {
-                break;
+                if (is_string(static::$aliases[$root])) {
+                    return $pos === false ? static::$aliases[$root] : static::$aliases[$root] . substr($alias, $pos);
+                } elseif (is_array(static::$aliases[$root])) {
+                    foreach (static::$aliases[$root] as $name => $path) {
+                        if (strpos($alias . '/', $name . '/') === 0) {
+                            return $path . substr($alias, strlen($name));
+                        }
+                    }
+                } else {
+                    return false;
+                }
             }
             if ($root == $alias) {
-                return false;
+                break;
             }
             $pos++;
         }
-        if (is_string(static::$aliases[$root])) {
-            return $pos === false ? static::$aliases[$root] : static::$aliases[$root] . substr($alias, $pos);
-        }
-        foreach (static::$aliases[$root] as $name => $path) {
-            if (strpos($alias . '/', $name . '/') === 0) {
-                return $path . substr($alias, strlen($name));
-            }
+        // 对 Yii2 的支持
+        if (method_exists('\Yii', 'getAlias') && $result = \Yii::getAlias($alias)) {
+            true === $loadNew && static::setAlias($alias, $result);
+            return $result;
         }
 
         return false;
@@ -181,6 +189,8 @@ class I
      */
     public static function setAlias($alias, $path)
     {
+        // 对 Yii2 的支持
+        method_exists('\Yii', 'getAlias') && \Yii::setAlias($alias, $path);
         if (strncmp($alias, '@', 1)) {
             $alias = '@' . $alias;
         }
