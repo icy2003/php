@@ -12,7 +12,7 @@
  * 在注释掉 ini_set 居然可以匹配到数据，由于 $string 后面有好几个 w:p，如果是正则错误，那肯定是匹配不到数据的
  * 因此，可以确定是 PHP7.0~7.2 的 bug
  *
- * $string is cut out from a Word, because the data is personal, I replace all the content part, but it will not affect result.
+ * $string is cut out from a Word document, because the data is personal, I replace all the content part, but it will not affect result.
  * It is empty on PHP7.0 to 7.2, the correct result should be some data.
  * Besides:
  * The pattern is all right, you can replace w:p to w:p1 at the start of $string.
