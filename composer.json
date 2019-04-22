@@ -23,5 +23,9 @@
         "psr-4": {
             "icy2003\\php\\": "src/"
         }
+    },
+    "require-dev": {
+        "codeception/codeception": "2.6.x-dev",
+        "phpdocumentor/phpdocumentor": "2.*"
     }
 }
