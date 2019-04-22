@@ -120,8 +120,13 @@ class I
      */
     public static function phpini($key, $default = null)
     {
-        $result = get_cfg_var($key);
-        return null === $result ? $default : $result;
+        if (false !== ($ini = ini_get($key))) {
+            return $ini;
+        }
+        if (false !== ($ini = get_cfg_var($key))) {
+            return $ini;
+        }
+        return $default;
     }
 
     /**
