@@ -16,6 +16,7 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\TemplateProcessor as T;
+use icy2003\php\ihelpers\Preg;
 
 /**
  * TemplateProcessor 扩展
@@ -298,7 +299,7 @@ class TemplateProcessor extends T
     public function replaceBlock($blockname, $replacement)
     {
         // PHP7.0~7.2 会有 bug 导致匹配不到结果，例子参见 samples/php7preg_bug.php
-        ini_set('pcre.jit', 0);
+        Preg::jitOff();
         preg_match(
             '/(<\?xml.*?)(<w:p ((?!<w:p ).)*?\${' . $blockname . '}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/' . $blockname . '}.*?<\/w:p>)/is',
             $this->tempDocumentMainPart,
