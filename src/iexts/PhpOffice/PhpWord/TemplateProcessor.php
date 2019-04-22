@@ -249,16 +249,17 @@ class TemplateProcessor extends T
      *
      * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
      * @param array $array 一维数组
+     * @param int $depth 列表层级，从 0 开始。默认 0
      * @todo 给列表加样式
      *
      * @return void
      */
-    public function setList($var, $array)
+    public function setList($var, $array, $depth = 0)
     {
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         foreach ($array as $item) {
-            $section->addListItem($item, 0);
+            $section->addListItem($item, $depth);
         }
         $objWriter = IOFactory::createWriter($phpWord);
         $xml = $objWriter->getWriterPart('Document')->write();
@@ -299,11 +300,10 @@ class TemplateProcessor extends T
         // PHP7.0~7.2 会有 bug 导致匹配不到结果，例子参见 samples/php7preg_bug.php
         ini_set('pcre.jit', 0);
         preg_match(
-            '/(<\?xml.*?)(<w:p ((?!<w:p ).)*?\${'.$blockname.'}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/'.$blockname.'}.*?<\/w:p>)/is',
+            '/(<\?xml.*?)(<w:p ((?!<w:p ).)*?\${' . $blockname . '}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/' . $blockname . '}.*?<\/w:p>)/is',
             $this->tempDocumentMainPart,
             $matches
         );
-
         if (isset($matches[2])) {
             $this->tempDocumentMainPart = str_replace(
                 $matches[2] . $matches[4] . $matches[5],
