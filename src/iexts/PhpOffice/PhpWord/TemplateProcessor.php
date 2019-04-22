@@ -11,12 +11,12 @@ namespace icy2003\php\iexts\PhpOffice\PhpWord;
 
 use icy2003\php\I;
 use icy2003\php\ihelpers\Html;
+use icy2003\php\ihelpers\Preg;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\TemplateProcessor as T;
-use icy2003\php\ihelpers\Preg;
 
 /**
  * TemplateProcessor 扩展
@@ -184,10 +184,16 @@ class TemplateProcessor extends T
             'cellMarginRight' => 150,
         ]);
         $table = $section->addTable($style);
+        $cindexs = [];
         foreach ($array as $rowIndex => $row) {
             // echo $rowIndex; 1
             $table->addRow();
             $i = 0;
+            if (empty($cindexs)) {
+                $cindexs = array_map(function ($cs) {
+                    return Coordinate::columnIndexFromString($cs);
+                }, array_keys($row));
+            }
             foreach ($row as $c => $value) {
                 if ($i > 0) {
                     $i--;
@@ -202,8 +208,8 @@ class TemplateProcessor extends T
                     list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range); // A1:B2
                     if ($rangeEnd[0] > $rangeStart[0]) {
                         if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0] && $rowIndex >= $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
-                            $array = array_merge($array, ['gridSpan' => $rangeEnd[0] - $rangeStart[0] + 1]);
-                            $i = $rangeEnd[0] - $rangeStart[0];
+                            $i = count(array_intersect(range($rangeStart[0], $rangeEnd[0]), $cindexs)) - 1;
+                            $array = array_merge($array, ['gridSpan' => $i + 1]);
                         }
                     }
                     if ($rangeEnd[1] > $rangeStart[1]) {

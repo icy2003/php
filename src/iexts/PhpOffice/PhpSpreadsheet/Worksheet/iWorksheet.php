@@ -138,8 +138,14 @@ class iWorksheet
                             }
                             $pVisible = $colVisible && $rowVisible;
                             if (true === $initVisible ^ $pVisible) {
-                                $title = $workSheet->getTitle();
-                                throw new \Exception('不允许隐藏合并单元格的一部分，该表为：' . $title . '，合并单元格范围是 ' . $range . '，其中 ' . $i . $j . ' 等单元格被隐藏了');
+                                // 如果隐藏单元格不拿，那返回的数据里肯定也没有，所以拿第一个单元格判断，因为第一个单元格存着合并单元格的内容数据，不能不拿
+                                if (empty($returnValue[$rangeStart[1]][$startCol])) {
+                                    $title = $workSheet->getTitle();
+                                    throw new \Exception('不允许隐藏合并单元格的主单元格（合并前左上角那个），' .
+                                        '该表为：' . $title . '，' .
+                                        '合并单元格是 ' . $range . '，' .
+                                        '其中 ' . $startCol . $rangeStart[1] . ' 被隐藏了');
+                                }
                             }
                         }
                     }
