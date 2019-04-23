@@ -56,7 +56,7 @@ class Migration extends M
                         sprintf('CHARACTER SET %s', I::value($options, 'character', 'utf8')),
                         sprintf('COLLATE %s', I::value($options, 'collate', 'utf8_unicode_ci')),
                         sprintf('ENGINE=%s', I::value($options, 'engine', 'InnoDB')),
-                        sprintf('COMMENT = \"%s\"', I::value($options, 'comment', '')),
+                        sprintf('COMMENT = "%s"', I::value($options, 'comment', '')),
                     ];
                     $optionString = implode(' ', $tableOptions);
                 } else {
