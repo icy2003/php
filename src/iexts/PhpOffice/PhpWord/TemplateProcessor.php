@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
+use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\TemplateProcessor as T;
 
 /**
@@ -177,13 +178,18 @@ class TemplateProcessor extends T
     {
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
-        $style = $phpWord->addTableStyle('tableStyle', [
+        /**
+         * addTableStyle 有 bug……
+         * @see https://github.com/PHPOffice/PHPWord/issues/629
+         */
+        $table = $section->addTable([
+            'unit' => TblWidth::PERCENT,
+            'width' => 100 * 50,
             'borderColor' => '000000',
             'borderSize' => 9,
             'cellMarginLeft' => 150,
             'cellMarginRight' => 150,
         ]);
-        $table = $section->addTable($style);
         $cindexs = [];
         foreach ($array as $rowIndex => $row) {
             // echo $rowIndex; 1
