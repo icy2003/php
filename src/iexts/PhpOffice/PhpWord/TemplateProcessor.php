@@ -20,7 +20,7 @@ use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\TemplateProcessor as T;
 
 /**
- * TemplateProcessor 扩展
+ * \PhpOffice\PhpWord\TemplateProcessor 扩展
  */
 class TemplateProcessor extends T
 {

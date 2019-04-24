@@ -65,6 +65,7 @@ class Convert
 
     /**
      * 将某进制的字符串转化成另一进制的字符串
+     *
      * @see http://php.net/manual/zh/function.base-convert.php
      *
      * @param string $numberInput 待转换的字符串

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Class iWorksheet
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 
 namespace icy2003\php\iexts\PhpOffice\PhpSpreadsheet\Worksheet;
 
@@ -7,11 +14,16 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+/**
+ * \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet 的扩展
+ */
 class iWorksheet
 {
     /**
      * 返回一个指定范围内的单元格的数组
+     *
      * 修复不被支持的函数： NUMBERSTRING
+     *
      * ps：作者表示不修车
      *
      * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $workSheet

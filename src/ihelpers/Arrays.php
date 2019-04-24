@@ -77,6 +77,7 @@ class Arrays
 
     /**
      * array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
+     *
      * 如果需要取某几项，建议使用 Arrays::columns
      *
      * @see http://php.net/array_column
