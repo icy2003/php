@@ -130,6 +130,19 @@ class I
     }
 
     /**
+     * 显示 PHP 错误
+     *
+     * @param boolean $show 是否显示，默认是
+     *
+     * @return void
+     */
+    public static function displayErrors($show = true)
+    {
+        ini_set("display_errors", true === $show ? 'On' : 'Off');
+        true === $show && error_reporting(E_ALL | E_STRICT);
+    }
+
+    /**
      * 别名列表
      *
      * @var array
