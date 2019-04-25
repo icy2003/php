@@ -382,6 +382,7 @@ class Db
             'VALUES',
             '(' . $valuesString . ')',
         ]));
+        $this->__queryString = str_replace('%pre%', $this->getTablePrefix(), $this->__queryString);
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
@@ -418,6 +419,7 @@ class Db
             $setsString,
             'WHERE ' . $this->__where,
         ]));
+        $this->__queryString = str_replace('%pre%', $this->getTablePrefix(), $this->__queryString);
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
@@ -442,6 +444,7 @@ class Db
             $table,
             'WHERE ' . $this->__where,
         ]));
+        $this->__queryString = str_replace('%pre%', $this->getTablePrefix(), $this->__queryString);
         $this->__query = $this->__conn->prepare($this->__queryString);
         $this->__bindParams();
         $this->__query->execute();
