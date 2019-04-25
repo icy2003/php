@@ -9,6 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * Json 类
  */
@@ -76,5 +78,19 @@ class Json
             $json = '[]';
         }
         echo $json;die;
+    }
+
+    /**
+     * 获取 Json 字符串里的参数
+     *
+     * @param string $json Json 字符串
+     * @param string $key @see \icy2003\php\I::value
+     *
+     * @return mixed
+     */
+    public static function value($json, $key, $defaultValue = null)
+    {
+        $array = static::decode($json);
+        return I::value($array, $key, $defaultValue);
     }
 }
