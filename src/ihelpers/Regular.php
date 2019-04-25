@@ -93,4 +93,31 @@ class Regular
         $chinese = Charset::toUtf($chinese);
         return (bool)preg_match('/[\x{4e00}-\x{9fa5}]+/u', $chinese);
     }
+
+    /**
+     * 关闭 JIT
+     *
+     * @param boolean $isOn 是否开启，默认 false
+     *
+     * @return void
+     */
+    public static function jitOff($isOn = false)
+    {
+        /**
+         * @see /samples/php7preg_bug.php
+         */
+        ini_set('pcre.jit', true === $isOn ? 1 : 0);
+    }
+
+    /**
+     * 判断一个正则是否合法
+     *
+     * @param string $pattern 正则表达式
+     *
+     * @return boolean
+     */
+    public static function isLegal($pattern)
+    {
+        return false !== @preg_match($pattern, null);
+    }
 }
