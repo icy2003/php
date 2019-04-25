@@ -20,7 +20,7 @@ use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\TemplateProcessor as T;
 
 /**
- * \PhpOffice\PhpWord\TemplateProcessor 扩展
+ * TemplateProcessor 扩展
  */
 class TemplateProcessor extends T
 {
@@ -107,16 +107,21 @@ class TemplateProcessor extends T
     }
 
     /**
-     * 在主文档中搜索
+     * 搜索关键字
      *
      * @param string $search 待搜索的关键字
+     * @param string $part 搜索的字符串部分，如果是 null，则搜索整个 main 内容
      *
      * @return integer 关键字位置
      */
-    public function tagPos($search)
+    public function tagPos($search, $part = null)
     {
         $search = parent::ensureMacroCompleted($search);
-        return strpos($this->tempDocumentMainPart, $search);
+        if (null === $part) {
+            return strpos($this->tempDocumentMainPart, $search);
+        } else {
+            return strpos($part, $search);
+        }
     }
 
     /**
@@ -164,9 +169,9 @@ class TemplateProcessor extends T
     }
 
     /**
-     * 将一个 word 模板变量替换成表格
-     * @see https://github.com/PHPOffice/PHPWord/issues/1198 感谢提供思路
+     * 在某部分 XML 串中，将一个 Word 模板变量替换成表格，并合并到主文档上
      *
+     * @param string $documentPartXML 某段 XML 字串
      * @param string $var 变量名
      * @param array $array 只支持行列号的二维数组
      * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
@@ -174,7 +179,7 @@ class TemplateProcessor extends T
      *
      * @return void
      */
-    public function setTable($var, $array, $mergeArray = [], $styleArray = [])
+    public function setTableFromPart($documentPartXML, $var, $array, $mergeArray = [], $styleArray = [])
     {
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
@@ -254,20 +259,37 @@ class TemplateProcessor extends T
         }
         $objWriter = IOFactory::createWriter($phpWord);
         $xml = $objWriter->getWriterPart('Document')->write();
-        $this->replaceBlock($var, $this->__getBodyBlock($xml));
+        $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
     }
 
     /**
-     * 将一个 word 模板变量替换成列表
+     * 在整个文档里，将一个 Word 模板变量替换成表格
      *
-     * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
-     * @param array $array 一维数组
-     * @param int $depth 列表层级，从 0 开始。默认 0
-     * @todo 给列表加样式
+     * @see https://github.com/PHPOffice/PHPWord/issues/1198 感谢提供思路
+     *
+     * @param string $var 变量名
+     * @param array $array 只支持行列号的二维数组
+     * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
+     * @param array $styleArray 对应所有单元格的样式二维数组
      *
      * @return void
      */
-    public function setList($var, $array, $depth = 0)
+    public function setTable($var, $array, $mergeArray = [], $styleArray = [])
+    {
+        $this->setTableFromPart($this->tempDocumentMainPart, $var, $array, $mergeArray, $styleArray);
+    }
+
+    /**
+     * 在某部分 XML 串中，将一个 Word 模板变量替换成列表，并合并到主文档上
+     *
+     * @param string $documentPartXML 某段 XML 字串
+     * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
+     * @param array $array 一维数组
+     * @param int $depth 列表层级，从 0 开始。默认 0
+     *
+     * @return void
+     */
+    public function setListFromPart($documentPartXML, $var, $array, $depth = 0)
     {
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
@@ -276,7 +298,23 @@ class TemplateProcessor extends T
         }
         $objWriter = IOFactory::createWriter($phpWord);
         $xml = $objWriter->getWriterPart('Document')->write();
-        $this->replaceBlock($var, $this->__getBodyBlock($xml));
+        $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
+    }
+
+    /**
+     * 在整个文档里，将一个 Word 模板变量替换成列表
+     *
+     * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
+     * @param array $array 一维数组
+     * @param int $depth 列表层级，从 0 开始。默认 0
+     *
+     * @todo 给列表加样式
+     *
+     * @return void
+     */
+    public function setList($var, $array, $depth = 0)
+    {
+        $this->setListFromPart($this->tempDocumentMainPart, $var, $array, $depth);
     }
 
     /**
@@ -308,22 +346,37 @@ class TemplateProcessor extends T
      *
      * @return void
      */
-    public function replaceBlock($blockname, $replacement)
+    public function replaceBlock($blockname, $replacement, $documentPartXML = null)
     {
+        null === $documentPartXML && $documentPartXML = $this->tempDocumentMainPart;
         // PHP7.0~7.2 会有 bug 导致匹配不到结果，例子参见 samples/php7preg_bug.php
         Preg::jitOff();
         preg_match(
-            '/(<\?xml.*?)(<w:p ((?!<w:p ).)*?\${' . $blockname . '}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/' . $blockname . '}.*?<\/w:p>)/is',
-            $this->tempDocumentMainPart,
+            '/(<w:p ((?!<w:p ).)*?\${' . $blockname . '}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/' . $blockname . '}.*?<\/w:p>)/is',
+            $documentPartXML,
             $matches
         );
-        if (isset($matches[2])) {
-            $this->tempDocumentMainPart = str_replace(
-                $matches[2] . $matches[4] . $matches[5],
-                $replacement,
-                $this->tempDocumentMainPart
-            );
+        if (isset($matches[1])) {
+            $part = $this->setValueForPart($matches[1] . $matches[3] . $matches[4], $replacement, $documentPartXML, parent::MAXIMUM_REPLACEMENTS_DEFAULT);
+            $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, parent::MAXIMUM_REPLACEMENTS_DEFAULT);
         }
+    }
+
+    /**
+     * 在某段 XML 中替换变量，并合并到主文档上
+     *
+     * @param string $documentPartXML 某段 XML 字串
+     * @param string $search 待搜索的变量名
+     * @param string $replace 替换的值
+     * @param int $limit 替换次数，默认-1，表示替换全部
+     *
+     * @return void
+     */
+    public function setValueFromPart($documentPartXML, $search, $replace, $limit = parent::MAXIMUM_REPLACEMENTS_DEFAULT)
+    {
+        $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit);
+        $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, $limit);
+        $this->setValue($search, $replace, $limit);
     }
 
 }
