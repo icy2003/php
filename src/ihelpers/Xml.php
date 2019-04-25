@@ -20,7 +20,7 @@ class Xml
      *
      * @param string $xmlString
      *
-     * @return boolean
+     * @return bool
      */
     public static function isXml($xmlString)
     {
@@ -28,7 +28,9 @@ class Xml
     }
 
     /**
-     * Xml 转成数组，失败时返回空数组
+     * Xml 转成数组
+     *
+     * 失败时返回空数组
      *
      * @param string $xmlString Xml 字符串
      *
@@ -50,7 +52,7 @@ class Xml
      * 数组转成 Xml 字符串
      *
      * @param array $array 数组
-     * @param boolean $isRoot 是否带上根节点，默认 true
+     * @param bool $isRoot 是否带上根节点，默认 true
      *
      * @return string
      */
