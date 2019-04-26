@@ -11,7 +11,6 @@ namespace icy2003\php\iexts\PhpOffice\PhpWord;
 
 use icy2003\php\I;
 use icy2003\php\ihelpers\Html;
-use icy2003\php\ihelpers\Preg;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
@@ -182,85 +181,87 @@ class TemplateProcessor extends T
      */
     public function setTableFromPart($documentPartXML, $var, $array, $mergeArray = [], $styleArray = [])
     {
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
-        /**
-         * addTableStyle 有 bug……
-         * @see https://github.com/PHPOffice/PHPWord/issues/629
-         */
-        $table = $section->addTable([
-            'unit' => TblWidth::PERCENT,
-            'width' => 100 * 50,
-            'borderColor' => '000000',
-            'borderSize' => 9,
-            'cellMarginLeft' => 150,
-            'cellMarginRight' => 150,
-        ]);
-        $cindexs = [];
-        foreach ($array as $rowIndex => $row) {
-            // echo $rowIndex; 1
-            $table->addRow();
-            $i = 0;
-            if (empty($cindexs)) {
-                $cindexs = array_map(function ($cs) {
-                    return Coordinate::columnIndexFromString($cs);
-                }, array_keys($row));
-            }
-            foreach ($row as $c => $value) {
-                if ($i > 0) {
-                    $i--;
-                    continue;
+        if ($this->tagPos($var, $documentPartXML)) {
+            $phpWord = new PhpWord();
+            $section = $phpWord->addSection();
+            /**
+             * addTableStyle 有 bug……
+             * @see https://github.com/PHPOffice/PHPWord/issues/629
+             */
+            $table = $section->addTable([
+                'unit' => TblWidth::PERCENT,
+                'width' => 100 * 50,
+                'borderColor' => '000000',
+                'borderSize' => 9,
+                'cellMarginLeft' => 150,
+                'cellMarginRight' => 150,
+            ]);
+            $cindexs = [];
+            foreach ($array as $rowIndex => $row) {
+                // echo $rowIndex; 1
+                $table->addRow();
+                $i = 0;
+                if (empty($cindexs)) {
+                    $cindexs = array_map(function ($cs) {
+                        return Coordinate::columnIndexFromString($cs);
+                    }, array_keys($row));
                 }
-                // echo $c; A
-                $colIndex = Coordinate::columnIndexFromString($c);
-                $array = [];
-                $isContinue = false;
-                foreach ($mergeArray as $range) {
-                    // 1,1 : 2,2
-                    list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range); // A1:B2
-                    if ($rangeEnd[0] > $rangeStart[0]) {
-                        if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0] && $rowIndex >= $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
-                            $i = count(array_intersect(range($rangeStart[0], $rangeEnd[0]), $cindexs)) - 1;
-                            $array = array_merge($array, ['gridSpan' => $i + 1]);
-                        }
+                foreach ($row as $c => $value) {
+                    if ($i > 0) {
+                        $i--;
+                        continue;
                     }
-                    if ($rangeEnd[1] > $rangeStart[1]) {
-                        if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0]) {
-                            if ($rowIndex == $rangeStart[1]) {
-                                $array = array_merge($array, ['vMerge' => 'restart']);
-                            } elseif ($rowIndex > $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
-                                $isContinue = true;
-                                $array = array_merge($array, ['vMerge' => 'continue']);
+                    // echo $c; A
+                    $colIndex = Coordinate::columnIndexFromString($c);
+                    $array = [];
+                    $isContinue = false;
+                    foreach ($mergeArray as $range) {
+                        // 1,1 : 2,2
+                        list($rangeStart, $rangeEnd) = Coordinate::rangeBoundaries($range); // A1:B2
+                        if ($rangeEnd[0] > $rangeStart[0]) {
+                            if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0] && $rowIndex >= $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
+                                $i = count(array_intersect(range($rangeStart[0], $rangeEnd[0]), $cindexs)) - 1;
+                                $array = array_merge($array, ['gridSpan' => $i + 1]);
                             }
                         }
+                        if ($rangeEnd[1] > $rangeStart[1]) {
+                            if ($colIndex >= $rangeStart[0] && $colIndex <= $rangeEnd[0]) {
+                                if ($rowIndex == $rangeStart[1]) {
+                                    $array = array_merge($array, ['vMerge' => 'restart']);
+                                } elseif ($rowIndex > $rangeStart[1] && $rowIndex <= $rangeEnd[1]) {
+                                    $isContinue = true;
+                                    $array = array_merge($array, ['vMerge' => 'continue']);
+                                }
+                            }
+                        }
+                        if (!empty($array)) {
+                            break;
+                        }
                     }
-                    if (!empty($array)) {
-                        break;
-                    }
-                }
-                $array = array_merge($array, [
-                    'valign' => I::value($styleArray, $rowIndex . '.' . $c . '.valign', Jc::CENTER),
-                    'bgColor' => I::value($styleArray, $rowIndex . '.' . $c . '.bgColor'),
-                ]);
-                $alignment = I::value($styleArray, $rowIndex . '.' . $c . '.alignment', Jc::CENTER);
-                // 在高版本的 Word 里，不支持 JC::JUSTIFY 呢
-                if (JC::JUSTIFY == $alignment) {
-                    $alignment = JC::BOTH;
-                }
-                $cellStyle = I::value($styleArray, $rowIndex . '.' . $c);
-                if (true === $isContinue) {
-                    $isContinue = false;
-                    $table->addCell(null, $array);
-                } else {
-                    $table->addCell(null, $array)->addText(Html::encode($value), $cellStyle, [
-                        'alignment' => $alignment,
+                    $array = array_merge($array, [
+                        'valign' => I::value($styleArray, $rowIndex . '.' . $c . '.valign', Jc::CENTER),
+                        'bgColor' => I::value($styleArray, $rowIndex . '.' . $c . '.bgColor'),
                     ]);
+                    $alignment = I::value($styleArray, $rowIndex . '.' . $c . '.alignment', Jc::CENTER);
+                    // 在高版本的 Word 里，不支持 JC::JUSTIFY 呢
+                    if (JC::JUSTIFY == $alignment) {
+                        $alignment = JC::BOTH;
+                    }
+                    $cellStyle = I::value($styleArray, $rowIndex . '.' . $c);
+                    if (true === $isContinue) {
+                        $isContinue = false;
+                        $table->addCell(null, $array);
+                    } else {
+                        $table->addCell(null, $array)->addText(Html::encode($value), $cellStyle, [
+                            'alignment' => $alignment,
+                        ]);
+                    }
                 }
             }
+            $objWriter = IOFactory::createWriter($phpWord);
+            $xml = $objWriter->getWriterPart('Document')->write();
+            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
         }
-        $objWriter = IOFactory::createWriter($phpWord);
-        $xml = $objWriter->getWriterPart('Document')->write();
-        $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
     }
 
     /**
@@ -292,14 +293,16 @@ class TemplateProcessor extends T
      */
     public function setListFromPart($documentPartXML, $var, $array, $depth = 0)
     {
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
-        foreach ($array as $item) {
-            $section->addListItem($item, $depth);
+        if ($this->tagPos($var, $documentPartXML)) {
+            $phpWord = new PhpWord();
+            $section = $phpWord->addSection();
+            foreach ($array as $item) {
+                $section->addListItem($item, $depth);
+            }
+            $objWriter = IOFactory::createWriter($phpWord);
+            $xml = $objWriter->getWriterPart('Document')->write();
+            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
         }
-        $objWriter = IOFactory::createWriter($phpWord);
-        $xml = $objWriter->getWriterPart('Document')->write();
-        $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
     }
 
     /**
@@ -375,9 +378,11 @@ class TemplateProcessor extends T
      */
     public function setValueFromPart($documentPartXML, $search, $replace, $limit = parent::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
-        $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit);
-        $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, $limit);
-        $this->setValue($search, $replace, $limit);
+        if ($this->tagPos($search, $documentPartXML)) {
+            $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit);
+            $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, $limit);
+            $this->setValue($search, $replace, $limit);
+        }
     }
 
 }
