@@ -9,6 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * Xml 类
  */
@@ -74,5 +76,20 @@ class Xml
         }
         true === $isRoot && $xmlstring .= '</xml>';
         return $xmlstring;
+    }
+
+    /**
+     * 获取 Xml 字符串里的参数
+     *
+     * @param string $xmlString Xml 字符串
+     * @param string $key @see \icy2003\php\I::value
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public static function value($xmlString, $key, $defaultValue = null)
+    {
+        $array = self::toArray($xmlString);
+        return I::value($array, $key, $defaultValue);
     }
 }
