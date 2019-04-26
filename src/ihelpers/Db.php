@@ -346,8 +346,8 @@ class Db
     private function __table($table, $alias = '')
     {
         $table = '%pre%' . str_replace('%pre%', '', $table);
-        $this->__tablesMap[$table] = $alias;
-        return implode(' ', array_filter([$table, $alias]));
+        $this->__tablesMap['`' . $table . '`'] = $alias;
+        return implode(' ', array_filter(['`' . $table . '`', $alias]));
     }
 
     // base operations
