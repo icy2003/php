@@ -18,6 +18,7 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\TemplateProcessor as T;
+use icy2003\php\ihelpers\Regular;
 
 /**
  * TemplateProcessor 扩展
@@ -350,7 +351,7 @@ class TemplateProcessor extends T
     {
         null === $documentPartXML && $documentPartXML = $this->tempDocumentMainPart;
         // PHP7.0~7.2 会有 bug 导致匹配不到结果，例子参见 samples/php7preg_bug.php
-        Preg::jitOff();
+        Regular::jitOff();
         preg_match(
             '/(<w:p ((?!<w:p ).)*?\${' . $blockname . '}.*?<\/w:p>)(.*?)(<w:p ((?!<w:p ).)*\${\/' . $blockname . '}.*?<\/w:p>)/is',
             $documentPartXML,
