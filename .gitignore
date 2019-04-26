@@ -1,1 +1,45 @@
-/vendor/
+# phpstorm 项目文件
+.idea
+
+# netbeans 项目文件
+nbproject
+
+# zend studio 的 eclipse 项目文件
+.buildpath
+.project
+.settings
+
+# sublime 的项目或工作区文件
+*.sublime-project
+*.sublime-workspace
+
+# visual studio code 项目文件
+.vscode
+
+# windows 缩略图缓存
+Thumbs.db
+
+# composer vendor 目录
+/vendor
+
+# cubrid 安装目录
+/cubrid
+
+# composer 本身不需要
+composer.phar
+
+# composer.lock 也不需要因为 composer 在安装时会自动生成该文件
+/composer.lock
+
+# Mac DS_Store 文件
+.DS_Store
+
+# phpunit 本身不需要
+phpunit.phar
+
+# 本地的 phpunit 配置
+/phpunit.xml
+
+# NPM 包
+/node_modules
+.env
