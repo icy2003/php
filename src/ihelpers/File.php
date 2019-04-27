@@ -69,9 +69,9 @@ class File
      *
      * @return bool 是否成功创建
      */
-    public static function createDir($dir)
+    public static function createDir($dir, $mode = 0777)
     {
-        return is_dir($dir) || self::createDir(dirname($dir)) && mkdir($dir, 0777);
+        return mkdir($dir, $mode, true);
     }
 
     /**
