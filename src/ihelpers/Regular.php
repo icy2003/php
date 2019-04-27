@@ -88,7 +88,7 @@ class Regular
      *
      * @return boolean
      */
-    public static function isChinese($chinese)
+    public static function chinese($chinese)
     {
         $chinese = Charset::toUtf($chinese);
         return (bool)preg_match('/[\x{4e00}-\x{9fa5}]+/u', $chinese);
