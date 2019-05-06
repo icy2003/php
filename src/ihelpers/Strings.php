@@ -233,4 +233,16 @@ class Strings
         return implode('', array_reverse(preg_split('/(?<!^)(?!$)/u', $string)));
     }
 
+    /**
+     * 多次换行
+     *
+     * @param int $num 换行次数
+     *
+     * @return string
+     */
+    public static function eol($num = 1)
+    {
+        return str_repeat(PHP_EOL, $num);
+    }
+
 }
