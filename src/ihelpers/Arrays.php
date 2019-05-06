@@ -492,4 +492,27 @@ class Arrays
         }
         return current($array);
     }
+
+    /**
+     * 用给定的值填充数组
+     *
+     * 和原生函数 array_fill 不同的是，array_fill 第一参数在为负的时候，生成的数组的第二个元素是从 0 开始的！
+     *
+     * @param int $startIndex 返回的数组的第一个索引值
+     * @param int $num 插入元素的数量。如果为 0 或者负数，则返回空数组
+     * @param mixed $value 用来填充的值
+     *
+     * @return array
+     */
+    public static function arrayFill($startIndex, $num, $value)
+    {
+        if ($num <= 0) {
+            return [];
+        }
+        $array = [];
+        foreach (self::range($startIndex, $startIndex + $num - 1) as $key) {
+            $array[$key] = $value;
+        }
+        return $array;
+    }
 }
