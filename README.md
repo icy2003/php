@@ -25,6 +25,7 @@ composer require icy2003/php dev-master
 - \ihelpers\Arrays：数组操作
 - \ihelpers\Base64：Base64 相关
 - \ihelpers\Charset：编码转换
+- \ihelpers\Color：处理颜色
 - \ihelpers\Console：控制台相关
 - \ihelpers\Convert：进制转换、单位转换等
 - \ihelpers\DateTime：日期相关
