@@ -65,7 +65,7 @@ class Strings
     {
         $str = '';
         for ($i = 0; $i < $length; ++$i) {
-            $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+            $str .= mb_substr($chars, mt_rand(0, self::length($chars) - 1), 1);
         }
 
         return $str;
