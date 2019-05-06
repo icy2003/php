@@ -347,6 +347,7 @@ class TemplateProcessor extends T
      *
      * @param string $blockname 变量名
      * @param string $replacement 替换字符串
+     * @param string $documentPartXML xml 字符串，默认整个文档的
      *
      * @return void
      */

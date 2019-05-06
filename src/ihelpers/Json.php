@@ -85,6 +85,7 @@ class Json
      *
      * @param string $json Json 字符串
      * @param string $key @see \icy2003\php\I::value
+     * @param mixed $defaultValue 取不到对应的值时返回的默认值，默认为 null
      *
      * @return mixed
      */

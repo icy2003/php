@@ -66,6 +66,7 @@ class File
      * 创建一个目录（递归）.
      *
      * @param string $dir 目录路径
+     * @param int 目录权限，默认 777
      *
      * @return bool 是否成功创建
      */
