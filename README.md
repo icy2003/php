@@ -50,6 +50,7 @@ composer require icy2003/php dev-master
 - \ihelpers\Url：Url 编码等
 - \ihelpers\Validator：验证器（可用，暂不维护）
 - \ihelpers\Xml：Xml 相关
+- \ihelpers\cache\FileCache：文件缓存
 
 以及
 
