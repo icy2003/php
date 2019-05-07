@@ -107,10 +107,11 @@ class File
      * 删除一个目录（递归）.
      *
      * @param string $dir 目录路径
+     * @param bool $deleteRoot 是否删除根目录，默认是
      *
      * @return bool 是否成功删除
      */
-    public static function deleteDir($dir)
+    public static function deleteDir($dir, $deleteRoot = true)
     {
         // glob 函数拿不到隐藏文件
         $files = array_diff(scandir($dir), array('.', '..'));
@@ -118,7 +119,7 @@ class File
             is_dir($dir . '/' . $file) ? self::deleteDir($dir . '/' . $file) : self::deleteFile($dir . '/' . $file);
         }
 
-        return rmdir($dir);
+        return true === $deleteRoot ? rmdir($dir) : true;
     }
 
     /**
