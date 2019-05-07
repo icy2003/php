@@ -515,4 +515,19 @@ class Arrays
         }
         return $array;
     }
+
+    /**
+     * 原生函数 count 在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
+     *
+     * @param array $array 数组
+     *
+     * @return int
+     */
+    public static function count($array)
+    {
+        if (is_array($array)) {
+            return count($array);
+        }
+        return 0;
+    }
 }
