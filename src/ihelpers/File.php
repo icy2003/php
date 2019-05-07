@@ -96,7 +96,11 @@ class File
      */
     public static function deleteFile($file)
     {
-        return self::fileExists($file) && unlink($file);
+        if (self::fileExists($file)) {
+            @chmod($file, 0777);
+            return unlink($file);
+        }
+        return true;
     }
 
     /**
