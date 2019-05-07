@@ -327,4 +327,46 @@ class Image
         imagedestroy($this->_imageIn);
         imagedestroy($this->_imageOut);
     }
+
+    /**
+     * 生成验证码
+     *
+     * @todo 智能处理文字和图片间距大小等
+     *
+     * @param string $code 验证码
+     * @param array $size 验证码图片宽高，默认 80*30
+     * @param int $fontSize 字体大小，默认 14
+     * @param string $fontPath 字体路径，默认宋体
+     * @param int $pixelNum 杂点数量，默认 2
+     * @param int $pixelColor 杂点颜色数量，默认 5
+     * @param int $padding 文字左右间距
+     * @param int $margin 文字左边距
+     * @param int $base 文字上边距
+     * @param int $baseOffset 文字抖动偏差
+     */
+    public static function captcha($code, $size = [80, 30], $fontSize = 14, $fontPath = 'simkai', $pixelNum = 2, $pixelColor = 5, $padding = 8, $margin = 7, $base = 20, $baseOffset = 4)
+    {
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Pragma: no-cache");
+        header("Cache-control: private");
+        header('Content-Type: image/png');
+        $codeLength = Strings::length($code);
+        $image = imagecreatetruecolor($size[0], $size[1]);
+        imagefilledrectangle($image, 0, 0, $size[0] - 1, $size[1] - 1, imagecolorallocate($image, mt_rand(235, 255), mt_rand(235, 255), mt_rand(235, 255)));
+        for ($i = 0; $i < $pixelColor; $i++) {
+            $noiseColor = imagecolorallocate($image, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
+            for ($j = 0; $j < $pixelNum; $j++) {
+                imagestring($image, 1, mt_rand(-10, $size[0]), mt_rand(-10, $size[1]), Strings::random(1), $noiseColor);
+            }
+        }
+        $codeArray = Strings::strSplit($code);
+        for ($i = 0; $i < $codeLength; ++$i) {
+            $color = imagecolorallocate($image, mt_rand(0, 100), mt_rand(20, 120), mt_rand(50, 150));
+            imagettftext($image, $fontSize, mt_rand(-10, 10), $margin, mt_rand($base - $baseOffset, $base + $baseOffset), $color, $fontPath, $codeArray[$i]);
+            $margin += (imagefontwidth($fontSize) + $padding);
+        }
+        imagepng($image);
+        imagedestroy($image);
+    }
 }
