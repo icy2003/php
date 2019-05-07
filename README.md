@@ -34,6 +34,7 @@ composer require icy2003/php dev-master
 - \ihelpers\Header：header 函数的实际应用
 - \ihelpers\Html：Html 相关
 - \ihelpers\Http：Http 请求
+- \ihelpers\Image：图片处理（缩放、裁剪、文字水印、图片水印、XY轴翻转等）
 - \ihelpers\Json：Json 相关
 - \ihelpers\Language：语言文件相关（可用，待定）
 - \ihelpers\Logger：日志操作（不可用，暂不维护）
