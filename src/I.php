@@ -149,6 +149,7 @@ class I
      */
     public static $aliases = [
         '@icy2003/php_tests' => __DIR__ . '/../tests',
+        '@icy2003/php_runtime' => __DIR__ . '/../runtime',
         '@icy2003/php' => __DIR__,
     ];
 
