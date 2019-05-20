@@ -530,4 +530,26 @@ class Arrays
         }
         return 0;
     }
+
+    /**
+     * 让 var_export 返回 `[]` 的格式
+     *
+     * @param mixed $expression 变量
+     * @param bool $return 默认值 为 true，即返回字符串而不是输出
+     *
+     * @return mixed
+     */
+    public static function dump($expression, $return = true)
+    {
+        $export = var_export($expression, true);
+        $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
+        $array = preg_split("/\r\n|\n|\r/", $export);
+        $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [null, ']$1', ' => ['], $array);
+        $export = implode(PHP_EOL, array_filter(["["] + $array));
+        if (true === $return) {
+            return $export;
+        } else {
+            echo $export;
+        }
+    }
 }
