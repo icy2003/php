@@ -245,4 +245,17 @@ class Strings
         return str_repeat(PHP_EOL, $num);
     }
 
+    /**
+     * 返回字符串占用行数
+     *
+     * @param string $string
+     *
+     * @return int
+     */
+    public static function lineNumber($string)
+    {
+        $array = explode(PHP_EOL, $string);
+        return Arrays::count($array);
+    }
+
 }
