@@ -539,7 +539,7 @@ class Arrays
      *
      * @return mixed
      */
-    public static function dump($expression, $return = true)
+    public static function export($expression, $return = true)
     {
         $export = var_export($expression, true);
         $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
