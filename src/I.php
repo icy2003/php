@@ -83,8 +83,10 @@ class I
     /**
      * 让 empty 支持函数调用
      *
-     * 注意：此函数并不比 empty 好，只是更方用在回调里
+     * 注意：此函数并不比 empty 好，只是为了让 empty 支持函数调用
+     *
      * 例如：empty($array[0]) 就不能用此函数代替，另外，empty 是语法结构，性能明显比函数高
+     *
      * @see http://php.net/manual/zh/function.empty.php
      *
      * @param mixed $data
