@@ -20,12 +20,26 @@ class Json
      * Json 编码
      *
      * @param array $value 数组
-     *
+     * @param int $options Json 选项，默认 JSON_UNESCAPED_UNICODE，其他选项说明：
+     * ```
+     * JSON_HEX_QUOT：所有的 " 转换成 \u0022。PHP>=5.3.0
+     * JSON_HEX_TAG：所有的 < 和 > 转换成 \u003C 和 \u003E。PHP>=5.3.0
+     * JSON_HEX_AMP：所有的 & 转换成 \u0026。PHP>=5.3.0
+     * JSON_HEX_APOS：所有的 ' 转换成 \u0027。PHP>=5.3.0
+     * JSON_NUMERIC_CHECK：将所有数字字符串编码成数字（numbers）。PHP>=5.3.3
+     * JSON_PRETTY_PRINT：用空白字符格式化返回的数据。PHP>=5.4.0
+     * JSON_UNESCAPED_SLASHES：不要编码 /。PHP>=5.4.0
+     * JSON_FORCE_OBJECT：使一个非关联数组输出一个类（Object）而非数组。 在数组为空而接受者需要一个类（Object）的时候尤其有用。PHP>=5.3.0
+     * JSON_PRESERVE_ZERO_FRACTION：确保 float 值一直都编码成 float。PHP>=5.6.6
+     * JSON_UNESCAPED_UNICODE：以字面编码多字节 Unicode 字符（默认是编码成 \uXXXX）。PHP>=5.4.0
+     * JSON_PARTIAL_OUTPUT_ON_ERROR：替换一些不可编码的值，而不是失败。PHP>=5.5.0
+     * ```
      * @return string
      */
-    public static function encode($value)
+    public static function encode($value, $options = null)
     {
-        return json_encode($value, JSON_PRETTY_PRINT ^ JSON_UNESCAPED_UNICODE);
+        null === $options && $options = JSON_UNESCAPED_UNICODE;
+        return json_encode($value, $options);
     }
 
     /**
