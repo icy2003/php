@@ -113,6 +113,9 @@ class File
      */
     public static function deleteDir($dir, $deleteRoot = true)
     {
+        if (!is_dir($dir)) {
+            return true;
+        }
         // glob 函数拿不到隐藏文件
         $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
