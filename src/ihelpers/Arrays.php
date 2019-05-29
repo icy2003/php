@@ -141,11 +141,34 @@ class Arrays
     {
         $result = [];
         foreach ($arrays as $k => $array) {
-            $result[$k] = array_combine($keys, $array);
+            $result[$k] = self::arrayCombine($keys, $array);
         }
 
         return $result;
     }
+
+    /**
+     * array_combine 的改良，在两个数组元素个数不一致时，取小的（而不是报错）
+     *
+     * @param array $keys
+     * @param array $values
+     *
+     * @return array
+     */
+    public static function arrayCombine($keys, $values)
+    {
+        if (count($keys) == count($values)) {
+            return array_combine($keys, $values);
+        }
+        $array = [];
+        foreach ($keys as $index => $key) {
+            if (array_key_exists($index, $values)) {
+                $array[$key] = $values[$index];
+            }
+        }
+        return $array;
+    }
+
     /**
      * 递归地合并多个数组，区别于 array_merge_recursive，如果有相同的键，后者会覆盖前者
      *
