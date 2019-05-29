@@ -72,7 +72,7 @@ class File
      */
     public static function createDir($dir, $mode = 0777)
     {
-        return mkdir($dir, $mode, true);
+        return is_dir($dir) || self::createDir(dirname($dir)) && mkdir($dir, $mode);
     }
 
     /**
