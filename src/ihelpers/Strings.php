@@ -258,4 +258,48 @@ class Strings
         return Arrays::count($array);
     }
 
+    /**
+     * 字符串转成变量（变量是被如：{{}}括起来的字符串）
+     *
+     * @param string $name
+     * @param array $boundary 边界符，默认是 {{}}
+     *
+     * @return string
+     */
+    public static function toVariable($name, $boundary = ['{{', '}}'])
+    {
+        return $boundary[0] . $name . $boundary[1];
+    }
+
+    /**
+     * 判断一个字符串是否是变量
+     *
+     * @param string $name
+     * @param array $boundary
+     *
+     * @return bool
+     */
+    public static function isVariable($name, $boundary = ['{{', '}}'])
+    {
+        return self::startsWith($name, $boundary[0]) && self::endsWith($name, $boundary[1]);
+    }
+
+    /**
+     * 计算包含变量的字符串
+     *
+     * @param string $text
+     * @param array $array 键值对形式，键是变量名（例如：{{var}}），值是变量值。如果键不是变量，则不会替换进 $text
+     * @param array $boundary
+     *
+     * @return void
+     */
+    public static function fromVariable($text, $array, $boundary = ['{{', '}}'])
+    {
+        $data = [];
+        foreach ($array as $name => $value) {
+            self::isVariable($name, $boundary) && $data[$name] = $value;
+        }
+        return str_replace(array_keys($data), array_values($data), $text);
+    }
+
 }
