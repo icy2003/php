@@ -148,7 +148,13 @@ class Arrays
     }
 
     /**
-     * array_combine 的改良，在两个数组元素个数不一致时，取小的（而不是报错）
+     * array_combine 的改良
+     *
+     * ```
+     * 在两个数组元素个数不一致时，以键为准:
+     * 1、键比值多，值都被填充为 null
+     * 2、值比键多，值被舍去
+     * ```
      *
      * @param array $keys
      * @param array $values
@@ -162,9 +168,7 @@ class Arrays
         }
         $array = [];
         foreach ($keys as $index => $key) {
-            if (array_key_exists($index, $values)) {
-                $array[$key] = $values[$index];
-            }
+            $array[$key] = array_key_exists($index, $values) ? $values[$index] : null;
         }
         return $array;
     }
