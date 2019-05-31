@@ -119,10 +119,10 @@ class Arrays
      *
      * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyExists
      */
-    public static function arrayKeysExists($keys, $array)
+    public static function arrayKeysExists($keys, $array, &$diff = null)
     {
 
-        return empty(array_diff($keys, array_keys($array)));
+        return empty($diff = array_diff($keys, array_keys($array)));
     }
 
     /**
