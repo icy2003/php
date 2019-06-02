@@ -291,7 +291,7 @@ class Strings
      * @param array $array 键值对形式，键是变量名（例如：{{var}}），值是变量值。如果键不是变量，则不会替换进 $text
      * @param array $boundary
      *
-     * @return void
+     * @return string
      */
     public static function fromVariable($text, $array, $boundary = ['{{', '}}'])
     {

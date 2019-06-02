@@ -4,7 +4,7 @@
  *
  * @link https://www.icy2003.com/
  * @author icy2003 <2317216477@qq.com>
- * @copyright Copyright (c) 2017, icy2003
+ * @copyright Copyright (c) 2019, icy2003
  */
 
 namespace icy2003\php\ihelpers\cache;
@@ -126,7 +126,7 @@ class FileCache extends Base
      * @param mixed $value 缓存值
      * @param int $duration 有效期，默认 0，表示永久
      *
-     * @return void
+     * @return boolean
      */
     protected function _setValue($fullKey, $value, $duration = 0)
     {
@@ -166,7 +166,7 @@ class FileCache extends Base
      *
      * @param string $fullKey 缓存键全名
      *
-     * @return void
+     * @return boolean
      */
     protected function _deleteValue($fullKey)
     {
@@ -200,7 +200,7 @@ class FileCache extends Base
     /**
      * 清空缓存
      *
-     * @return void
+     * @return boolean
      */
     public function clear()
     {

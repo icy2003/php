@@ -76,15 +76,16 @@ class File
     }
 
     /**
-     * 创建一个文件（递归创建目录）.
+     * 创建一个文件（递归创建目录）
      *
      * @param string $file 文件路径
+     * @param int 目录权限，默认 777
      *
      * @return bool 是否成功创建
      */
-    public static function createFile($file)
+    public static function createFile($file, $mode = 0777)
     {
-        return self::fileExists($file) || self::createDir(dirname($file)) && touch($file);
+        return self::fileExists($file) || self::createDir(dirname($file), $mode) && touch($file) && @chmod($file, $mode);
     }
 
     /**

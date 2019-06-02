@@ -110,10 +110,11 @@ class Arrays
     }
 
     /**
-     * 检测数组里是否有某些键.
+     * 检测数组里是否有某些键
      *
      * @param array $keys 被检测的键
      * @param array $array
+     * @param array $diff 引用返回不包含的键
      *
      * @return boolean
      *

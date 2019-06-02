@@ -1,10 +1,10 @@
 <?php
 /**
- * Class Base
+ * abstract Class Base
  *
  * @link https://www.icy2003.com/
  * @author icy2003 <2317216477@qq.com>
- * @copyright Copyright (c) 2017, icy2003
+ * @copyright Copyright (c) 2019, icy2003
  */
 
 namespace icy2003\php\ihelpers\cache;
@@ -29,7 +29,7 @@ abstract class Base
      * @param mixed $value 缓存值
      * @param int $duration 有效期，默认 0，表示永久
      *
-     * @return void
+     * @return boolean
      */
     abstract public function set($key, $value, $duration = 0);
 
@@ -47,14 +47,14 @@ abstract class Base
      *
      * @param string $key 缓存键
      *
-     * @return void
+     * @return boolean
      */
     abstract public function delete($key);
 
     /**
      * 清空缓存
      *
-     * @return void
+     * @return boolean
      */
     abstract public function clear();
 }
