@@ -231,4 +231,17 @@ class I
             }
         }
     }
+
+    /**
+     * 判断给定选项值里是否设置某选项
+     *
+     * @param integer $flags 选项值
+     * @param integer $flag 待判断的选项值
+     *
+     * @return boolean
+     */
+    public static function hasFlag($flags, $flag)
+    {
+        return $flags === ($flag | $flags);
+    }
 }
