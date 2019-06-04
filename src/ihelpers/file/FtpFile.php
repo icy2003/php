@@ -42,18 +42,22 @@ class FtpFile extends Base
         if (false === $this->_conn) {
             throw new \Exception("连接失败");
         }
-        if (false === ftp_login($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
+        if (false === @ftp_login($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
             throw new \Exception("账号密码错误");
         }
         ftp_pasv($this->_conn, true);
     }
 
     /**
-     * 是否是一个文件
-     *
-     * @param string $file 文件的路径
-     *
-     * @return boolean
+     * @ignore
+     */
+    public function getCommandResult($command)
+    {
+        return implode(',', ftp_raw($this->_conn, $command));
+    }
+
+    /**
+     * @ignore
      */
     public function getIsFile($file)
     {
@@ -61,40 +65,35 @@ class FtpFile extends Base
     }
 
     /**
-     * 是否是一个目录
-     *
-     * @param string $dir 目录的路径
-     *
-     * @return boolean
+     * @ignore
      */
     public function getIsDir($dir)
     {
-        return ($current = @ftp_pwd($this->_conn)) &&
-        !!@ftp_chdir($this->_conn, $dir) &&
+        return ($current = ftp_pwd($this->_conn)) &&
+        (bool) @ftp_chdir($this->_conn, $dir) &&
         ftp_chdir($this->_conn, $current);
     }
 
     /**
-     * 列出指定路径中的文件和目录
-     *
-     * 返回文件和目录的全路径
-     *
-     * @param string $dir 目录的路径
-     *
-     * @return array
+     * @ignore
      */
-    public function getLists($dir = null)
+    public function getLists($dir = null, $flags = FileConstants::COMPLETE_PATH)
     {
+        static $list = [];
         null === $dir && $dir = ftp_pwd($this->_conn);
-        return ftp_nlist($this->_conn, $dir);
+        $dir = rtrim($dir, '/') . '/';
+        $files = ftp_nlist($this->_conn, $dir);
+        foreach ($files as $file) {
+            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->getIsDir($file)) {
+                $this->getLists($file, $flags);
+            }
+            $list[] = I::hasFlag($flags, FileConstants::COMPLETE_PATH) ? $file : $this->getBasename($file);
+        }
+        return $list;
     }
 
     /**
-     * 取得文件大小
-     *
-     * @param string $file 文件的路径
-     *
-     * @return integer
+     * @ignore
      */
     public function getFilesize($file)
     {
@@ -102,11 +101,7 @@ class FtpFile extends Base
     }
 
     /**
-     * 将整个文件读入一个字符串
-     *
-     * @param string $file 要读取的文件的名称
-     *
-     * @return string
+     * @ignore
      */
     public function getFileContent($file)
     {
@@ -137,70 +132,64 @@ class FtpFile extends Base
     }
 
     /**
-     * 创建文件（目录会被递归地创建）
-     *
-     * @param string $file 文件的路径
-     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
-     *
-     * @return boolean
+     * @ignore
      */
     public function createFile($file, $mode = 0777)
     {
-        return $this->getIsFile($file) ||
-        $this->createDir(File::dirname($file), $mode) &&
-        $this->__createFile($file) &&
-        @ftp_chmod($this->_conn, $mode, $file);
+        if (false === $this->getIsFile($file)) {
+            $this->createDir($this->getDirname($file), $mode);
+            $this->__createFile($file);
+        }
+        return $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
     }
 
     /**
-     * 递归地创建目录
-     *
-     * @param string $dir 目录的路径
-     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
-     *
-     * @return boolean
+     * @ignore
+     */
+    public function createFileFromString($file, $string, $mode = 0777)
+    {
+        $this->createDir($this->getDirname($file));
+        $fp = fopen('data://text/plain,' . $string, 'r');
+        $isNewFile = @ftp_fput($this->_conn, $file, $fp, FTP_BINARY);
+        fclose($fp);
+        return $isNewFile && $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
+    }
+
+    /**
+     * @ignore
      */
     public function createDir($dir, $mode = 0777)
     {
-        return $this->getIsDir($dir) ||
-        $this->createDir(File::dirname($dir), $mode) &&
-        ftp_mkdir($this->_conn, $dir) &&
-        ftp_chmod($this->_conn, $mode, $dir);
+        if (false === $this->getIsDir($dir)) {
+            $this->createDir($this->getDirname($dir), $mode);
+            ftp_mkdir($this->_conn, $dir);
+        }
+        return $this->chmod($dir, $mode, FileConstants::RECURSIVE_DISABLED);
     }
 
     /**
-     * 删除一个文件
-     *
-     * @param string $file 文件的路径
-     *
-     * @return boolean
+     * @ignore
      */
     public function deleteFile($file)
     {
         if ($this->getIsFile($file)) {
-            @ftp_chmod($this->_conn, 0777, $file);
+            $this->chmod($file, 0777, FileConstants::RECURSIVE_DISABLED);
             return ftp_delete($this->_conn, $file);
         }
         return true;
     }
 
     /**
-     * 递归地删除目录
-     *
-     * @param string $dir 目录的路径
-     * @param boolean $deleteRoot 是否删除目录的根节点，默认 true，即删除
-     *
-     * @return boolean
+     * @ignore
      */
     public function deleteDir($dir, $deleteRoot = true)
     {
         if (false === $this->getIsDir($dir)) {
             return true;
         }
-        $files = $this->getLists($dir);
+        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
         foreach ($files as $file) {
-            $file = File::basename($file);
-            $this->getIsDir($dir . '/' . $file) ? $this->deleteDir($dir . '/' . $file) : $this->deleteFile($dir . '/' . $file);
+            $this->getIsDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
         }
         return true === $deleteRoot ? ftp_rmdir($this->_conn, $dir) : true;
     }
@@ -222,13 +211,7 @@ class FtpFile extends Base
     }
 
     /**
-     * 复制文件（目录会被递归地创建）
-     *
-     * @param string $fromFile 文件原路径
-     * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function copyFile($fromFile, $toFile, $overWrite = false)
     {
@@ -242,19 +225,12 @@ class FtpFile extends Base
                 $this->deleteFile($toFile);
             }
         }
-        $this->createDir(File::dirname($toFile));
-        $this->__copyFile($fromFile, $toFile);
-        return true;
+        $this->createDir($this->getDirname($toFile));
+        return $this->__copyFile($fromFile, $toFile);
     }
 
     /**
-     * 递归地复制目录
-     *
-     * @param string $fromDir 目录原路径
-     * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function copyDir($fromDir, $toDir, $overWrite = false)
     {
@@ -263,10 +239,9 @@ class FtpFile extends Base
         if (false === $this->getIsDir($fromDir)) {
             return false;
         }
-        $files = $this->getLists($fromDir);
         $this->createDir($toDir);
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
         foreach ($files as $file) {
-            $file = $this->getBasename($file);
             if ($this->getIsDir($fromDir . $file)) {
                 $this->copyDir($fromDir . $file, $toDir . $file, $overWrite);
             } else {
@@ -277,13 +252,7 @@ class FtpFile extends Base
     }
 
     /**
-     * 移动文件（目录会被递归地创建）
-     *
-     * @param string $fromFile 文件原路径
-     * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function moveFile($fromFile, $toFile, $overWrite = false)
     {
@@ -298,18 +267,11 @@ class FtpFile extends Base
             }
         }
         $this->createDir($this->getDirname($toFile));
-        ftp_rename($this->_conn, $fromFile, $toFile);
-        return true;
+        return ftp_rename($this->_conn, $fromFile, $toFile);
     }
 
     /**
-     * 递归地移动目录
-     *
-     * @param string $fromDir 目录原路径
-     * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function moveDir($fromDir, $toDir, $overWrite = false)
     {
@@ -318,9 +280,9 @@ class FtpFile extends Base
         if (false === $this->getIsDir($fromDir)) {
             return false;
         }
-        $files = $this->getLists($fromDir);
+        $this->createDir($toDir);
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
         foreach ($files as $file) {
-            $file = $this->getBasename($file);
             if ($this->getIsDir($fromDir . $file)) {
                 $this->moveDir($fromDir . $file, $toDir . $file, $overWrite);
             } else {
@@ -329,18 +291,59 @@ class FtpFile extends Base
         }
         return $this->deleteDir($fromDir);
     }
+    /**
+     * @ignore
+     */
+    public function chown($file, $user, $flags = FileConstants::RECURSIVE_DISABLED)
+    {
+        return false;
+    }
+
+    /**
+     * @ignore
+     */
+    public function chgrp($file, $group, $recursive = false)
+    {
+        return false;
+    }
+
+    /**
+     * @ignore
+     */
+    public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
+    {
+        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+            $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
+            foreach ($files as $subFile) {
+                @ftp_chmod($this->_conn, $mode, $subFile);
+            }
+        }
+        return (bool) @ftp_chmod($this->_conn, $mode, $file);
+    }
+
+    /**
+     * @ignore
+     */
+    public function symlink($from, $to)
+    {
+        return false;
+    }
 
     /**
      * 上传文件
      *
      * @param string $toFile 目标文件
      * @param string $fromFile 原文件，如果是 null，表示当前目录下的同名文件
+     * @param boolean $overWrite 是否覆盖，默认 true，即：是
      *
      * @return boolean
      */
-    public function uploadFile($toFile, $fromFile = null)
+    public function uploadFile($toFile, $fromFile = null, $overWrite = true)
     {
         null === $fromFile && $fromFile = './' . $this->getBasename($toFile);
+        if (false === $overWrite && $this->getIsFile($toFile)) {
+            return false;
+        }
         $this->createDir($this->getDirname($toFile));
         return ftp_put($this->_conn, $toFile, $fromFile, FTP_BINARY, 0);
     }
@@ -350,28 +353,24 @@ class FtpFile extends Base
      *
      * @param string $fromFile 原文件
      * @param string $toFile 目标文件，如果是 null，表示当前目录下的同名文件
+     * @param boolean $overWrite 是否覆盖，默认 true，即：是
      *
      * @return boolean
      */
-    public function downloadFile($fromFile, $toFile = null)
+    public function downloadFile($fromFile, $toFile = null, $overWrite = true)
     {
         null === $toFile && $toFile = './' . $this->getBasename($fromFile);
+        if (false === $overWrite && $this->getIsFile($toFile)) {
+            return false;
+        }
         return ftp_get($this->_conn, $toFile, $fromFile, FTP_BINARY, 0);
     }
 
     /**
-     * 关闭 ftp 连接
+     * @ignore
      */
     public function close()
     {
-        ftp_close($this->_conn);
-    }
-
-    /**
-     * 析构函数
-     */
-    public function __destruct()
-    {
-        $this->close();
+        return ftp_close($this->_conn);
     }
 }

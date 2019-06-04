@@ -10,6 +10,7 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
+use icy2003\php\ihelpers\file\LocalFile;
 
 /**
  * 文件类
@@ -28,7 +29,7 @@ class File
      */
     public static function fileExists($file)
     {
-        return file_exists($file);
+        return (new LocalFile())->getIsFile($file);
     }
 
     /**
@@ -43,8 +44,7 @@ class File
      */
     public static function basename($path, $suffix = null)
     {
-        $path = str_replace('\\', '/', $path);
-        return basename($path, $suffix);
+        return (new LocalFile())->getBasename($path, $suffix);
     }
 
     /**
@@ -58,8 +58,7 @@ class File
      */
     public static function dirname($path)
     {
-        $path = str_replace('\\', '/', $path);
-        return dirname($path);
+        return (new LocalFile())->getDirname($path);
     }
 
     /**
@@ -72,7 +71,7 @@ class File
      */
     public static function createDir($dir, $mode = 0777)
     {
-        return is_dir($dir) || self::createDir(dirname($dir)) && mkdir($dir, $mode);
+        return (new LocalFile())->createDir($dir, $mode);
     }
 
     /**
@@ -85,7 +84,7 @@ class File
      */
     public static function createFile($file, $mode = 0777)
     {
-        return self::fileExists($file) || self::createDir(dirname($file), $mode) && touch($file) && @chmod($file, $mode);
+        return (new LocalFile())->createFile($file, $mode);
     }
 
     /**
@@ -97,11 +96,7 @@ class File
      */
     public static function deleteFile($file)
     {
-        if (self::fileExists($file)) {
-            @chmod($file, 0777);
-            return unlink($file);
-        }
-        return true;
+        return (new LocalFile())->deleteFile($file);
     }
 
     /**
@@ -114,16 +109,7 @@ class File
      */
     public static function deleteDir($dir, $deleteRoot = true)
     {
-        if (!is_dir($dir)) {
-            return true;
-        }
-        // glob 函数拿不到隐藏文件
-        $files = array_diff(scandir($dir), array('.', '..'));
-        foreach ($files as $file) {
-            is_dir($dir . '/' . $file) ? self::deleteDir($dir . '/' . $file) : self::deleteFile($dir . '/' . $file);
-        }
-
-        return true === $deleteRoot ? rmdir($dir) : true;
+        return (new LocalFile())->deleteDir($dir, $deleteRoot);
     }
 
     /**
@@ -137,20 +123,7 @@ class File
      */
     public static function copyFile($fromFile, $toFile, $overWrite = false)
     {
-        if (!self::fileExists($fromFile)) {
-            return false;
-        }
-        if (self::fileExists($toFile)) {
-            if (false === $overWrite) {
-                return false;
-            } else {
-                self::deleteFile($toFile);
-            }
-        }
-        self::createDir(dirname($toFile));
-        copy($fromFile, $toFile);
-
-        return true;
+        return (new LocalFile())->copyFile($fromFile, $toFile, $overWrite);
     }
 
     /**
@@ -164,28 +137,7 @@ class File
      */
     public static function copyDir($fromDir, $toDir, $overWrite = false)
     {
-        $fromDir = rtrim($fromDir, '/') . '/';
-        $toDir = rtrim($toDir, '/') . '/';
-        if (!is_dir($fromDir)) {
-            return false;
-        }
-        if (false === ($dirHanlder = opendir($fromDir))) {
-            return false;
-        }
-        self::createDir($toDir);
-        while (false !== ($file = readdir($dirHanlder))) {
-            if ('.' == $file || '..' == $file) {
-                continue;
-            }
-            if (is_dir($fromDir . $file)) {
-                self::copyDir($fromDir . $file, $toDir . $file, $overWrite);
-            } else {
-                self::copyFile($fromDir . $file, $toDir . $file, $overWrite);
-            }
-        }
-        closedir($dirHanlder);
-
-        return true;
+        return (new LocalFile())->copyDir($fromDir, $toDir, $overWrite);
     }
 
     /**
@@ -199,20 +151,7 @@ class File
      */
     public static function moveFile($fromFile, $toFile, $overWrite = false)
     {
-        if (!self::fileExists($fromFile)) {
-            return false;
-        }
-        if (self::fileExists($toFile)) {
-            if (false === $overWrite) {
-                return false;
-            } else {
-                self::deleteFile($toFile);
-            }
-        }
-        self::createDir(dirname($toFile));
-        rename($fromFile, $toFile);
-
-        return true;
+        return (new LocalFile())->moveFile($fromFile, $toFile, $overWrite);
     }
 
     /**
@@ -226,28 +165,7 @@ class File
      */
     public static function moveDir($fromDir, $toDir, $overWrite = false)
     {
-        $fromDir = rtrim($fromDir, '/') . '/';
-        $toDir = rtrim($toDir, '/') . '/';
-        if (!is_dir($fromDir)) {
-            return false;
-        }
-        if (false === ($dirHanlder = opendir($fromDir))) {
-            return false;
-        }
-        self::createDir($toDir);
-        while (false !== ($file = readdir($dirHanlder))) {
-            if ('.' === $file || '..' === $file) {
-                continue;
-            }
-            if (is_dir($fromDir . $file)) {
-                self::moveDir($fromDir . $file, $toDir . $file, $overWrite);
-            } else {
-                self::moveFile($fromDir . $file, $toDir . $file, $overWrite);
-            }
-        }
-        closedir($dirHanlder);
-
-        return self::deleteDir($fromDir);
+        return (new LocalFile())->moveDir($fromDir, $toDir, $overWrite);
     }
 
     // 读文件

@@ -8,7 +8,8 @@
  */
 namespace icy2003\php\ihelpers\file;
 
-use icy2003\php\ihelpers\File;
+use icy2003\php\I;
+use Symfony\Component\Process\Process;
 
 /**
  * 本地文件
@@ -16,23 +17,25 @@ use icy2003\php\ihelpers\File;
 class LocalFile extends Base
 {
     /**
-     * 是否是一个文件
-     *
-     * @param string $file 文件的路径
-     *
-     * @return boolean
+     * @ignore
      */
-    public function getIsFile($file)
+    public function getCommandResult($command)
     {
-        return File::fileExists($file);
+        $process = new Process($command);
+        $process->run();
+        return $process->getOutput();
     }
 
     /**
-     * 是否是一个目录
-     *
-     * @param string $dir 目录的路径
-     *
-     * @return boolean
+     * @ignore
+     */
+    public function getIsFile($file)
+    {
+        return file_exists($file);
+    }
+
+    /**
+     * @ignore
      */
     public function getIsDir($dir)
     {
@@ -40,28 +43,40 @@ class LocalFile extends Base
     }
 
     /**
-     * 列出指定路径中的文件和目录
-     *
-     * 返回文件和目录的全路径
-     *
-     * @param string $dir 目录的路径
-     *
-     * @return array
+     * @ignore
      */
-    public function getLists($dir = null)
+    public function getRealpath($path)
     {
-        null === $dir && $dir = './';
-        return array_map(function ($file) use ($dir) {
-            return rtrim($dir, '/') . '/' . $file;
-        }, array_diff(scandir($dir), ['..', '.']));
+        return realpath($path);
     }
 
     /**
-     * 取得文件大小
-     *
-     * @param string $file 文件的路径
-     *
-     * @return integer
+     * @ignore
+     */
+    public function getLists($dir = null, $flags = FileConstants::COMPLETE_PATH)
+    {
+        null === $dir && $dir = $this->getRealpath('./');
+        $dir = rtrim($dir, '/') . '/';
+        $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS);
+        if (I::hasFlag($flags, FileConstants::RECURSIVE)) {
+            $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
+        }
+        $files = [];
+        /**
+         * @var \RecursiveDirectoryIterator $file
+         */
+        foreach ($iterator as $file) {
+            if (I::hasFlag($flags, FileConstants::COMPLETE_PATH)) {
+                $files[] = $file->getPathname();
+            } else {
+                $files[] = $file->getFilename();
+            }
+        }
+        return $files;
+    }
+
+    /**
+     * @ignore
      */
     public function getFilesize($file)
     {
@@ -69,11 +84,7 @@ class LocalFile extends Base
     }
 
     /**
-     * 将整个文件读入一个字符串
-     *
-     * @param string $file 要读取的文件的名称
-     *
-     * @return string
+     * @ignore
      */
     public function getFileContent($file)
     {
@@ -81,110 +92,205 @@ class LocalFile extends Base
     }
 
     /**
-     * 创建文件（目录会被递归地创建）
-     *
-     * @param string $file 文件的路径
-     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
-     *
-     * @return boolean
+     * @ignore
      */
     public function createFile($file, $mode = 0777)
     {
-        return File::createFile($file, $mode);
+        return $this->getIsFile($file) ||
+        $this->createDir($this->getDirname($file), $mode) &&
+        touch($file) &&
+        $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
     }
 
     /**
-     * 递归地创建目录
-     *
-     * @param string $dir 目录的路径
-     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
-     *
-     * @return boolean
+     * @ignore
+     */
+    public function createFileFromString($file, $string, $mode = 0777)
+    {
+        return $this->createDir($this->getDirname($file), $mode) &&
+        file_put_contents($file, $string) &&
+        $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
+    }
+
+    /**
+     * @ignore
      */
     public function createDir($dir, $mode = 0777)
     {
-        return File::createDir($dir, $mode);
+        return $this->getIsDir($dir) ||
+        $this->createDir($this->getDirname($dir), $mode) &&
+        mkdir($dir, $mode);
     }
 
     /**
-     * 删除一个文件
-     *
-     * @param string $file 文件的路径
-     *
-     * @return boolean
+     * @ignore
      */
     public function deleteFile($file)
     {
-        return File::deleteFile($file);
+        if ($this->getIsFile($file)) {
+            $this->chmod($file, 0777, FileConstants::RECURSIVE_DISABLED);
+            return unlink($file);
+        }
+        return true;
     }
 
     /**
-     * 递归地删除目录
-     *
-     * @param string $dir 目录的路径
-     * @param boolean $deleteRoot 是否删除目录的根节点，默认 true，即删除
-     *
-     * @return boolean
+     * @ignore
      */
     public function deleteDir($dir, $deleteRoot = true)
     {
-        return File::deleteDir($dir, $deleteRoot);
+        if (false === $this->getIsDir($dir)) {
+            return true;
+        }
+        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
+        foreach ($files as $file) {
+            $this->getIsDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
+        }
+
+        return true === $deleteRoot ? rmdir($dir) : true;
     }
 
     /**
-     * 复制文件（目录会被递归地创建）
-     *
-     * @param string $fromFile 文件原路径
-     * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function copyFile($fromFile, $toFile, $overWrite = false)
     {
-        return File::copyFile($fromFile, $toFile, $overWrite);
+        if (false === $this->getIsFile($fromFile)) {
+            return false;
+        }
+        if ($this->getIsFile($toFile)) {
+            if (false === $overWrite) {
+                return false;
+            } else {
+                $this->deleteFile($toFile);
+            }
+        }
+        $this->createDir($this->getDirname($toFile));
+        copy($fromFile, $toFile);
+
+        return true;
     }
 
     /**
-     * 递归地复制目录
-     *
-     * @param string $fromDir 目录原路径
-     * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function copyDir($fromDir, $toDir, $overWrite = false)
     {
-        return File::copyDir($fromDir, $toDir, $overWrite);
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
+        if (false === $this->getIsDir($fromDir)) {
+            return false;
+        }
+        $this->createDir($toDir);
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
+        foreach ($files as $file) {
+            if ($this->getIsDir($fromDir . $file)) {
+                $this->copyDir($fromDir . $file, $toDir . $file, $overWrite);
+            } else {
+                $this->copyFile($fromDir . $file, $toDir . $file, $overWrite);
+            }
+        }
+        return true;
     }
 
     /**
-     * 移动文件（目录会被递归地创建）
-     *
-     * @param string $fromFile 文件原路径
-     * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function moveFile($fromFile, $toFile, $overWrite = false)
     {
-        return File::moveFile($fromFile, $toFile, $overWrite);
+        if (false === $this->getIsFile($fromFile)) {
+            return false;
+        }
+        if ($this->getIsFile($toFile)) {
+            if (false === $overWrite) {
+                return false;
+            } else {
+                $this->deleteFile($toFile);
+            }
+        }
+        $this->createDir($this->getDirname($toFile));
+        rename($fromFile, $toFile);
+
+        return true;
     }
 
     /**
-     * 递归地移动目录
-     *
-     * @param string $fromDir 目录原路径
-     * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
-     *
-     * @return boolean
+     * @ignore
      */
     public function moveDir($fromDir, $toDir, $overWrite = false)
     {
-        return File::moveDir($fromDir, $toDir, $overWrite);
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
+        if (false === $this->getIsDir($fromDir)) {
+            return false;
+        }
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
+        foreach ($files as $file) {
+            if ($this->getIsDir($fromDir . $file)) {
+                $this->moveDir($fromDir . $file, $toDir . $file, $overWrite);
+            } else {
+                $this->moveFile($fromDir . $file, $toDir . $file, $overWrite);
+            }
+        }
+        return $this->deleteDir($fromDir);
+    }
+
+    /**
+     * @ignore
+     */
+    public function chown($file, $user, $flags = FileConstants::RECURSIVE_DISABLED)
+    {
+        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+            $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
+            foreach ($files as $subFile) {
+                chown($subFile, $user);
+            }
+        }
+        return chown($file, $user);
+    }
+
+    /**
+     * @ignore
+     */
+    public function chgrp($file, $group, $flags = FileConstants::RECURSIVE_DISABLED)
+    {
+        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+            $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
+            foreach ($files as $subFile) {
+                chgrp($subFile, $group);
+            }
+        }
+        return chgrp($file, $group);
+    }
+
+    /**
+     * @ignore
+     */
+    public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
+    {
+        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+            $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIV);
+            foreach ($files as $subFile) {
+                chmod($subFile, $mode);
+            }
+        }
+        return (bool) chmod($file, $mode);
+    }
+
+    /**
+     * @ignore
+     */
+    public function symlink($from, $to)
+    {
+        return symlink($from, $to);
+    }
+
+    /**
+     * @ignore
+     */
+    public function close()
+    {
+        return true;
     }
 
 }
