@@ -218,7 +218,7 @@ class Strings
      */
     public static function contains($string, $search)
     {
-        return !empty($search) && mb_strpos($string, $search) !== false;
+        return (string)$search !== "" && mb_strpos($string, $search) !== false;
     }
 
     /**
@@ -228,7 +228,7 @@ class Strings
      *
      * @return string
      */
-    public static function strSplit($string)
+    public static function strReverse($string)
     {
         return implode('', array_reverse(preg_split('/(?<!^)(?!$)/u', $string)));
     }
