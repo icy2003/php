@@ -35,7 +35,7 @@ class Strings
      *
      * @param string $string
      *
-     * @return int
+     * @return integer
      */
     public static function byteLength($string)
     {
@@ -46,7 +46,7 @@ class Strings
      *
      * @param string $string
      *
-     * @return int
+     * @return integer
      */
     public static function length($string)
     {
@@ -56,7 +56,7 @@ class Strings
     /**
      * 生成随机字符串
      *
-     * @param integer $length
+     * @param integer $length 随机字符串的长度，默认 32
      * @param string $chars 字符列表，默认为0-9和大小写字母
      *
      * @return string
@@ -75,7 +75,7 @@ class Strings
      * 生成密码 hash
      *
      * @param string $password 原始密码
-     * @param int $cost
+     * @param integer $cost
      *
      * @return string
      */
@@ -102,7 +102,7 @@ class Strings
      * 验证密码
      *
      * @param string $password 原始密码
-     * @param string $hash
+     * @param string $hash HASH 后的密码，需配合 Strings::generatePasswordHash
      *
      * @return boolean
      */
@@ -192,7 +192,7 @@ class Strings
      */
     public static function startsWith($string, $search)
     {
-        return !empty($search) && mb_strpos($string, $search) === 0;
+        return (string)$search !== "" && mb_strpos($string, $search) === 0;
     }
 
     /**
@@ -205,7 +205,7 @@ class Strings
      */
     public static function endsWith($string, $search)
     {
-        return !empty($search) && mb_substr($string, -static::length($search)) === $search;
+        return (string)$search !== "" && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
@@ -230,13 +230,25 @@ class Strings
      */
     public static function strReverse($string)
     {
-        return implode('', array_reverse(preg_split('/(?<!^)(?!$)/u', $string)));
+        return implode('', array_reverse(self::strSplit($string)));
+    }
+
+    /**
+     * 把字符串打散为数组
+     *
+     * @param string $string
+     *
+     * @return array
+     */
+    public static function strSplit($string)
+    {
+        return preg_split('/(?<!^)(?!$)/u', $string);
     }
 
     /**
      * 多次换行
      *
-     * @param int $num 换行次数
+     * @param integer $num 换行次数
      *
      * @return string
      */
@@ -250,7 +262,7 @@ class Strings
      *
      * @param string $string
      *
-     * @return int
+     * @return integer
      */
     public static function lineNumber($string)
     {
@@ -259,10 +271,13 @@ class Strings
     }
 
     /**
-     * 字符串转成变量（变量是被如：{{}}括起来的字符串）
+     * 字符串转成变量
+     *
+     * - 变量是被如：{{}}括起来的字符串
+     * - 例如：{{var}}
      *
      * @param string $name
-     * @param array $boundary 边界符，默认是 {{}}
+     * @param array $boundary 边界符，默认 ['{{', '}}']
      *
      * @return string
      */
@@ -275,9 +290,9 @@ class Strings
      * 判断一个字符串是否是变量
      *
      * @param string $name
-     * @param array $boundary
+     * @param array $boundary 边界符，默认 ['{{', '}}']
      *
-     * @return bool
+     * @return boolean
      */
     public static function isVariable($name, $boundary = ['{{', '}}'])
     {
@@ -288,8 +303,8 @@ class Strings
      * 计算包含变量的字符串
      *
      * @param string $text
-     * @param array $array 键值对形式，键是变量名（例如：{{var}}），值是变量值。如果键不是变量，则不会替换进 $text
-     * @param array $boundary
+     * @param array $array 键值对形式：[{{键}} => 值]。如果键不是变量，则不会替换进 $text
+     * @param array $boundary 边界符，默认 ['{{', '}}']
      *
      * @return string
      */
@@ -300,6 +315,43 @@ class Strings
             self::isVariable($name, $boundary) && $data[$name] = $value;
         }
         return str_replace(array_keys($data), array_values($data), $text);
+    }
+
+    /**
+     * 判断两个字符串像不像
+     *
+     * - 图形验证码里经常有人把 o 看成 0，所以……
+     * - 例如：hello 和 hell0 看起来是像的 (-w-)o~
+     *
+     * @param string $string1 第一个字符串
+     * @param string $string2 第二个字符串
+     * @param boolean $ignoreCase 是否忽略大小写，默认 true，即：是
+     * @param array $array 看起来像的字符的列表，默认 ['0o', 'yv', 'ij', '1l']
+     *
+     * @return boolean
+     */
+    public static function lookLike($string1, $string2, $ignoreCase = true, $array = ['0o', 'yv', 'ij', '1l'])
+    {
+        $array1 = self::strSplit($string1);
+        $array2 = self::strSplit($string2);
+        foreach ($array1 as $index => $char1) {
+            $char1 = true === $ignoreCase ? strtolower($char1) : $char1;
+            $char2 = true === $ignoreCase ? strtolower($array2[$index]) : $array2[$index];
+            $isEqual = false;
+            if ($char1 == $char2) {
+                $isEqual = true;
+            }
+            foreach ($array as $row) {
+                if (Strings::contains($row, $char1) && Strings::contains($row, $char2)) {
+                    $isEqual = true;
+                    break;
+                }
+            }
+            if (false === $isEqual) {
+                break;
+            }
+        }
+        return $isEqual;
     }
 
 }
