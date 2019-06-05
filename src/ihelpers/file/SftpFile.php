@@ -1,6 +1,6 @@
 <?php
 /**
- * Class FtpFile
+ * Class SftpFile
  *
  * @link https://www.icy2003.com/
  * @author icy2003 <2317216477@qq.com>
@@ -12,39 +12,56 @@ use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
 
 /**
- * FTP 文件
+ * sftp
+ *
+ * - 由于 PHP 里 sftp 提供的函数相对较少，为了让代码不那么诡异，这里用了很多 shell 命令
+ * - Windows 平台自求多福
  */
-class FtpFile extends Base
+class SftpFile extends Base
 {
-
     /**
-     * FTP 连接
+     * ssh 连接
      *
      * @var resource
      */
     protected $_conn;
 
     /**
+     * sftp 对象
+     *
+     * @var resource
+     */
+    protected $_sftp;
+
+    /**
      * 构造函数
      *
-     * @param array $config ftp 连接配置。至少包括：host、username、password，可选：port、timeout
+     * @param array $config sftp 连接配置。至少包括：host、username、password，可选：port、methods、callback
      */
     public function __construct($config)
     {
-        if (!function_exists('ftp_connect')) {
-            throw new \Exception("请开启 ftp 扩展");
+        if (!function_exists('ssh2_connect')) {
+            throw new \Exception("请开启 ssh2 扩展");
         }
         if (!Arrays::arrayKeysExists(['host', 'username', 'password'], $config, $diff)) {
             throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
         }
-        $this->_conn = ftp_connect(I::value($config, 'host'), I::value($config, 'port', 21), I::value($config, 'timeout', 90));
+        $this->_conn = ssh2_connect(
+            I::value($config, 'host'),
+            I::value($config, 'port', 22),
+            I::value($config, 'methods', []),
+            I::value($config, 'callback', [])
+        );
         if (false === $this->_conn) {
             throw new \Exception("连接失败");
         }
-        if (false === @ftp_login($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
+        if (false === ssh2_auth_password($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
             throw new \Exception("账号密码错误");
         }
-        ftp_pasv($this->_conn, true);
+        $this->_sftp = ssh2_sftp($this->_conn);
+        if (false === $this->_sftp) {
+            throw new \Exception("初始化 sftp 失败");
+        }
     }
 
     /**
@@ -52,7 +69,23 @@ class FtpFile extends Base
      */
     public function getCommandResult($command)
     {
-        return implode(',', ftp_raw($this->_conn, $command));
+        $stream = ssh2_exec($this->_conn, $command);
+        stream_set_blocking($stream, true);
+        $result = stream_get_contents($stream);
+        fclose($stream);
+        return $result;
+    }
+
+    /**
+     * 获取 ssh2 协议格式的文件路径
+     *
+     * @param string $file 文件（目录）的路径
+     *
+     * @return string
+     */
+    private function __getFilepath($file)
+    {
+        return rtrim('ssh2.sftp://' . intval($this->_sftp), '/') . $file;
     }
 
     /**
@@ -60,7 +93,7 @@ class FtpFile extends Base
      */
     public function getIsFile($file)
     {
-        return ftp_size($this->_conn, $file) > -1;
+        return file_exists($this->__getFilepath($file));
     }
 
     /**
@@ -68,12 +101,15 @@ class FtpFile extends Base
      */
     public function getIsDir($dir)
     {
-        $current = ftp_pwd($this->_conn);
-        if (@ftp_chdir($this->_conn, $dir)) {
-            ftp_chdir($this->_conn, $current);
-            return true;
-        }
-        return false;
+        return is_dir($this->__getFilepath($dir));
+    }
+
+    /**
+     * @ignore
+     */
+    public function getRealpath($path)
+    {
+        return ssh2_sftp_realpath($this->_sftp, $path);
     }
 
     /**
@@ -82,14 +118,17 @@ class FtpFile extends Base
     public function getLists($dir = null, $flags = FileConstants::COMPLETE_PATH)
     {
         $list = [];
-        null === $dir && $dir = ftp_pwd($this->_conn);
+        null === $dir && $dir = rtrim($this->getCommandResult('pwd'), PHP_EOL);
         $dir = rtrim($dir, '/') . '/';
-        $files = ftp_nlist($this->_conn, $dir);
+        $command = 'ls -m "' . $dir . '"';
+        $listString = rtrim($this->getCommandResult($command), PHP_EOL);
+        $files = explode(', ', $listString);
         foreach ($files as $file) {
-            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->getIsDir($file)) {
-                $list = array_merge($list, $this->getLists($file, $flags));
+            $file = $this->getBasename($file);
+            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->getIsDir($dir . $file)) {
+                $list = array_merge($list, $this->getLists($dir . $file, $flags));
             }
-            $list[] = I::hasFlag($flags, FileConstants::COMPLETE_PATH) ? $file : $this->getBasename($file);
+            $list[] = I::hasFlag($flags, FileConstants::COMPLETE_PATH) ? $dir . $file : $file;
         }
         return $list;
     }
@@ -99,7 +138,7 @@ class FtpFile extends Base
      */
     public function getFilesize($file)
     {
-        return ftp_size($this->_conn, $file);
+        return filesize($this->__getFilepath($file));
     }
 
     /**
@@ -107,15 +146,7 @@ class FtpFile extends Base
      */
     public function getFileContent($file)
     {
-        $fp = fopen('php://temp', 'r+');
-        if (@ftp_fget($this->_conn, $fp, $file, FTP_BINARY, 0)) {
-            rewind($fp);
-            $content = stream_get_contents($fp);
-            fclose($fp);
-            return $content;
-        } else {
-            return false;
-        }
+        return file_get_contents($this->__getFilepath($file));
     }
 
     /**
@@ -123,17 +154,18 @@ class FtpFile extends Base
      */
     public function putFileContent($file, $string, $mode = 0777)
     {
-        if (is_array($string)) {
-            $string = implode('', $string);
-        } elseif (is_resource($string)) {
-            $string = stream_get_contents($string);
-        }
         $this->createDir($this->getDirname($file));
-        $fp = fopen('data://text/plain,' . $string, 'r');
-        $isNewFile = @ftp_fput($this->_conn, $file, $fp, FTP_BINARY);
-        fclose($fp);
+        $isCreated = false !== file_put_contents($this->__getFilepath($file), $string);
         $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
-        return $isNewFile;
+        return $isCreated;
+    }
+
+    /**
+     * @ignore
+     */
+    public function createDir($dir, $mode = 0777)
+    {
+        return ssh2_sftp_mkdir($this->_sftp, $dir, $mode, true);
     }
 
     /**
@@ -142,7 +174,7 @@ class FtpFile extends Base
     public function deleteFile($file)
     {
         if ($this->getIsFile($file)) {
-            return ftp_delete($this->_conn, $file);
+            return ssh2_sftp_unlink($this->_sftp, $file);
         }
         return true;
     }
@@ -157,7 +189,7 @@ class FtpFile extends Base
             return false;
         }
         $this->createDir($this->getDirname($toFile));
-        return ftp_put($this->_conn, $toFile, $fromFile, FTP_BINARY, 0);
+        return copy($fromFile, $this->__getFilepath($toFile));
     }
 
     /**
@@ -169,7 +201,7 @@ class FtpFile extends Base
         if (false === $overwrite && $this->getIsFile($toFile)) {
             return false;
         }
-        return ftp_get($this->_conn, $toFile, $fromFile, FTP_BINARY, 0);
+        return copy($this->__getFilepath($fromFile), $toFile);
     }
 
     /**
@@ -196,10 +228,10 @@ class FtpFile extends Base
         if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                @ftp_chmod($this->_conn, $mode, $subFile);
+                @ssh2_sftp_chmod($this->_sftp, $subFile, $mode);
             }
         }
-        return (bool) @ftp_chmod($this->_conn, $mode, $file);
+        return @ssh2_sftp_chmod($this->_sftp, $subFile, $mode);
     }
 
     /**
@@ -207,7 +239,7 @@ class FtpFile extends Base
      */
     public function symlink($from, $to)
     {
-        return false;
+        return ssh2_sftp_symlink($this->_sftp, $from, $to);
     }
 
     /**
@@ -215,7 +247,7 @@ class FtpFile extends Base
      */
     public function close()
     {
-        return ftp_close($this->_conn);
+        return ssh2_disconnect($this->_conn);
     }
 
     /**
@@ -223,10 +255,7 @@ class FtpFile extends Base
      */
     protected function _copy($fromFile, $toFile)
     {
-        $fp = fopen("php://temp", 'r+');
-        ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
-        rewind($fp);
-        return @ftp_fput($this->_conn, $toFile, $fp, FTP_BINARY, 0);
+        return copy($this->__getFilepath($fromFile), $this->__getFilepath($toFile));
     }
 
     /**
@@ -234,7 +263,7 @@ class FtpFile extends Base
      */
     protected function _move($fromFile, $toFile)
     {
-        return @ftp_rename($this->_conn, $fromFile, $toFile);
+        return ssh2_sftp_rename($this->_sftp, $fromFile, $toFile);
     }
 
     /**
@@ -242,9 +271,7 @@ class FtpFile extends Base
      */
     protected function _mkdir($dir, $mode = 0777)
     {
-        $isCreated = @ftp_mkdir($this->_conn, $dir);
-        $this->chmod($dir, $mode, FileConstants::RECURSIVE_DISABLED);
-        return $isCreated;
+        return ssh2_sftp_mkdir($this->_sftp, $dir, $mode);
     }
 
     /**
@@ -252,6 +279,6 @@ class FtpFile extends Base
      */
     protected function _rmdir($dir)
     {
-        return @ftp_rmdir($this->_conn, $dir);
+        return ssh2_sftp_rmdir($this->_sftp, $dir);
     }
 }

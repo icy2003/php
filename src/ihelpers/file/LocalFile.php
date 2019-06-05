@@ -57,7 +57,7 @@ class LocalFile extends Base
     {
         null === $dir && $dir = $this->getRealpath('./');
         $dir = rtrim($dir, '/') . '/';
-        $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS);
         if (I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
         }
@@ -94,32 +94,12 @@ class LocalFile extends Base
     /**
      * @ignore
      */
-    public function createFile($file, $mode = 0777)
+    public function putFileContent($file, $string, $mode = 0777)
     {
-        return $this->getIsFile($file) ||
-        $this->createDir($this->getDirname($file), $mode) &&
-        touch($file) &&
+        $this->createDir($this->getDirname($file), $mode);
+        $isCreated = false !== file_put_contents($file, $string);
         $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
-    }
-
-    /**
-     * @ignore
-     */
-    public function createFileFromString($file, $string, $mode = 0777)
-    {
-        return $this->createDir($this->getDirname($file), $mode) &&
-        file_put_contents($file, $string) &&
-        $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
-    }
-
-    /**
-     * @ignore
-     */
-    public function createDir($dir, $mode = 0777)
-    {
-        return $this->getIsDir($dir) ||
-        $this->createDir($this->getDirname($dir), $mode) &&
-        mkdir($dir, $mode);
+        return $isCreated;
     }
 
     /**
@@ -128,7 +108,6 @@ class LocalFile extends Base
     public function deleteFile($file)
     {
         if ($this->getIsFile($file)) {
-            $this->chmod($file, 0777, FileConstants::RECURSIVE_DISABLED);
             return unlink($file);
         }
         return true;
@@ -137,102 +116,17 @@ class LocalFile extends Base
     /**
      * @ignore
      */
-    public function deleteDir($dir, $deleteRoot = true)
+    public function uploadFile($toFile, $fromFile = null, $overwrite = true)
     {
-        if (false === $this->getIsDir($dir)) {
-            return true;
-        }
-        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
-        foreach ($files as $file) {
-            $this->getIsDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
-        }
-
-        return true === $deleteRoot ? rmdir($dir) : true;
+        return false;
     }
 
     /**
      * @ignore
      */
-    public function copyFile($fromFile, $toFile, $overWrite = false)
+    public function downloadFile($fromFile, $toFile = null, $overwrite = true)
     {
-        if (false === $this->getIsFile($fromFile)) {
-            return false;
-        }
-        if ($this->getIsFile($toFile)) {
-            if (false === $overWrite) {
-                return false;
-            } else {
-                $this->deleteFile($toFile);
-            }
-        }
-        $this->createDir($this->getDirname($toFile));
-        copy($fromFile, $toFile);
-
-        return true;
-    }
-
-    /**
-     * @ignore
-     */
-    public function copyDir($fromDir, $toDir, $overWrite = false)
-    {
-        $fromDir = rtrim($fromDir, '/') . '/';
-        $toDir = rtrim($toDir, '/') . '/';
-        if (false === $this->getIsDir($fromDir)) {
-            return false;
-        }
-        $this->createDir($toDir);
-        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
-        foreach ($files as $file) {
-            if ($this->getIsDir($fromDir . $file)) {
-                $this->copyDir($fromDir . $file, $toDir . $file, $overWrite);
-            } else {
-                $this->copyFile($fromDir . $file, $toDir . $file, $overWrite);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @ignore
-     */
-    public function moveFile($fromFile, $toFile, $overWrite = false)
-    {
-        if (false === $this->getIsFile($fromFile)) {
-            return false;
-        }
-        if ($this->getIsFile($toFile)) {
-            if (false === $overWrite) {
-                return false;
-            } else {
-                $this->deleteFile($toFile);
-            }
-        }
-        $this->createDir($this->getDirname($toFile));
-        rename($fromFile, $toFile);
-
-        return true;
-    }
-
-    /**
-     * @ignore
-     */
-    public function moveDir($fromDir, $toDir, $overWrite = false)
-    {
-        $fromDir = rtrim($fromDir, '/') . '/';
-        $toDir = rtrim($toDir, '/') . '/';
-        if (false === $this->getIsDir($fromDir)) {
-            return false;
-        }
-        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
-        foreach ($files as $file) {
-            if ($this->getIsDir($fromDir . $file)) {
-                $this->moveDir($fromDir . $file, $toDir . $file, $overWrite);
-            } else {
-                $this->moveFile($fromDir . $file, $toDir . $file, $overWrite);
-            }
-        }
-        return $this->deleteDir($fromDir);
+        return false;
     }
 
     /**
@@ -274,7 +168,7 @@ class LocalFile extends Base
                 chmod($subFile, $mode);
             }
         }
-        return (bool) chmod($file, $mode);
+        return (bool)chmod($file, $mode);
     }
 
     /**
@@ -291,6 +185,38 @@ class LocalFile extends Base
     public function close()
     {
         return true;
+    }
+
+    /**
+     * @ignore
+     */
+    protected function _copy($fromFile, $toFile)
+    {
+        return copy($fromFile, $toFile);
+    }
+
+    /**
+     * @ignore
+     */
+    protected function _move($fromFile, $toFile)
+    {
+        return rename($fromFile, $toFile);
+    }
+
+    /**
+     * @ignore
+     */
+    protected function _mkdir($dir, $mode = 0777)
+    {
+        return mkdir($dir, $mode);
+    }
+
+    /**
+     * @ignore
+     */
+    protected function _rmdir($dir)
+    {
+        return rmdir($dir);
     }
 
 }

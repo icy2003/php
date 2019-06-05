@@ -8,40 +8,44 @@
  */
 namespace icy2003\php\ihelpers\file;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 /**
  * 文件抽象类
  *
- * - getCommandResult：获得命令返回值
- * - getBasename：返回路径中的文件名部分
- * - getDirname：返回路径中的目录部分
- * - getIsFile：是否是一个文件
- * - getIsDir：是否是一个目录
- * - getIsAbsolute：是否是一个绝对路径
- * - getRealpath：返回规范化的绝对路径名
- * - getLists：列出指定路径中的文件和目录
- * - getFilesize：取得文件大小
- * - getFileContent：将整个文件读入一个字符串
- * - createFile：创建文件（目录会被递归地创建）
- * - createFileFromString：创建一个文件（目录会被递归地创建），并用字符串填充进文件
- * - createDir：递归地创建目录
- * - deleteFile：删除一个文件
- * - deleteDir：递归地删除目录
- * - copyFile：复制文件（目录会被递归地创建）
- * - copyDir：递归地复制目录
- * - moveFile：移动文件（目录会被递归地创建）
- * - moveDir：递归地移动目录
- * - chown：改变文件（目录）的创建者
- * - chgrp：改变一个文件（目录）的群组
- * - chmod：改变文件（目录）的安全模式
- * - symlink：建立符号连接
- * - close：关闭文件句柄
+ * - public getCommandResult()：获得命令返回值
+ * - public getBasename()：返回路径中的文件名部分
+ * - public getDirname()：返回路径中的目录部分
+ * - public getIsFile()：是否是一个文件
+ * - public getIsDir()：是否是一个目录
+ * - public getRealpath()：返回规范化的绝对路径名
+ * - public getLists()：列出指定路径中的文件和目录
+ * - public getFilesize()：取得文件大小
+ * - public getFileContent()：将整个文件读入一个字符串
+ * - public putFileContent()：创建一个文件（目录会被递归地创建），并用字符串（资源）填充进文件
+ * - public createDir()：递归地创建目录
+ * - public deleteFile()：删除一个文件
+ * - public deleteDir()：递归地删除目录
+ * - public copyFile()：复制文件（目录会被递归地创建）
+ * - public copyDir()：递归地复制目录
+ * - public moveFile()：移动文件（目录会被递归地创建）
+ * - public moveDir()：递归地移动目录
+ * - public uploadFile()：上传文件
+ * - public downloadFile()：下载文件
+ * - public chown()：改变文件（目录）的创建者
+ * - public chgrp()：改变一个文件（目录）的群组
+ * - public chmod()：改变文件（目录）的安全模式
+ * - public symlink()：建立符号连接
+ * - public close()：关闭文件句柄
+ * - protected _copy(): 非递归地复制文件
+ * - protected _move()：非递归地移动文件
+ * - protected _mkdir()：非递归地创建目录
+ * - protected _rmdir()：非递归地删除目录
  */
 abstract class Base
 {
     /**
      * 获得命令返回值
+     *
+     * - 不要依赖这个，一些环境不一定支持
      *
      * @param string $command 命令
      *
@@ -95,23 +99,10 @@ abstract class Base
     abstract public function getIsDir($dir);
 
     /**
-     * 是否是一个绝对路径
-     *
-     * @param string $file 文件或目录
-     *
-     * @return boolean
-     */
-    public function getIsAbsolute($file)
-    {
-        $fs = new Filesystem();
-        return $fs->isAbsolutePath($file);
-    }
-
-    /**
      * 返回规范化的绝对路径名
      *
-     * - 不支持 realpath 的类：FtpFile
-     * - 这些类的函数实现是：处理输入的 path 中的 '/./', '/../' 以及多余的 '/'
+     * - 不支持 realpath 的类将使用这个，其他的由子类实现
+     * - 该函数实现是：处理输入的 path 中的 '/./', '/../' 以及多余的 '/'
      *
      * @param string $path 要检查的路径
      *
@@ -172,25 +163,20 @@ abstract class Base
     abstract public function getFileContent($file);
 
     /**
-     * 创建文件（目录会被递归地创建）
+     * 创建一个文件（目录会被递归地创建），并用字符串（资源）填充进文件
+     *
+     * - 可将字符串、资源、数组写入文件，行为和 file_put_contents 一样
+     * - 资源：`$fp = fopen('https://www.icy2003.com', 'r');`
+     *
+     * @link https://www.php.net/manual/zh/function.file-put-contents.php
      *
      * @param string $file 文件的路径
+     * @param string|array $string 待填充进文件的字符串（资源）
      * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
      *
      * @return boolean
      */
-    abstract public function createFile($file, $mode = 0777);
-
-    /**
-     * 创建一个文件（目录会被递归地创建），并用字符串填充进文件
-     *
-     * @param string $file 文件的路径
-     * @param string $string 待填充进文件的字符串
-     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
-     *
-     * @return boolean
-     */
-    abstract public function createFileFromString($file, $string, $mode = 0777);
+    abstract public function putFileContent($file, $string, $mode = 0777);
 
     /**
      * 递归地创建目录
@@ -200,7 +186,14 @@ abstract class Base
      *
      * @return boolean
      */
-    abstract public function createDir($dir, $mode = 0777);
+    public function createDir($dir, $mode = 0777)
+    {
+        if ($this->getIsDir($dir)) {
+            return true;
+        }
+        $this->createDir($this->getDirname($dir), $mode);
+        return $this->_mkdir($dir, $mode);
+    }
 
     /**
      * 删除一个文件
@@ -219,54 +212,148 @@ abstract class Base
      *
      * @return boolean
      */
-    abstract public function deleteDir($dir, $deleteRoot = true);
+    public function deleteDir($dir, $deleteRoot = true)
+    {
+        if (false === $this->getIsDir($dir)) {
+            return true;
+        }
+        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
+        foreach ($files as $file) {
+            $this->getIsDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
+        }
+
+        return true === $deleteRoot ? $this->_rmdir($dir) : true;
+    }
 
     /**
      * 复制文件（目录会被递归地创建）
      *
      * @param string $fromFile 文件原路径
      * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
+     * @param boolean $overwrite 已存在的文件是否被覆盖，默认 false，即不覆盖
      *
      * @return boolean
      */
-    abstract public function copyFile($fromFile, $toFile, $overWrite = false);
+    public function copyFile($fromFile, $toFile, $overwrite = false)
+    {
+        if (false === $this->getIsFile($fromFile)) {
+            return false;
+        }
+        if ($this->getIsFile($toFile)) {
+            if (false === $overwrite) {
+                return false;
+            } else {
+                $this->deleteFile($toFile);
+            }
+        }
+        $this->createDir($this->getDirname($toFile));
+        return $this->_copy($fromFile, $toFile);
+    }
 
     /**
      * 递归地复制目录
      *
      * @param string $fromDir 目录原路径
      * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
+     * @param boolean $overwrite 已存在的目录是否被覆盖，默认 false，即不覆盖
      *
      * @return boolean
      */
-    abstract public function copyDir($fromDir, $toDir, $overWrite = false);
+    public function copyDir($fromDir, $toDir, $overwrite = false){
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
+        if (false === $this->getIsDir($fromDir)) {
+            return false;
+        }
+        $this->createDir($toDir);
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
+        foreach ($files as $file) {
+            if ($this->getIsDir($fromDir . $file)) {
+                $this->copyDir($fromDir . $file, $toDir . $file, $overwrite);
+            } else {
+                $this->copyFile($fromDir . $file, $toDir . $file, $overwrite);
+            }
+        }
+        return true;
+    }
 
     /**
      * 移动文件（目录会被递归地创建）
      *
      * @param string $fromFile 文件原路径
      * @param string $toFile 文件目标路径
-     * @param boolean $overWrite 已存在的文件是否被覆盖，默认 false，即不覆盖
+     * @param boolean $overwrite 已存在的文件是否被覆盖，默认 false，即不覆盖
      *
      * @return boolean
      */
-    abstract public function moveFile($fromFile, $toFile, $overWrite = false);
+    public function moveFile($fromFile, $toFile, $overwrite = false){
+        if (false === $this->getIsFile($fromFile)) {
+            return false;
+        }
+        if ($this->getIsFile($toFile)) {
+            if (false === $overwrite) {
+                return false;
+            } else {
+                $this->deleteFile($toFile);
+            }
+        }
+        $this->createDir($this->getDirname($toFile));
+        return $this->_move($fromFile, $toFile);
+    }
 
     /**
      * 递归地移动目录
      *
      * @param string $fromDir 目录原路径
      * @param string $toDir 目录目标路径
-     * @param boolean $overWrite 已存在的目录是否被覆盖，默认 false，即不覆盖
+     * @param boolean $overwrite 已存在的目录是否被覆盖，默认 false，即不覆盖
      *
      * @return boolean
      */
-    abstract public function moveDir($fromDir, $toDir, $overWrite = false);
+    public function moveDir($fromDir, $toDir, $overwrite = false){
+        $fromDir = rtrim($fromDir, '/') . '/';
+        $toDir = rtrim($toDir, '/') . '/';
+        if (false === $this->getIsDir($fromDir)) {
+            return false;
+        }
+        $this->createDir($toDir);
+        $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
+        foreach ($files as $file) {
+            if ($this->getIsDir($fromDir . $file)) {
+                $this->moveDir($fromDir . $file, $toDir . $file, $overwrite);
+            } else {
+                $this->moveFile($fromDir . $file, $toDir . $file, $overwrite);
+            }
+        }
+        return $this->deleteDir($fromDir);
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param string $toFile 目标文件
+     * @param string $fromFile 源文件，如果是 null，则表示当前目录下的同名文件
+     * @param boolean $overwrite 是否覆盖，默认 true，即：是
+     *
+     * @return boolean
+     */
+    abstract public function uploadFile($toFile, $fromFile = null , $overwrite = true);
+
+    /**
+     * 下载文件
+     *
+     * @param string $fromFile 源文件
+     * @param string $toFile 目标文件，如果是 null，则表示当前目录下的同名文件
+     * @param boolean $overwrite 是否覆盖，默认 true，即：是
+     *
+     * @return boolean
+     */
+   abstract public function downloadFile($fromFile, $toFile = null , $overwrite = true);
 
     /**
      * 改变文件（目录）的创建者
+     *
+     * - 不支持的类：FtpFile
      *
      * @param string $file 文件或者目录
      * @param string $user 创建者
@@ -280,6 +367,8 @@ abstract class Base
 
     /**
      * 改变文件（目录）的群组
+     *
+     * - 不支持的类：FtpFile
      *
      * @param string $file 文件或者目录
      * @param string $group 群组
@@ -306,6 +395,8 @@ abstract class Base
     /**
      * 建立符号连接
      *
+     * - 不支持的类：FtpFile
+     *
      * @param string $from 连接的目标
      * @param string $to 连接的名称
      *
@@ -319,6 +410,45 @@ abstract class Base
      * @return boolean
      */
     abstract public function close();
+
+    /**
+     * 非递归地复制目录（文件）
+     *
+     * @param string $fromFile 源目录（文件）的路径
+     * @param string $toFile 目标目录（文件）的路径
+     *
+     * @return boolean
+     */
+    abstract protected function _copy($fromFile, $toFile);
+
+    /**
+     * 非递归地移动目录（文件）
+     *
+     * @param string $fromFile 源目录（文件）的路径
+     * @param string $toFile 目标目录（文件）的路径
+     *
+     * @return boolean
+     */
+    abstract protected function _move($fromFile, $toFile);
+
+    /**
+     * 非递归地创建目录
+     *
+     * @param string $dir 目录的路径
+     * @param integer $mode 默认的 mode 是 0777，意味着最大可能的访问权
+     *
+     * @return boolean
+     */
+    abstract protected function _mkdir($dir, $mode = 0777);
+
+    /**
+     * 非递归地删除目录
+     *
+     * @param string $dir
+     *
+     * @return boolean
+     */
+    abstract protected function _rmdir($dir);
 
     /**
      * 析构函数：关闭文件句柄（连接）

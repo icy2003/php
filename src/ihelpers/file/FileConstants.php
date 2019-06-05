@@ -27,10 +27,10 @@ class FileConstants
     /**
      * 递归遍历
      */
-    const RECURSIVE = 3;
+    const RECURSIVE = 4;
 
     /**
      * 递归遍历禁用
      */
-    const RECURSIVE_DISABLED = 4;
+    const RECURSIVE_DISABLED = 8;
 }
