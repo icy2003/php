@@ -6,7 +6,7 @@
  * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2019, icy2003
  */
-namespace icy2003\php\ihelpers\file;
+namespace icy2003\php\icomponents\file;
 
 use icy2003\php\I;
 use Symfony\Component\Process\Process;

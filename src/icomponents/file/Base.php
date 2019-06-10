@@ -6,39 +6,39 @@
  * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
-namespace icy2003\php\ihelpers\file;
+namespace icy2003\php\icomponents\file;
 
 /**
  * 文件抽象类
  *
- * - public getCommandResult()：获得命令返回值
- * - public getBasename()：返回路径中的文件名部分
- * - public getDirname()：返回路径中的目录部分
- * - public getIsFile()：是否是一个文件
- * - public getIsDir()：是否是一个目录
- * - public getRealpath()：返回规范化的绝对路径名
- * - public getLists()：列出指定路径中的文件和目录
- * - public getFilesize()：取得文件大小
- * - public getFileContent()：将整个文件读入一个字符串
- * - public putFileContent()：创建一个文件（目录会被递归地创建），并用字符串（资源）填充进文件
- * - public createDir()：递归地创建目录
- * - public deleteFile()：删除一个文件
- * - public deleteDir()：递归地删除目录
- * - public copyFile()：复制文件（目录会被递归地创建）
- * - public copyDir()：递归地复制目录
- * - public moveFile()：移动文件（目录会被递归地创建）
- * - public moveDir()：递归地移动目录
- * - public uploadFile()：上传文件
- * - public downloadFile()：下载文件
- * - public chown()：改变文件（目录）的创建者
- * - public chgrp()：改变一个文件（目录）的群组
- * - public chmod()：改变文件（目录）的安全模式
- * - public symlink()：建立符号连接
- * - public close()：关闭文件句柄
- * - protected _copy(): 非递归地复制文件
- * - protected _move()：非递归地移动文件
- * - protected _mkdir()：非递归地创建目录
- * - protected _rmdir()：非递归地删除目录
+ * - getCommandResult()：获得命令返回值
+ * - getBasename()：返回路径中的文件名部分
+ * - getDirname()：返回路径中的目录部分
+ * - getIsFile()：是否是一个文件
+ * - getIsDir()：是否是一个目录
+ * - getRealpath()：返回规范化的绝对路径名
+ * - getLists()：列出指定路径中的文件和目录
+ * - getFilesize()：取得文件大小
+ * - getFileContent()：将整个文件读入一个字符串
+ * - putFileContent()：创建一个文件（目录会被递归地创建），并用字符串（资源）填充进文件
+ * - createDir()：递归地创建目录
+ * - deleteFile()：删除一个文件
+ * - deleteDir()：递归地删除目录
+ * - copyFile()：复制文件（目录会被递归地创建）
+ * - copyDir()：递归地复制目录
+ * - moveFile()：移动文件（目录会被递归地创建）
+ * - moveDir()：递归地移动目录
+ * - uploadFile()：上传文件
+ * - downloadFile()：下载文件
+ * - chown()：改变文件（目录）的创建者
+ * - chgrp()：改变一个文件（目录）的群组
+ * - chmod()：改变文件（目录）的安全模式
+ * - symlink()：建立符号连接
+ * - close()：关闭文件句柄
+ * - _copy(): 非递归地复制文件
+ * - _move()：非递归地移动文件
+ * - _mkdir()：非递归地创建目录
+ * - _rmdir()：非递归地删除目录
  */
 abstract class Base
 {
@@ -259,7 +259,8 @@ abstract class Base
      *
      * @return boolean
      */
-    public function copyDir($fromDir, $toDir, $overwrite = false){
+    public function copyDir($fromDir, $toDir, $overwrite = false)
+    {
         $fromDir = rtrim($fromDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
         if (false === $this->getIsDir($fromDir)) {
@@ -286,7 +287,8 @@ abstract class Base
      *
      * @return boolean
      */
-    public function moveFile($fromFile, $toFile, $overwrite = false){
+    public function moveFile($fromFile, $toFile, $overwrite = false)
+    {
         if (false === $this->getIsFile($fromFile)) {
             return false;
         }
@@ -310,7 +312,8 @@ abstract class Base
      *
      * @return boolean
      */
-    public function moveDir($fromDir, $toDir, $overwrite = false){
+    public function moveDir($fromDir, $toDir, $overwrite = false)
+    {
         $fromDir = rtrim($fromDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
         if (false === $this->getIsDir($fromDir)) {
@@ -337,7 +340,7 @@ abstract class Base
      *
      * @return boolean
      */
-    abstract public function uploadFile($toFile, $fromFile = null , $overwrite = true);
+    abstract public function uploadFile($toFile, $fromFile = null, $overwrite = true);
 
     /**
      * 下载文件
@@ -348,7 +351,7 @@ abstract class Base
      *
      * @return boolean
      */
-   abstract public function downloadFile($fromFile, $toFile = null , $overwrite = true);
+    abstract public function downloadFile($fromFile, $toFile = null, $overwrite = true);
 
     /**
      * 改变文件（目录）的创建者

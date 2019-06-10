@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2019, icy2003
  */
 
-namespace icy2003\php\ihelpers\cache;
+namespace icy2003\php\icomponents\cache;
 
 /**
  * 缓存抽象类

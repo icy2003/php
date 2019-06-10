@@ -10,7 +10,7 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
-use icy2003\php\ihelpers\file\LocalFile;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 文件类
