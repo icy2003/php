@@ -27,7 +27,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testIndexBy
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testIndexBy
      */
     public static function indexBy($array, $index, $isMerge = false)
     {
@@ -55,7 +55,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testColumns
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testColumns
      */
     public static function columns($array, $fields, $dimension = 2)
     {
@@ -88,7 +88,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayColumn
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayColumn
      */
     public static function arrayColumn($array, $column, $index = null)
     {
@@ -118,25 +118,23 @@ class Arrays
      *
      * @return boolean
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyExists
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyExists
      */
     public static function arrayKeysExists($keys, $array, &$diff = null)
     {
 
-        return empty($diff = array_diff($keys, array_keys($array)));
+        return I::isEmpty(($diff = array_diff($keys, array_keys($array))));
     }
 
     /**
      * 参照 PHP 的 array_combine 函数，array_combine 得到的是一行记录的格式，该函数得到多行
-     *
-     * @see http://php.net/array_combine
      *
      * @param array $keys 作为键的字段
      * @param array $arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayCombines
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayCombines
      */
     public static function arrayCombines($keys, $arrays)
     {
@@ -156,6 +154,8 @@ class Arrays
      * 1、键比值多，值都被填充为 null
      * 2、值比键多，值被舍去
      * ```
+     *
+     * @see http://php.net/array_combine
      *
      * @param array $keys
      * @param array $values
@@ -184,7 +184,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayMergeRecursive
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayMergeRecursive
      */
     public static function arrayMergeRecursive($a, $b)
     {
@@ -222,7 +222,7 @@ class Arrays
      * @return \Generator
      * @throws \LogicException
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testRange
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testRange
      */
     public static function range($start, $end, $step = 1)
     {
@@ -252,7 +252,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayTransposed
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayTransposed
      */
     public static function arrayTransposed($array)
     {
@@ -273,7 +273,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testDetect
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetect
      */
     public static function detect($array, $callback)
     {
@@ -294,7 +294,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testAll
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testAll
      */
     public static function all($array, $callback, $filter = null)
     {
@@ -320,7 +320,7 @@ class Arrays
      *
      * @return string
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyLast
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyLast
      */
     public static function arrayKeyLast($array)
     {
@@ -343,7 +343,7 @@ class Arrays
      *
      * @return string
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testArrayKeyFirst
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyFirst
      */
     public static function arrayKeyFirst($array)
     {
@@ -364,7 +364,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testToPart
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testToPart
      */
     public static function toPart($array)
     {
@@ -386,7 +386,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testToCellArray
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testToCellArray
      */
     public static function toCellArray($array)
     {
@@ -409,7 +409,7 @@ class Arrays
      *
      * @return int
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testDimension
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testDimension
      */
     public static function dimension($array)
     {
@@ -435,7 +435,7 @@ class Arrays
      *
      * @return boolean
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testIsAssoc
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testIsAssoc
      */
     public static function isAssoc($array)
     {
@@ -455,7 +455,7 @@ class Arrays
      *
      * @return boolean
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testIsIndexed
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testIsIndexed
      */
     public static function isIndexed($array)
     {
@@ -476,7 +476,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testFirst
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testFirst
      */
     public static function first($array, $pos = 1)
     {
@@ -503,7 +503,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php\tests\ihelpers\ArraysTest::testLast
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testLast
      */
     public static function last($array, $pos = 1)
     {

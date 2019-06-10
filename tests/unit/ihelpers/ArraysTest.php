@@ -1,6 +1,6 @@
 <?php
 
-namespace icy2003\php\tests\ihelpers;
+namespace icy2003\php_tests\ihelpers;
 
 use icy2003\php\ihelpers\Arrays;
 
