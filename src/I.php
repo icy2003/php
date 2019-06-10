@@ -6,8 +6,11 @@
  * @author icy2003 <2317216477@qq.com>
  * @copyright Copyright (c) 2017, icy2003
  */
-
 namespace icy2003\php;
+
+use Exception;
+use icy2003\php\ihelpers\Strings;
+use ReflectionClass;
 
 /**
  * I 类
@@ -17,15 +20,35 @@ class I
     /**
      * 获取值
      *
-     * @param object|array|string $mixed 对象或数组。
+     * @deprecated
+     *
+     * @param object|array $mixed 对象或数组。
      * @param string $keyString 点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套。
-     *                          对于一个多维数组“$array”来说，“a.b.cd_ef”会拿“$array['a']['b']['cd_ef']”的值。
-     *                          如果“$array['a']”是对象，则先检查“getB”方法，然后检查“b”属性。
-     *                          如果“$array['a']['b']”是对象，则检查“getCdEf”方法，然后检查“cd_ef”属性。
+     * - 对于一个多维数组 `$array` 来说，`a.b.cd_ef` 会拿 `$array['a']['b']['cd_ef']` 的值。
+     * - 如果 `$array['a']` 是对象，则先检查 `getB` 方法，然后检查 `b`属性。
+     * - 如果 `$array['a']['b']` 是对象，则检查 `getCdEf` 方法，然后检查 `cd_ef` 属性。
      * @param mixed $defaultValue 拿不到值时会直接返回该默认值。
+     *
      * @return mixed
      */
     public static function value($mixed, $keyString, $defaultValue = null)
+    {
+        return self::get($mixed, $keyString, $defaultValue);
+    }
+
+    /**
+     * 获取值
+     *
+     * @param object|array $mixed 对象或数组。
+     * @param string $keyString 点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套。
+     * - 对于一个多维数组 `$array` 来说，`a.b.cd_ef` 会拿 `$array['a']['b']['cd_ef']` 的值。
+     * - 如果 `$array['a']` 是对象，则先检查 `getB` 方法，然后检查 `b`属性。
+     * - 如果 `$array['a']['b']` 是对象，则检查 `getCdEf` 方法，然后检查 `cd_ef` 属性。
+     * @param mixed $defaultValue 拿不到值时会直接返回该默认值。
+     *
+     * @return mixed
+     */
+    public static function get($mixed, $keyString, $defaultValue = null)
     {
         $keyArray = explode('.', $keyString);
         foreach ($keyArray as $key) {
@@ -36,9 +59,7 @@ class I
                     return $defaultValue;
                 }
             } elseif (is_object($mixed)) {
-                $method = 'get' . implode('', array_map(function ($part) {
-                    return ucfirst(strtolower($part));
-                }, explode('_', $key)));
+                $method = 'get' . ucfirst(Strings::underline2camel($key));
                 if (method_exists($mixed, $method)) {
                     $mixed = $mixed->$method();
                 } elseif (property_exists($mixed, $key)) {
@@ -51,6 +72,39 @@ class I
             }
         }
         return $mixed;
+    }
+
+    /**
+     * 设置值
+     *
+     * @param array|object $mixed 对象或数组
+     * @param string $key 键
+     * @param mixed $value 值
+     * @param boolean $overWrite 如果对应的值存在，是否用给定的值覆盖，默认 true，即：是
+     *
+     * @return void
+     */
+    public static function set($mixed, $key, $value, $overWrite = true)
+    {
+        if (is_array($mixed)) {
+            if (false === isset($mixed[$key]) || true === $overWrite) {
+                $mixed[$key] = $value;
+            }
+        } elseif (is_object($mixed)) {
+            $originValue = self::get($mixed, $key);
+            if (null === $originValue || true === $overWrite) {
+                $method = 'set' . ucfirst(Strings::underline2camel($key));
+                if (method_exists($mixed, $method)) {
+                    $mixed->$method($value);
+                } elseif (method_exists($mixed, '_' . $method)) {
+                    // 保护方法
+                    $method = '_' . $method;
+                    $mixed->$method($value);
+                } elseif (property_exists($mixed, $key)) {
+                    $mixed->$key = $value;
+                }
+            }
+        }
     }
 
     /**
@@ -243,5 +297,35 @@ class I
     public static function hasFlag($flags, $flag)
     {
         return $flags === ($flag | $flags);
+    }
+
+    /**
+     * 创建一个对象
+     *
+     * @param array $params
+     * - class：表示类名，可使用别名
+     * - 其他：该类的属性，初始化这些属性
+     * @param array $config
+     * - 构造函数传参
+     *
+     * @return object
+     */
+    public static function createObject($params, $config = [])
+    {
+        if (is_array($params) && isset($params['class'])) {
+            try {
+                $class = $params['class'];
+                unset($params['class']);
+                $reflection = new ReflectionClass(self::getAlias($class));
+                $object = $reflection->newInstanceArgs($config);
+                foreach ($params as $name => $value) {
+                    self::set($object, $name, $value);
+                }
+                return $object;
+            } catch (Exception $e) {
+                throw new Exception('初始化 ' . $class . ' 失败', $e->getCode(), $e);
+            }
+        }
+        return null;
     }
 }
