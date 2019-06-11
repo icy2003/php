@@ -47,15 +47,15 @@ class SftpFile extends Base
             throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
         }
         $this->_conn = ssh2_connect(
-            I::value($config, 'host'),
-            I::value($config, 'port', 22),
-            I::value($config, 'methods', []),
-            I::value($config, 'callback', [])
+            I::get($config, 'host'),
+            I::get($config, 'port', 22),
+            I::get($config, 'methods', []),
+            I::get($config, 'callback', [])
         );
         if (false === $this->_conn) {
             throw new \Exception("连接失败");
         }
-        if (false === ssh2_auth_password($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
+        if (false === ssh2_auth_password($this->_conn, I::get($config, 'username'), I::get($config, 'password'))) {
             throw new \Exception("账号密码错误");
         }
         $this->_sftp = ssh2_sftp($this->_conn);

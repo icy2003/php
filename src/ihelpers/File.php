@@ -264,8 +264,8 @@ class File
             } else {
                 $url = parse_url($fileName);
                 $host = $url['host'];
-                $path = I::value($url, 'path', '/');
-                $port = I::value($url, 'port', 80);
+                $path = I::get($url, 'path', '/');
+                $port = I::get($url, 'port', 80);
                 $fp = fsockopen($host, $port, $errno, $error);
                 if ($fp) {
                     $header = [
@@ -314,7 +314,7 @@ class File
      */
     public function getAttribute($name, $defaultValue = null)
     {
-        return I::value($this->__attributes, $name, $defaultValue);
+        return I::get($this->__attributes, $name, $defaultValue);
     }
 
     /**

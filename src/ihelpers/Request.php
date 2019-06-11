@@ -100,7 +100,7 @@ class Request
         if (isset($_POST[$this->__methodParam]) && !in_array($method = strtoupper($_POST[$this->__methodParam]), ['GET', 'HEAD', 'OPTIONS'])) {
             return $method;
         }
-        if ($method = I::value($this->getHeaders(), 'x-http-method-override')) {
+        if ($method = I::get($this->getHeaders(), 'x-http-method-override')) {
             return strtoupper($method);
         }
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -186,7 +186,7 @@ class Request
      */
     public function isAjax()
     {
-        return 'XMLHttpRequest' === Arrays::first(I::value($this->getHeaders(), 'x-requested-with'));
+        return 'XMLHttpRequest' === Arrays::first(I::get($this->getHeaders(), 'x-requested-with'));
     }
 
     /**
@@ -257,7 +257,7 @@ class Request
      */
     public function getBodyParam($name, $defaultValue = null)
     {
-        return I::value($this->getBodyParams(), $name, $defaultValue);
+        return I::get($this->getBodyParams(), $name, $defaultValue);
     }
 
     /**
@@ -306,7 +306,7 @@ class Request
      */
     public function getQueryParam($name, $defaultValue = null)
     {
-        return I::value($this->getQueryParams(), $name, $defaultValue);
+        return I::get($this->getQueryParams(), $name, $defaultValue);
     }
 
     /**
@@ -342,10 +342,10 @@ class Request
         if (null === $this->__hostInfo) {
             $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
-            if (I::value($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim(Arrays::first(explode(',', Arrays::first(I::value($this->getHeaders(), 'x-forward-host')))));
-            } elseif (I::value($this->getHeaders(), 'host')) {
-                $this->__hostInfo = $http . '://' . Arrays::first(I::value($this->getHeaders(), 'host'));
+            if (I::get($this->getHeaders(), 'x-forwarded-host')) {
+                $this->__hostInfo = $http . '://' . trim(Arrays::first(explode(',', Arrays::first(I::get($this->getHeaders(), 'x-forward-host')))));
+            } elseif (I::get($this->getHeaders(), 'host')) {
+                $this->__hostInfo = $http . '://' . Arrays::first(I::get($this->getHeaders(), 'host'));
             } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->__hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();
@@ -426,7 +426,7 @@ class Request
      */
     public function getQueryString()
     {
-        return I::value($_SERVER, 'QUERY_STRING', '');
+        return I::get($_SERVER, 'QUERY_STRING', '');
     }
 
     /**
@@ -440,7 +440,7 @@ class Request
             return true;
         }
         foreach ($this->__secureProtocolHeaders as $header => $values) {
-            if (($headerValue = I::value($this->getHeaders(), $header)) !== null) {
+            if (($headerValue = I::get($this->getHeaders(), $header)) !== null) {
                 foreach ($values as $value) {
                     if (strcasecmp($headerValue, $value) === 0) {
                         return true;
@@ -459,7 +459,7 @@ class Request
      */
     public function getServerName()
     {
-        return I::value($_SERVER, 'SERVER_NAME');
+        return I::get($_SERVER, 'SERVER_NAME');
     }
 
     /**
@@ -469,7 +469,7 @@ class Request
      */
     public function getServerPort()
     {
-        return I::value($_SERVER, 'SERVER_PORT');
+        return I::get($_SERVER, 'SERVER_PORT');
     }
 
     /**
@@ -479,7 +479,7 @@ class Request
      */
     public function getReferrer()
     {
-        return Arrays::first(I::value($this->getHeaders(), 'referer'));
+        return Arrays::first(I::get($this->getHeaders(), 'referer'));
     }
 
     /**
@@ -489,7 +489,7 @@ class Request
      */
     public function getOrigin()
     {
-        return Arrays::first(I::value($this->getHeaders(), 'origin'));
+        return Arrays::first(I::get($this->getHeaders(), 'origin'));
     }
 
     /**
@@ -499,7 +499,7 @@ class Request
      */
     public function getUserAgent()
     {
-        return Arrays::first(I::value($this->getHeaders(), 'user-agent'));
+        return Arrays::first(I::get($this->getHeaders(), 'user-agent'));
     }
 
     /**
@@ -510,8 +510,8 @@ class Request
     public function getUserIP()
     {
         foreach ($this->__ipHeaders as $ipHeader) {
-            if (I::value($this->getHeaders(), $ipHeader)) {
-                return trim(Arrays::first(explode(',', Arrays::first(I::value($this->getHeaders(), $ipHeader)))));
+            if (I::get($this->getHeaders(), $ipHeader)) {
+                return trim(Arrays::first(explode(',', Arrays::first(I::get($this->getHeaders(), $ipHeader)))));
             }
         }
         return $this->getRemoteIP();
@@ -524,7 +524,7 @@ class Request
      */
     public function getRemoteIP()
     {
-        return I::value($_SERVER, 'REMOTE_ADDR');
+        return I::get($_SERVER, 'REMOTE_ADDR');
     }
 
     /**
@@ -534,7 +534,7 @@ class Request
      */
     public function getRemoteHost()
     {
-        return I::value($_SERVER, 'REMOTE_HOST');
+        return I::get($_SERVER, 'REMOTE_HOST');
     }
 
     /**
@@ -547,7 +547,7 @@ class Request
         if (isset($_SERVER['CONTENT_TYPE'])) {
             return $_SERVER['CONTENT_TYPE'];
         }
-        return Arrays::first(I::value($this->getHeaders(), 'content-type'));
+        return Arrays::first(I::get($this->getHeaders(), 'content-type'));
     }
 
 }

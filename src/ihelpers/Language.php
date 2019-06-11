@@ -62,7 +62,7 @@ class Language
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
             $config = include I::getAlias('@icy2003/php/config.php');
-            static::$_instance->__config = I::value($config, 'Language');
+            static::$_instance->__config = I::get($config, 'Language');
         }
 
         return static::$_instance;
@@ -115,8 +115,8 @@ class Language
     public function t($category, $message, $params = [], $language = 'zh-cn')
     {
         $config = $this->__config;
-        $language = !empty($language) ? $language : I::value($config, 'language');
-        $basePath = I::value($config, 'basePath');
+        $language = !empty($language) ? $language : I::get($config, 'language');
+        $basePath = I::get($config, 'basePath');
         if (empty($this->__categories[$category . '_' . $language])) {
             $map = include I::getAlias(trim($basePath, '/') . '/' . $language . '/' . $category . '.php');
             $this->__categories[$category . '_' . $language] = $map;
@@ -125,6 +125,6 @@ class Language
         }
         return str_replace(array_map(function ($data) {
             return '{' . $data . '}';
-        }, array_keys($params)), array_values($params), I::value($map, $message, $message));
+        }, array_keys($params)), array_values($params), I::get($map, $message, $message));
     }
 }

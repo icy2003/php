@@ -239,15 +239,15 @@ class TemplateProcessor extends T
                         }
                     }
                     $array = array_merge($array, [
-                        'valign' => I::value($styleArray, $rowIndex . '.' . $c . '.valign', Jc::CENTER),
-                        'bgColor' => I::value($styleArray, $rowIndex . '.' . $c . '.bgColor'),
+                        'valign' => I::get($styleArray, $rowIndex . '.' . $c . '.valign', Jc::CENTER),
+                        'bgColor' => I::get($styleArray, $rowIndex . '.' . $c . '.bgColor'),
                     ]);
-                    $alignment = I::value($styleArray, $rowIndex . '.' . $c . '.alignment', Jc::CENTER);
+                    $alignment = I::get($styleArray, $rowIndex . '.' . $c . '.alignment', Jc::CENTER);
                     // 在高版本的 Word 里，不支持 JC::JUSTIFY 呢
                     if (JC::JUSTIFY == $alignment) {
                         $alignment = JC::BOTH;
                     }
-                    $cellStyle = I::value($styleArray, $rowIndex . '.' . $c);
+                    $cellStyle = I::get($styleArray, $rowIndex . '.' . $c);
                     if (true === $isContinue) {
                         $isContinue = false;
                         $table->addCell(null, $array);

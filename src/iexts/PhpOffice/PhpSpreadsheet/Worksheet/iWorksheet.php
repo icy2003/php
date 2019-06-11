@@ -51,8 +51,8 @@ class iWorksheet
 
         ++$maxCol;
         $r = -1;
-        $onlyVisible = I::value($params, 'onlyVisible', true);
-        $fillColor = I::value($params, 'fillColor', false);
+        $onlyVisible = I::get($params, 'onlyVisible', true);
+        $fillColor = I::get($params, 'fillColor', false);
         for ($row = $minRow; $row <= $maxRow; ++$row) {
             if (true === $onlyVisible) {
                 $rowVisible = $workSheet->getRowDimension($row)->getVisible();

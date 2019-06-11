@@ -143,7 +143,7 @@ class Image
      */
     public function getAttribute($name)
     {
-        return I::value($this->_attributes, $name);
+        return I::get($this->_attributes, $name);
     }
 
     /**

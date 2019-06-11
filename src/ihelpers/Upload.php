@@ -52,9 +52,9 @@ class Upload
     {
         if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
-            static::$_instance->__formName = I::value($config, 'formName', 'file');
-            static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::value($config, 'sizeLimit', 0));
-            static::$_instance->__extLimit = I::value($config, 'extLimit', []);
+            static::$_instance->__formName = I::get($config, 'formName', 'file');
+            static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::get($config, 'sizeLimit', 0));
+            static::$_instance->__extLimit = I::get($config, 'extLimit', []);
         }
 
         return static::$_instance;

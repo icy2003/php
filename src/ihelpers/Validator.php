@@ -177,9 +177,9 @@ class Validator
 
     protected function _requiredValidator($data, $field, $rule)
     {
-        if (null === I::value($data, $field)) {
-            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 必填');
-            $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_REQUIRED);
+        if (null === I::get($data, $field)) {
+            $this->__messages[$field][] = I::get($rule, 'message', $field . ' 必填');
+            $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_REQUIRED);
         }
     }
 
@@ -188,12 +188,12 @@ class Validator
         if (!Arrays::arrayKeysExists(['range'], $rule)) {
             throw new Exception('range error');
         }
-        $value = I::value($data, $field);
-        $range = I::value($rule, 'range', []);
-        $isStrict = I::value($rule, 'isStrict', false);
+        $value = I::get($data, $field);
+        $range = I::get($rule, 'range', []);
+        $isStrict = I::get($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
-            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 不在范围内');
-            $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_IN);
+            $this->__messages[$field][] = I::get($rule, 'message', $field . ' 不在范围内');
+            $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_IN);
         }
     }
 
@@ -202,43 +202,43 @@ class Validator
         if (!Arrays::arrayKeysExists(['pattern'], $rule)) {
             throw new Exception('pattern error');
         }
-        $value = I::value($data, $field);
-        $pattern = I::value($rule, 'pattern', '//');
+        $value = I::get($data, $field);
+        $pattern = I::get($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
-            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 格式不正确');
-            $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_MATCH);
+            $this->__messages[$field][] = I::get($rule, 'message', $field . ' 格式不正确');
+            $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_MATCH);
         }
     }
 
     protected function _mobileValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^1\\d{10}$/';
-        $rule['message'] = I::value($rule, 'message', $field . ' 手机号格式不正确');
-        $rule['code'] = I::value($rule, 'code', self::CODE_VALIDATE_MOBILE);
+        $rule['message'] = I::get($rule, 'message', $field . ' 手机号格式不正确');
+        $rule['code'] = I::get($rule, 'code', self::CODE_VALIDATE_MOBILE);
         $this->_matchValidator($data, $field, $rule);
     }
 
     protected function _emailValidator($data, $field, $rule)
     {
         $rule['pattern'] = '/^[\w\-\.]+@[\w\-]+(\.\w+)+$/';
-        $rule['message'] = I::value($rule, 'message', $field . ' 邮箱格式不正确');
-        $rule['code'] = I::value($rule, 'code', self::CODE_VALIDATE_EMAIL);
+        $rule['message'] = I::get($rule, 'message', $field . ' 邮箱格式不正确');
+        $rule['code'] = I::get($rule, 'code', self::CODE_VALIDATE_EMAIL);
         $this->_matchValidator($data, $field, $rule);
     }
 
     protected function _uniqueValidator($data, $field, $rule)
     {
-        $value = I::value($data, $field);
+        $value = I::get($data, $field);
         if (Arrays::arrayKeysExists(['model'], $rule)) {
 
         } else {
-            $function = I::value($rule, 'function');
+            $function = I::get($rule, 'function');
             if (!is_callable($function)) {
                 throw new Exception('function error');
             }
             if (!$function($value)) {
-                $this->__messages[$field][] = I::value($rule, 'message', $field . ' 不唯一');
-                $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_UNIQUE);
+                $this->__messages[$field][] = I::get($rule, 'message', $field . ' 不唯一');
+                $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_UNIQUE);
             }
         }
     }
@@ -248,13 +248,13 @@ class Validator
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
         }
-        $function = I::value($rule, 'function');
+        $function = I::get($rule, 'function');
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        if (!$function(I::value($data, $field))) {
-            $this->__messages[$field][] = I::value($rule, 'message', $field . ' 验证不通过');
-            $this->__codes[$field][] = I::value($rule, 'code', self::CODE_VALIDATE_CALL);
+        if (!$function(I::get($data, $field))) {
+            $this->__messages[$field][] = I::get($rule, 'message', $field . ' 验证不通过');
+            $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_CALL);
         }
     }
 
@@ -263,11 +263,11 @@ class Validator
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
         }
-        $value = I::value($rule, 'value');
-        $isStrict = I::value($rule, 'isStrict', false);
+        $value = I::get($rule, 'value');
+        $isStrict = I::get($rule, 'isStrict', false);
         $defaultValue = is_callable($value) ? $value() : $value;
         if (true === $isStrict) {
-            $this->__data[$field] = I::value($data, $field, $defaultValue);
+            $this->__data[$field] = I::get($data, $field, $defaultValue);
         } else {
             $this->__data[$field] = !empty($data[$field]) ? $data[$field] : $defaultValue;
         }
@@ -278,7 +278,7 @@ class Validator
         if (!Arrays::arrayKeysExists(['value'], $rule)) {
             throw new Exception('value error');
         }
-        $value = I::value($rule, 'value');
+        $value = I::get($rule, 'value');
         $this->__data[$field] = is_callable($value) ? $value() : $value;
     }
 
@@ -287,11 +287,11 @@ class Validator
         if (!Arrays::arrayKeysExists(['function'], $rule)) {
             throw new Exception('function error');
         }
-        $function = I::value($rule, 'function');
+        $function = I::get($rule, 'function');
         if (!is_callable($function)) {
             throw new Exception('function call error');
         }
-        $this->__data[$field] = $function(I::value($data, $field));
+        $this->__data[$field] = $function(I::get($data, $field));
     }
 
     protected function _safeValidator($data, $field, $rule)

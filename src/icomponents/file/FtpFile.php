@@ -37,11 +37,11 @@ class FtpFile extends Base
         if (!Arrays::arrayKeysExists(['host', 'username', 'password'], $config, $diff)) {
             throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
         }
-        $this->_conn = ftp_connect(I::value($config, 'host'), I::value($config, 'port', 21), I::value($config, 'timeout', 90));
+        $this->_conn = ftp_connect(I::get($config, 'host'), I::get($config, 'port', 21), I::get($config, 'timeout', 90));
         if (false === $this->_conn) {
             throw new \Exception("连接失败");
         }
-        if (false === @ftp_login($this->_conn, I::value($config, 'username'), I::value($config, 'password'))) {
+        if (false === @ftp_login($this->_conn, I::get($config, 'username'), I::get($config, 'password'))) {
             throw new \Exception("账号密码错误");
         }
         ftp_pasv($this->_conn, true);

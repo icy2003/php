@@ -53,10 +53,10 @@ class Migration extends M
             if ('imysql' === $this->db->getDriverName()) {
                 if (is_array($options)) {
                     $tableOptions = [
-                        sprintf('CHARACTER SET %s', I::value($options, 'character', 'utf8')),
-                        sprintf('COLLATE %s', I::value($options, 'collate', 'utf8_unicode_ci')),
-                        sprintf('ENGINE=%s', I::value($options, 'engine', 'InnoDB')),
-                        sprintf('COMMENT = "%s"', I::value($options, 'comment', '')),
+                        sprintf('CHARACTER SET %s', I::get($options, 'character', 'utf8')),
+                        sprintf('COLLATE %s', I::get($options, 'collate', 'utf8_unicode_ci')),
+                        sprintf('ENGINE=%s', I::get($options, 'engine', 'InnoDB')),
+                        sprintf('COMMENT = "%s"', I::get($options, 'comment', '')),
                     ];
                     $optionString = implode(' ', $tableOptions);
                 } else {

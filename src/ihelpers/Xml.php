@@ -82,7 +82,7 @@ class Xml
      * 获取 Xml 字符串里的参数
      *
      * @param string $xmlString Xml 字符串
-     * @param string $key @see \icy2003\php\I::value
+     * @param string $key @see \icy2003\php\I::get
      * @param mixed $defaultValue
      *
      * @return mixed
@@ -90,6 +90,6 @@ class Xml
     public static function value($xmlString, $key, $defaultValue = null)
     {
         $array = self::toArray($xmlString);
-        return I::value($array, $key, $defaultValue);
+        return I::get($array, $key, $defaultValue);
     }
 }

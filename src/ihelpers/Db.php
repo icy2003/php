@@ -243,16 +243,16 @@ class Db
             static::$_instance = new static();
             if (!empty($config['dsn'])) {
                 $dbName = 'test';
-                static::$_instance->__dsn = $dsn = I::value($config, 'dsn', 'mysql:dbname=' . $dbName . ';host=127.0.0.1;port=3306');
+                static::$_instance->__dsn = $dsn = I::get($config, 'dsn', 'mysql:dbname=' . $dbName . ';host=127.0.0.1;port=3306');
             } else {
-                static::$_instance->__db = $db = I::value($config, 'db', 'mysql');
-                static::$_instance->__dbName = $dbName = I::value($config, 'dbName', 'test');
-                static::$_instance->__host = $host = I::value($config, 'host', '127.0.0.1');
-                static::$_instance->__port = $port = I::value($config, 'port', '3306');
+                static::$_instance->__db = $db = I::get($config, 'db', 'mysql');
+                static::$_instance->__dbName = $dbName = I::get($config, 'dbName', 'test');
+                static::$_instance->__host = $host = I::get($config, 'host', '127.0.0.1');
+                static::$_instance->__port = $port = I::get($config, 'port', '3306');
                 static::$_instance->__dsn = $dsn = $db . ':dbname=' . $dbName . ';host=' . $host . ';port=' . $port;
             }
-            static::$_instance->__user = $user = I::value($config, 'user', 'root');
-            static::$_instance->__password = $password = I::value($config, 'password', 'root');
+            static::$_instance->__user = $user = I::get($config, 'user', 'root');
+            static::$_instance->__password = $password = I::get($config, 'password', 'root');
             try {
                 static::$_instance->__conn = new \PDO($dsn, $user, $password, [
                     \PDO::ATTR_PERSISTENT => true,
@@ -526,7 +526,7 @@ class Db
         $this->__select = $this->__select . ',' . $alias . '.*';
         $this->from($this->__from, 't0');
         $table = $this->__table($table, $alias);
-        $table0 = !empty($on[2]) ? I::value($this->__tablesMap, $on[2]) : 't0';
+        $table0 = !empty($on[2]) ? I::get($this->__tablesMap, $on[2]) : 't0';
         $this->__join[] = implode(' ', [$join, $table, 'ON ' . $alias . '.' . $on[0] . ' = ' . $table0 . '.' . $on[1]]);
         return $this;
     }
@@ -906,7 +906,7 @@ class Db
         ];
         $type = gettype($data);
 
-        return I::value($typeMap, $type, \PDO::PARAM_STR);
+        return I::get($typeMap, $type, \PDO::PARAM_STR);
     }
 
     /**

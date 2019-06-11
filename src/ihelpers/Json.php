@@ -98,7 +98,7 @@ class Json
      * 获取 Json 字符串里的参数
      *
      * @param string $json Json 字符串
-     * @param string $key @see \icy2003\php\I::value
+     * @param string $key @see \icy2003\php\I::get
      * @param mixed $defaultValue 取不到对应的值时返回的默认值，默认为 null
      *
      * @return mixed
@@ -106,6 +106,6 @@ class Json
     public static function value($json, $key, $defaultValue = null)
     {
         $array = static::decode($json);
-        return I::value($array, $key, $defaultValue);
+        return I::get($array, $key, $defaultValue);
     }
 }

@@ -314,7 +314,7 @@ class Color
                 }
             } else {
                 // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
-                $hex = I::value(static::$_names, $color, $color);
+                $hex = I::get(static::$_names, $color, $color);
                 if ($hex > 0xFFFFFF || $hex < 0) {
                     throw new \Exception('错误的颜色值：' . $color);
                 }
