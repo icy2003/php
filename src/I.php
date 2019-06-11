@@ -84,7 +84,7 @@ class I
      *
      * @return void
      */
-    public static function set($mixed, $key, $value, $overWrite = true)
+    public static function set(&$mixed, $key, $value, $overWrite = true)
     {
         if (is_array($mixed)) {
             if (false === isset($mixed[$key]) || true === $overWrite) {
