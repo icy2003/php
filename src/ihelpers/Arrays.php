@@ -97,7 +97,7 @@ class Arrays
         } else {
             $result = [];
             foreach ($array as $row) {
-                $data = !empty($row[$column]) ? $row[$column] : null;
+                $data = I::get($row, $column);
                 if (null === $index) {
                     $result[] = $data;
                 } else {
@@ -579,5 +579,18 @@ class Arrays
         } else {
             echo $export;
         }
+    }
+
+    /**
+     * 返回矩阵的列数和行数
+     * - 返回两个元素的一维数组，第一个元素表示矩阵的列数，第二个元素表示矩阵的行数
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function colRowCount($array)
+    {
+        return [self::count(self::first($array)), self::count($array)];
     }
 }
