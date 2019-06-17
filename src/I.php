@@ -9,6 +9,7 @@
 namespace icy2003\php;
 
 use Exception;
+use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\ihelpers\Strings;
 use ReflectionClass;
 
@@ -188,11 +189,7 @@ class I
      *
      * @var array
      */
-    public static $aliases = [
-        '@icy2003/php_tests' => __DIR__ . '/../tests',
-        '@icy2003/php_runtime' => __DIR__ . '/../runtime',
-        '@icy2003/php' => __DIR__,
-    ];
+    public static $aliases = [];
 
     /**
      * 用别名获取真实路径
@@ -204,6 +201,18 @@ class I
      */
     public static function getAlias($alias, $loadNew = false)
     {
+        $localFile = new LocalFile();
+        $aliases = [
+            '@vendor' => __DIR__ . '/../../../../vendor',
+            '@icy2003/php_tests' => __DIR__ . '/../tests',
+            '@icy2003/php_runtime' => __DIR__ . '/../runtime',
+            '@icy2003/php' => __DIR__,
+        ];
+        foreach ($aliases as $k => $v) {
+            if (false === array_key_exists($k, static::$aliases)) {
+                static::$aliases[$k] = $localFile->getRealpath($v);
+            }
+        }
         if (strncmp($alias, '@', 1)) {
             return $alias;
         }
