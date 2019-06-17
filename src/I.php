@@ -97,10 +97,6 @@ class I
                 $method = 'set' . ucfirst(Strings::underline2camel($key));
                 if (method_exists($mixed, $method)) {
                     $mixed->$method($value);
-                } elseif (method_exists($mixed, '_' . $method)) {
-                    // 保护方法
-                    $method = '_' . $method;
-                    $mixed->$method($value);
                 } elseif (property_exists($mixed, $key)) {
                     $mixed->$key = $value;
                 }
