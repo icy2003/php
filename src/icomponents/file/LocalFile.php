@@ -9,7 +9,6 @@
 namespace icy2003\php\icomponents\file;
 
 use icy2003\php\I;
-use Symfony\Component\Process\Process;
 
 /**
  * 本地文件
@@ -21,9 +20,7 @@ class LocalFile extends Base
      */
     public function getCommandResult($command)
     {
-        $process = new Process($command);
-        $process->run();
-        return $process->getOutput();
+        return false;
     }
 
     /**

@@ -8,9 +8,6 @@
  */
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\I;
-use Symfony\Component\Process\Process;
-
 /**
  * 控制台类
  *
@@ -489,22 +486,5 @@ class Console
     {
         global $argv;
         return array_slice($argv, 1);
-    }
-
-    /**
-     * 语法检查某个 php 文件
-     *
-     * @param string $file 文件路径或别名
-     * @param string $message 输出结果
-     *
-     * @return boolean 是否有语法错误
-     */
-    public static function syntaxCheckFile($file, &$message = '')
-    {
-        $file = I::getAlias($file);
-        $process = new Process('php -l ' . $file);
-        $process->run();
-        $message = $process->getOutput();
-        return $process->isSuccessful();
     }
 }
