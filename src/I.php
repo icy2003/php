@@ -18,24 +18,6 @@ use ReflectionClass;
  */
 class I
 {
-    /**
-     * 获取值
-     *
-     * @deprecated
-     *
-     * @param object|array $mixed 对象或数组。
-     * @param string $keyString 点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套。
-     * - 对于一个多维数组 `$array` 来说，`a.b.cd_ef` 会拿 `$array['a']['b']['cd_ef']` 的值。
-     * - 如果 `$array['a']` 是对象，则先检查 `getB` 方法，然后检查 `b`属性。
-     * - 如果 `$array['a']['b']` 是对象，则检查 `getCdEf` 方法，然后检查 `cd_ef` 属性。
-     * @param mixed $defaultValue 拿不到值时会直接返回该默认值。
-     *
-     * @return mixed
-     */
-    public static function value($mixed, $keyString, $defaultValue = null)
-    {
-        return self::get($mixed, $keyString, $defaultValue);
-    }
 
     /**
      * 获取值
