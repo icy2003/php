@@ -103,7 +103,7 @@ class Json
      *
      * @return mixed
      */
-    public static function value($json, $key, $defaultValue = null)
+    public static function get($json, $key, $defaultValue = null)
     {
         $array = static::decode($json);
         return I::get($array, $key, $defaultValue);
