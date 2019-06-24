@@ -87,7 +87,7 @@ class Xml
      *
      * @return mixed
      */
-    public static function value($xmlString, $key, $defaultValue = null)
+    public static function get($xmlString, $key, $defaultValue = null)
     {
         $array = self::toArray($xmlString);
         return I::get($array, $key, $defaultValue);
