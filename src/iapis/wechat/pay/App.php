@@ -405,14 +405,14 @@ class App
     }
 
     /**
-     * 校验数据
+     * 支付结果通知校验数据
      *
      * - 如果校验成功，会输出成功给微信，并返回数据
      * - 如果校验失败，返回 false
      *
      * @return boolean
      */
-    public function verify()
+    public function payNotify()
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
