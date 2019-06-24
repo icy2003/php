@@ -29,6 +29,32 @@ class Base64
     }
 
     /**
+     * base64 编码
+     *
+     * @param string $string 字符串
+     *
+     * @return string
+     */
+    public static function encode($string)
+    {
+        return base64_encode($string);
+    }
+
+    /**
+     * base64 解码
+     *
+     * - 如果给的不是 base64 字符串，则返回 false
+     *
+     * @param string $string base64 字符串
+     *
+     * @return string
+     */
+    public static function decode($string)
+    {
+        return self::isBase64($string) ? base64_decode($string) : false;
+    }
+
+    /**
      * 文件转成 base64 字符串
      *
      * @param string $file 文件路径
@@ -56,6 +82,6 @@ class Base64
      */
     public static function toFile($string, $file = '')
     {
-        return (bool)file_put_contents($file, base64_decode($string));
+        return (bool) file_put_contents($file, base64_decode($string));
     }
 }
