@@ -428,4 +428,333 @@ class App
         }
         return false;
     }
+
+    /**
+     * 微信订单号
+     *
+     * - 微信的订单号，优先使用
+     *
+     * @var string
+     */
+    protected $_transactionId;
+
+    /**
+     * 设置微信订单号
+     *
+     * @param string $transactionId
+     *
+     * @return void
+     */
+    public function setTransactionId($transactionId)
+    {
+        $this->_transactionId = $transactionId;
+    }
+
+    /**
+     * 该接口提供所有微信支付订单的查询，商户可以通过该接口主动查询订单状态
+     *
+     * @return array
+     */
+    public function orderQuery()
+    {
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+        ]);
+        if ($this->_transactionId) {
+            $values['transaction_id'] = $this->_transactionId;
+        } elseif ($this->_outTradeNo) {
+            $values['out_trade_no'] = $this->_outTradeNo;
+        } else {
+            throw new Exception("transaction_id 和 out_trade_no 必须二选一");
+        }
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/orderquery', Xml::fromArray($values));
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 关闭订单
+     *
+     * @return array
+     */
+    public function closeOrder()
+    {
+        $values = [
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'out_trade_no' => $this->_outTradeNo,
+            'nonce_str' => Strings::random(),
+        ];
+        if (null === $this->_outTradeNo) {
+            throw new Exception("缺少必填参数：out_trade_no");
+        }
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/closeorder', Xml::fromArray($values));
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 商户退款单号
+     *
+     * @var string
+     */
+    protected $_outRefundNo;
+
+    /**
+     * 设置商户退款单号
+     *
+     * - 商户系统内部的退款单号，商户系统内部唯一，只能是数字、大小写字母_-|*@ ，同一退款单号多次请求只退一笔
+     * - 如未设置，则和【商户订单号】一致
+     *
+     * @param string $outRefundNo
+     *
+     * @return void
+     */
+    public function setOutRefundNo($outRefundNo = null)
+    {
+        null === $outRefundNo && $this->_outRefundNo = $this->_outTradeNo;
+        null === $this->_outRefundNo && $this->_outRefundNo = $outRefundNo;
+    }
+
+    /**
+     * 退款金额
+     *
+     * @var integer
+     */
+    protected $_refundFee;
+
+    /**
+     * 设置退款金额
+     *
+     * - 退款总金额，订单总金额，单位为分，只能为整数
+     * - 详见[支付金额](https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=4_2)
+     * - 如未设置，则和【订单金额】一致
+     *
+     * @param integer $refundFee
+     *
+     * @return void
+     */
+    public function setRefundFee($refundFee = null)
+    {
+        null === $refundFee && $refundFee = $this->_totalFee;
+        null === $this->_refundFee && $this->_refundFee = $refundFee;
+    }
+
+    /**
+     * 退款货币种类
+     *
+     * @var string
+     */
+    protected $_refundFeeType = 'CNY';
+
+    /**
+     * 设置退款货币种类
+     *
+     * - 退款货币类型，需与支付一致，或者不填
+     * - 符合ISO 4217标准的三位字母代码，默认人民币：CNY
+     * - 其他值列表详见[货币类型](https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=4_2)
+     *
+     * @param string $refundFeeType
+     *
+     * @return void
+     */
+    public function setRefundFeeType($refundFeeType)
+    {
+        $this->_refundFeeType = $refundFeeType;
+    }
+
+    /**
+     * 退款原因
+     *
+     * @var string
+     */
+    protected $_refundDesc;
+
+    /**
+     * 设置退款原因
+     *
+     * - 若商户传入，会在下发给用户的退款消息中体现退款原因
+     * - 注意：若订单退款金额≤1元，且属于部分退款，则不会在退款消息中体现退款原因
+     *
+     * @param string $refundDesc
+     *
+     * @return void
+     */
+    public function setRefundDesc($refundDesc)
+    {
+        $this->_refundDesc = $refundDesc;
+    }
+
+    /**
+     * 退款资金来源
+     *
+     * @var string
+     */
+    protected $_refundAccount;
+
+    /**
+     * 设置退款资金来源
+     *
+     * - 仅针对老资金流商户使用：
+     *      1. REFUND_SOURCE_UNSETTLED_FUNDS---未结算资金退款（默认使用未结算资金退款）
+     *      2. REFUND_SOURCE_RECHARGE_FUNDS---可用余额退款
+     *
+     * @param string $refundAccount
+     *
+     * @return void
+     */
+    public function setRefundAccount($refundAccount)
+    {
+        $this->_refundAccount = $refundAccount;
+    }
+
+    /**
+     * 证书路径
+     *
+     * @var string
+     */
+    protected $_certPath;
+
+    /**
+     * 设置证书路径
+     *
+     * @param string $certPath
+     *
+     * @return void
+     */
+    public function setCertPath($certPath)
+    {
+        $this->_certPath = $certPath;
+    }
+
+    /**
+     * 证书密钥路径
+     *
+     * @var string
+     */
+    protected $_certKeyPath;
+
+    /**
+     * 设置证书密钥路径
+     *
+     * @param string $certKeyPath
+     *
+     * @return void
+     */
+    public function setCertKeyPath($certKeyPath)
+    {
+        $this->_certKeyPath = $certKeyPath;
+    }
+
+    /**
+     * 申请退款
+     *
+     * @return array
+     */
+    public function refund()
+    {
+        $this->setOutRefundNo();
+        $this->setRefundFee();
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+            'sign_type' => $this->_signType,
+            'out_refund_no' => $this->_outRefundNo,
+            'total_fee' => $this->_totalFee,
+            'refund_fee' => $this->_refundFee,
+            'refund_fee_type' => $this->_refundFeeType,
+            'refund_desc' => $this->_refundDesc,
+            'refund_account' => $this->_refundAccount,
+            'notify_url' => $this->_notifyUrl,
+        ]);
+        if ($this->_transactionId) {
+            $values['transaction_id'] = $this->_transactionId;
+        } elseif ($this->_outTradeNo) {
+            $values['out_trade_no'] = $this->_outTradeNo;
+        } else {
+            throw new Exception("transaction_id 和 out_trade_no 必须二选一");
+        }
+        if (null === $this->_certPath) {
+            throw new Exception("请使用 setCertPath 提供证书路径");
+        }
+        if (null === $this->_certKeyPath) {
+            throw new Exception("请使用 setCertKeyPath 提供证书密钥路径");
+        }
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/secapi/pay/refund', Xml::fromArray($values), [], [
+            'cert' => $this->_certPath,
+            'ssl_key' => $this->_certKeyPath,
+        ]);
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 偏移量
+     *
+     * @var integer
+     */
+    protected $_offset;
+
+    /**
+     * 设置偏移量
+     *
+     * @param integer $offset
+     *
+     * @return void
+     */
+    public function setOffset($offset)
+    {
+        $this->_offset = $offset;
+    }
+
+    /**
+     * 微信退款单号
+     *
+     * @var string
+     */
+    protected $_refundId;
+
+    /**
+     * 设置微信退款单号
+     *
+     * @param string $refundId
+     *
+     * @return void
+     */
+    public function setRefundId($refundId)
+    {
+        $this->_refundId = $refundId;
+    }
+
+    /**
+     * 查询退款
+     *
+     * @return array
+     */
+    public function refundQuery()
+    {
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+            'offset' => $this->_offset,
+        ]);
+        if ($this->_transactionId) {
+            $values['transaction_id'] = $this->_transactionId;
+        } elseif ($this->_outTradeNo) {
+            $values['out_trade_no'] = $this->_outTradeNo;
+        } elseif ($this->_outRefundNo) {
+            $values['out_refund_no'] = $this->_outRefundNo;
+        } elseif ($this->_refundId) {
+            $values['refund_id'] = $this->_refundId;
+        } else {
+            throw new Exception("transaction_id、out_trade_no、out_refund_no 和 refund_id 必须四选一");
+        }
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/refundquery', Xml::fromArray($values));
+        return Xml::toArray($responseBody);
+    }
 }
