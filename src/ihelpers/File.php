@@ -29,7 +29,7 @@ class File
      */
     public static function fileExists($file)
     {
-        return (new LocalFile())->getIsFile($file);
+        return (new LocalFile())->isFile($file);
     }
 
     /**

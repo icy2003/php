@@ -58,7 +58,7 @@ class FtpFile extends Base
     /**
      * @ignore
      */
-    public function getIsFile($file)
+    public function isFile($file)
     {
         return ftp_size($this->_conn, $file) > -1;
     }
@@ -66,7 +66,7 @@ class FtpFile extends Base
     /**
      * @ignore
      */
-    public function getIsDir($dir)
+    public function isDir($dir)
     {
         $current = ftp_pwd($this->_conn);
         if (@ftp_chdir($this->_conn, $dir)) {
@@ -86,7 +86,7 @@ class FtpFile extends Base
         $dir = rtrim($dir, '/') . '/';
         $files = ftp_nlist($this->_conn, $dir);
         foreach ($files as $file) {
-            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->getIsDir($file)) {
+            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->isDir($file)) {
                 $list = array_merge($list, $this->getLists($file, $flags));
             }
             $list[] = I::hasFlag($flags, FileConstants::COMPLETE_PATH) ? $file : $this->getBasename($file);
@@ -141,7 +141,7 @@ class FtpFile extends Base
      */
     public function deleteFile($file)
     {
-        if ($this->getIsFile($file)) {
+        if ($this->isFile($file)) {
             return ftp_delete($this->_conn, $file);
         }
         return true;
@@ -153,7 +153,7 @@ class FtpFile extends Base
     public function uploadFile($toFile, $fromFile = null, $overwrite = true)
     {
         null === $fromFile && $fromFile = './' . $this->getBasename($toFile);
-        if (false === $overwrite && $this->getIsFile($toFile)) {
+        if (false === $overwrite && $this->isFile($toFile)) {
             return false;
         }
         $this->createDir($this->getDirname($toFile));
@@ -166,7 +166,7 @@ class FtpFile extends Base
     public function downloadFile($fromFile, $toFile = null, $overwrite = true)
     {
         null === $toFile && $toFile = './' . $this->getBasename($fromFile);
-        if (false === $overwrite && $this->getIsFile($toFile)) {
+        if (false === $overwrite && $this->isFile($toFile)) {
             return false;
         }
         return ftp_get($this->_conn, $toFile, $fromFile, FTP_BINARY, 0);
@@ -193,7 +193,7 @@ class FtpFile extends Base
      */
     public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
     {
-        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+        if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
                 @ftp_chmod($this->_conn, $mode, $subFile);

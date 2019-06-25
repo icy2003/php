@@ -91,7 +91,7 @@ class SftpFile extends Base
     /**
      * @ignore
      */
-    public function getIsFile($file)
+    public function isFile($file)
     {
         return file_exists($this->__getFilepath($file));
     }
@@ -99,7 +99,7 @@ class SftpFile extends Base
     /**
      * @ignore
      */
-    public function getIsDir($dir)
+    public function isDir($dir)
     {
         return is_dir($this->__getFilepath($dir));
     }
@@ -125,7 +125,7 @@ class SftpFile extends Base
         $files = explode(', ', $listString);
         foreach ($files as $file) {
             $file = $this->getBasename($file);
-            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->getIsDir($dir . $file)) {
+            if (I::hasFlag($flags, FileConstants::RECURSIVE) && $this->isDir($dir . $file)) {
                 $list = array_merge($list, $this->getLists($dir . $file, $flags));
             }
             $list[] = I::hasFlag($flags, FileConstants::COMPLETE_PATH) ? $dir . $file : $file;
@@ -173,7 +173,7 @@ class SftpFile extends Base
      */
     public function deleteFile($file)
     {
-        if ($this->getIsFile($file)) {
+        if ($this->isFile($file)) {
             return ssh2_sftp_unlink($this->_sftp, $file);
         }
         return true;
@@ -185,7 +185,7 @@ class SftpFile extends Base
     public function uploadFile($toFile, $fromFile = null, $overwrite = true)
     {
         null === $fromFile && $fromFile = './' . $this->getBasename($toFile);
-        if (false === $overwrite && $this->getIsFile($toFile)) {
+        if (false === $overwrite && $this->isFile($toFile)) {
             return false;
         }
         $this->createDir($this->getDirname($toFile));
@@ -198,7 +198,7 @@ class SftpFile extends Base
     public function downloadFile($fromFile, $toFile = null, $overwrite = true)
     {
         null === $toFile && $toFile = './' . $this->getBasename($fromFile);
-        if (false === $overwrite && $this->getIsFile($toFile)) {
+        if (false === $overwrite && $this->isFile($toFile)) {
             return false;
         }
         return copy($this->__getFilepath($fromFile), $toFile);
@@ -225,7 +225,7 @@ class SftpFile extends Base
      */
     public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
     {
-        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+        if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
                 @ssh2_sftp_chmod($this->_sftp, $subFile, $mode);

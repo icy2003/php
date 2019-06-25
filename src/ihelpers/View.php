@@ -72,7 +72,7 @@ class View
     protected function _renderContent($view, $params = [])
     {
         $viewFile = I::getAlias($view);
-        if (false === (new LocalFile())->getIsFile($viewFile)) {
+        if (false === (new LocalFile())->isFile($viewFile)) {
             throw new Exception('找不到视图文件：' . $viewFile);
         }
         return $this->_renderPhpFile($viewFile, $params);

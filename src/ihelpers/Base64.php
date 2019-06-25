@@ -66,7 +66,7 @@ class Base64
     public static function fromFile($file)
     {
         $base64 = false;
-        File::fileExists($file) && $base64 = base64_encode(file_get_contents($file));
+        file_exists($file) && $base64 = base64_encode(file_get_contents($file));
         return $base64;
     }
 
@@ -80,8 +80,9 @@ class Base64
      *
      * @test icy2003\php\tests\ihelpers\Base64Test::testToFile
      */
-    public static function toFile($string, $file = '')
+    public static function toFile($string, $file = null)
     {
+        null === $file && $file = './Base64_toFile_' . date('YmdHis') . '.txt';
         return (bool) file_put_contents($file, base64_decode($string));
     }
 }

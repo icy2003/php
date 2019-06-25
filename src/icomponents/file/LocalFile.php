@@ -26,7 +26,7 @@ class LocalFile extends Base
     /**
      * @ignore
      */
-    public function getIsFile($file)
+    public function isFile($file)
     {
         return file_exists($file);
     }
@@ -34,7 +34,7 @@ class LocalFile extends Base
     /**
      * @ignore
      */
-    public function getIsDir($dir)
+    public function isDir($dir)
     {
         return is_dir($dir);
     }
@@ -104,7 +104,7 @@ class LocalFile extends Base
      */
     public function deleteFile($file)
     {
-        if ($this->getIsFile($file)) {
+        if ($this->isFile($file)) {
             return unlink($file);
         }
         return true;
@@ -131,7 +131,7 @@ class LocalFile extends Base
      */
     public function chown($file, $user, $flags = FileConstants::RECURSIVE_DISABLED)
     {
-        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+        if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
                 chown($subFile, $user);
@@ -145,7 +145,7 @@ class LocalFile extends Base
      */
     public function chgrp($file, $group, $flags = FileConstants::RECURSIVE_DISABLED)
     {
-        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+        if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
                 chgrp($subFile, $group);
@@ -159,7 +159,7 @@ class LocalFile extends Base
      */
     public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
     {
-        if ($this->getIsDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
+        if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIV);
             foreach ($files as $subFile) {
                 chmod($subFile, $mode);

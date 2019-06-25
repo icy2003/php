@@ -14,8 +14,8 @@ namespace icy2003\php\icomponents\file;
  * - getCommandResult()：获得命令返回值
  * - getBasename()：返回路径中的文件名部分
  * - getDirname()：返回路径中的目录部分
- * - getIsFile()：是否是一个文件
- * - getIsDir()：是否是一个目录
+ * - isFile()：是否是一个文件
+ * - isDir()：是否是一个目录
  * - getRealpath()：返回规范化的绝对路径名
  * - getLists()：列出指定路径中的文件和目录
  * - getFilesize()：取得文件大小
@@ -87,7 +87,7 @@ abstract class Base
      *
      * @return boolean
      */
-    abstract public function getIsFile($file);
+    abstract public function isFile($file);
 
     /**
      * 是否是一个目录
@@ -96,7 +96,7 @@ abstract class Base
      *
      * @return boolean
      */
-    abstract public function getIsDir($dir);
+    abstract public function isDir($dir);
 
     /**
      * 返回规范化的绝对路径名
@@ -188,7 +188,7 @@ abstract class Base
      */
     public function createDir($dir, $mode = 0777)
     {
-        if ($this->getIsDir($dir)) {
+        if ($this->isDir($dir)) {
             return true;
         }
         $this->createDir($this->getDirname($dir), $mode);
@@ -214,12 +214,12 @@ abstract class Base
      */
     public function deleteDir($dir, $deleteRoot = true)
     {
-        if (false === $this->getIsDir($dir)) {
+        if (false === $this->isDir($dir)) {
             return true;
         }
         $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
         foreach ($files as $file) {
-            $this->getIsDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
+            $this->isDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
         }
 
         return true === $deleteRoot ? $this->_rmdir($dir) : true;
@@ -236,10 +236,10 @@ abstract class Base
      */
     public function copyFile($fromFile, $toFile, $overwrite = false)
     {
-        if (false === $this->getIsFile($fromFile)) {
+        if (false === $this->isFile($fromFile)) {
             return false;
         }
-        if ($this->getIsFile($toFile)) {
+        if ($this->isFile($toFile)) {
             if (false === $overwrite) {
                 return false;
             } else {
@@ -263,13 +263,13 @@ abstract class Base
     {
         $fromDir = rtrim($fromDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
-        if (false === $this->getIsDir($fromDir)) {
+        if (false === $this->isDir($fromDir)) {
             return false;
         }
         $this->createDir($toDir);
         $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
         foreach ($files as $file) {
-            if ($this->getIsDir($fromDir . $file)) {
+            if ($this->isDir($fromDir . $file)) {
                 $this->copyDir($fromDir . $file, $toDir . $file, $overwrite);
             } else {
                 $this->copyFile($fromDir . $file, $toDir . $file, $overwrite);
@@ -289,10 +289,10 @@ abstract class Base
      */
     public function moveFile($fromFile, $toFile, $overwrite = false)
     {
-        if (false === $this->getIsFile($fromFile)) {
+        if (false === $this->isFile($fromFile)) {
             return false;
         }
-        if ($this->getIsFile($toFile)) {
+        if ($this->isFile($toFile)) {
             if (false === $overwrite) {
                 return false;
             } else {
@@ -316,13 +316,13 @@ abstract class Base
     {
         $fromDir = rtrim($fromDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
-        if (false === $this->getIsDir($fromDir)) {
+        if (false === $this->isDir($fromDir)) {
             return false;
         }
         $this->createDir($toDir);
         $files = $this->getLists($fromDir, FileConstants::COMPLETE_PATH_DISABLED);
         foreach ($files as $file) {
-            if ($this->getIsDir($fromDir . $file)) {
+            if ($this->isDir($fromDir . $file)) {
                 $this->moveDir($fromDir . $file, $toDir . $file, $overwrite);
             } else {
                 $this->moveFile($fromDir . $file, $toDir . $file, $overwrite);
