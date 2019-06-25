@@ -43,7 +43,7 @@ class SftpFile extends Base
         if (!function_exists('ssh2_connect')) {
             throw new \Exception("请开启 ssh2 扩展");
         }
-        if (!Arrays::arrayKeysExists(['host', 'username', 'password'], $config, $diff)) {
+        if (!Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff)) {
             throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
         }
         $this->_conn = ssh2_connect(

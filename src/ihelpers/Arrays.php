@@ -47,38 +47,32 @@ class Arrays
     }
 
     /**
-     * 选取数组中某几项字段.
+     * 选取数组中某几项字段
      *
      * @param array $array
-     * @param array $fields 某几项字段
-     * @param int $dimension 维度，默认 2 维数组
+     * @param array $keys 某几项字段，支持 I::get 的键格式
      *
      * @return array
      *
      * @test icy2003\php_tests\ihelpers\ArraysTest::testColumns
      */
-    public static function columns($array, $fields, $dimension = 2)
+    public static function columns($array, $keys)
     {
         $result = [];
-        if (2 === $dimension) {
-            foreach ($array as $key => $row) {
-                foreach ($fields as $field) {
-                    if (array_key_exists($field, $row)) {
-                        $result[$key][$field] = $row[$field];
-                    }
-                }
+        foreach ($array as $field => $row) {
+            foreach ($keys as $key) {
+                $result[$field][$key] = I::get($row, $key);
             }
-        } elseif (1 === $dimension) {
-            $result = array_intersect_key($array, array_flip($fields));
         }
 
-        return $result;
+        return array_filter($result);
     }
 
     /**
-     * array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
+     * 返回数组中指定的一列
      *
-     * 如果需要取某几项，建议使用 Arrays::columns
+     * - array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
+     * - 如果需要取某几项，使用 Arrays::columns
      *
      * @see http://php.net/array_column
      *
@@ -88,9 +82,9 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayColumn
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testColumn
      */
-    public static function arrayColumn($array, $column, $index = null)
+    public static function column($array, $column, $index = null)
     {
         if (function_exists('array_column')) {
             return array_column($array, $column, $index);
@@ -110,20 +104,37 @@ class Arrays
     }
 
     /**
-     * 检测数组里是否有某些键
+     * 检查数组里是否有指定的所有键名或索引
      *
-     * @param array $keys 被检测的键
+     * - array_key_exists：检测一个指定的键
+     * - Arrays::keyExistsOne：检测数组里是否存在指定的某些键
+     *
+     * @param array $keys 要检查的键
      * @param array $array
      * @param array $diff 引用返回不包含的键
      *
      * @return boolean
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyExists
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testKeyExistsAll
      */
-    public static function arrayKeysExists($keys, $array, &$diff = null)
+    public static function keyExistsAll($keys, $array, &$diff = null)
     {
 
-        return I::isEmpty(($diff = array_diff($keys, array_keys($array))));
+        return I::isEmpty($diff = array_diff($keys, array_keys($array)));
+    }
+
+    /**
+     * 检查数组里是否有指定的所有键名或索引
+     *
+     * @param array $keys 要检查的键
+     * @param array $array
+     * @param array $find 引用返回包含的键
+     *
+     * @return boolean
+     */
+    public static function keyExistsSome($keys, $array, &$find = null)
+    {
+        return !I::isEmpty($find = array_intersect($keys, array_keys($array)));
     }
 
     /**
@@ -134,25 +145,25 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayCombines
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testCombines
      */
-    public static function arrayCombines($keys, $arrays)
+    public static function combines($keys, $arrays)
     {
         $result = [];
         foreach ($arrays as $k => $array) {
-            $result[$k] = self::arrayCombine($keys, $array);
+            $result[$k] = self::combine($keys, $array);
         }
 
         return $result;
     }
 
     /**
-     * array_combine 的改良
+     * 创建一个数组，用一个数组的值作为其键名，另一个数组的值作为其值
      *
-     * ```
-     * 在两个数组元素个数不一致时，以键为准:
-     * 1、键比值多，值都被填充为 null
-     * 2、值比键多，值被舍去
+     * - array_combine：两个数组元素个数不一致将报错
+     * - 在两个数组元素个数不一致时，以键为准:
+     *      1.键比值多，值都被填充为 null
+     *      2.值比键多，值被舍去
      * ```
      *
      * @see http://php.net/array_combine
@@ -162,20 +173,23 @@ class Arrays
      *
      * @return array
      */
-    public static function arrayCombine($keys, $values)
+    public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
             return array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {
-            $array[$key] = array_key_exists($index, $values) ? $values[$index] : null;
+            $array[$key] = I::get($values, $index);
         }
         return $array;
     }
 
     /**
-     * 递归地合并多个数组，区别于 array_merge_recursive，如果有相同的键，后者会覆盖前者
+     * 递归地合并多个数组
+     *
+     * - array_merge_recursive：如果有相同的键，后者会覆盖前者
+     * - 此函数会合并两个相同键的值到一个数组里
      *
      * @see http://php.net/array_merge_recursive
      *
@@ -184,9 +198,9 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayMergeRecursive
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testMerge
      */
-    public static function arrayMergeRecursive($a, $b)
+    public static function merge($a, $b)
     {
         $args = func_get_args();
         $res = array_shift($args);
@@ -199,7 +213,7 @@ class Arrays
                         $res[$k] = $v;
                     }
                 } elseif (is_array($v) && isset($res[$k]) && is_array($res[$k])) {
-                    $res[$k] = self::arrayMergeRecursive($res[$k], $v);
+                    $res[$k] = self::merge($res[$k], $v);
                 } else {
                     $res[$k] = $v;
                 }
@@ -210,7 +224,7 @@ class Arrays
     }
 
     /**
-     *  range 的优化版
+     *  range 的性能优化版
      *
      * @see http://php.net/manual/zh/language.generators.overview.php
      * @version PHP >= 5.5
@@ -222,9 +236,9 @@ class Arrays
      * @return \Generator
      * @throws \LogicException
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testRange
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testRangeGenerator
      */
-    public static function range($start, $end, $step = 1)
+    public static function rangeGenerator($start, $end, $step = 1)
     {
         if ($start < $end) {
             if ($step <= 0) {
@@ -252,9 +266,9 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayTransposed
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testTransposed
      */
-    public static function arrayTransposed($array)
+    public static function transposed($array)
     {
         $data = [];
         foreach ($array as $r => $row) {
@@ -273,9 +287,9 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetect
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetectFirst
      */
-    public static function detect($array, $callback)
+    public static function detectFirst($array, $callback)
     {
         foreach ($array as $key => $item) {
             if (true === I::trigger($callback, [$item, $key])) {
@@ -294,9 +308,9 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testAll
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetectAll
      */
-    public static function all($array, $callback, $filter = null)
+    public static function detectAll($array, $callback, $filter = null)
     {
         $all = [];
         foreach ($array as $key => $item) {
@@ -314,15 +328,15 @@ class Arrays
     /**
      * 返回数组的最后一个元素的键
      *
-     * 原生函数需要 PHP7.3.0+ 才能支持
+     * - array_key_last：需要 PHP7.3.0+ 才能支持
      *
      * @param array $array
      *
      * @return string
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyLast
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testKeyLast
      */
-    public static function arrayKeyLast($array)
+    public static function keyLast($array)
     {
         if (!is_array($array) || empty($array)) {
             return null;
@@ -337,15 +351,15 @@ class Arrays
     /**
      * 返回数组的第一个元素的键
      *
-     * 原生函数需要 PHP7.3.0+ 才能支持
+     * - array_key_first：需要 PHP7.3.0+ 才能支持
      *
      * @param array $array
      *
      * @return string
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testArrayKeyFirst
+     * @test icy2003\php_tests\ihelpers\ArraysTest::testKeyFirst
      */
-    public static function arrayKeyFirst($array)
+    public static function keyFirst($array)
     {
         if (!is_array($array) || empty($array)) {
             return null;
@@ -469,7 +483,7 @@ class Arrays
     /**
      * 返回数组的顺数第 n 个元素，其中 n >= 1 且为整数，空数组直接返回 null
      *
-     * 支持关联数组，超过数组长度会对数组长度求余后查找
+     * - 支持关联数组，超过数组长度会对数组长度求余后查找
      *
      * @param array $array
      * @param int $pos 顺数第 n 个，默认 1
@@ -496,7 +510,7 @@ class Arrays
     /**
      * 返回数组的倒数第 n 个元素，其中 n >= 1 且为整数，空数组直接返回 null
      *
-     * 支持关联数组，超过数组长度会对数组长度求余后查找
+     * - 支持关联数组，超过数组长度会对数组长度求余后查找
      *
      * @param array $array
      * @param int $pos 倒数第 n 个，默认 1
@@ -524,7 +538,7 @@ class Arrays
     /**
      * 用给定的值填充数组
      *
-     * 和原生函数 array_fill 不同的是，array_fill 第一参数在为负的时候，生成的数组的第二个元素是从 0 开始的！
+     * - array_fill：第一参数在为负的时候，生成的数组的第二个元素是从 0 开始的！
      *
      * @param int $startIndex 返回的数组的第一个索引值
      * @param int $num 插入元素的数量。如果为 0 或者负数，则返回空数组
@@ -532,24 +546,26 @@ class Arrays
      *
      * @return array
      */
-    public static function arrayFill($startIndex, $num, $value)
+    public static function fill($startIndex, $num, $value)
     {
         if ($num <= 0) {
             return [];
         }
         $array = [];
-        foreach (self::range($startIndex, $startIndex + $num - 1) as $key) {
+        foreach (self::rangeGenerator($startIndex, $startIndex + $num - 1) as $key) {
             $array[$key] = $value;
         }
         return $array;
     }
 
     /**
-     * 原生函数 count 在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
+     * 计算数组中的单元数目，或对象中的属性个数
+     *
+     * - count：在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
      *
      * @param array $array 数组
      *
-     * @return int
+     * @return integer
      */
     public static function count($array)
     {
@@ -583,6 +599,7 @@ class Arrays
 
     /**
      * 返回矩阵的列数和行数
+     *
      * - 返回两个元素的一维数组，第一个元素表示矩阵的列数，第二个元素表示矩阵的行数
      *
      * @param array $array

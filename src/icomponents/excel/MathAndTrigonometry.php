@@ -417,7 +417,7 @@ trait MathAndTrigonometry
             return 1;
         }
         $result = 1;
-        foreach (Arrays::range(1, $number) as $num) {
+        foreach (Arrays::rangeGenerator(1, $number) as $num) {
             $result *= $num;
         }
         return $result;
@@ -441,7 +441,7 @@ trait MathAndTrigonometry
         }
         $result = 1;
         $isEven = $number % 2 == 0;
-        foreach (Arrays::range($isEven ? 2 : 1, $number, 2) as $num) {
+        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, $number, 2) as $num) {
             $result *= $num;
         }
         return $result;
@@ -642,7 +642,7 @@ trait MathAndTrigonometry
                 for ($c = 0; $c < $col2; $c++) {
                     $arr[$r][$c] = array_sum(array_map(function ($a1, $a2) {
                         return $a1 * $a2;
-                    }, $array1[$r], Arrays::arrayColumn($array2, $c)));
+                    }, $array1[$r], Arrays::column($array2, $c)));
                 }
             }
             return $arr;

@@ -29,7 +29,7 @@ class Http
      */
     public static function get($url, $get = [], $options = [])
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('GET', $url, [
             'query' => $get,
         ]);
@@ -49,7 +49,7 @@ class Http
      */
     public static function getAsync($url, $get = [], $options = [], $success = null, $error = null)
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('GET', $url, [
             'query' => $get,
         ]);
@@ -72,7 +72,7 @@ class Http
      */
     public static function post($url, $post = [], $get = [], $options = [])
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
             'query' => $get,
             'form_params' => $post,
@@ -94,7 +94,7 @@ class Http
      */
     public static function postAsync($url, $post = [], $get = [], $options = [], $success = null, $error = null)
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
             'query' => $get,
             'form_params' => $post,
@@ -118,7 +118,7 @@ class Http
      */
     public static function body($url, $body = '', $get = [], $options = [])
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
             'query' => $get,
             'body' => $body,
@@ -140,7 +140,7 @@ class Http
      */
     public static function bodyAsync($url, $body = '', $get = [], $options = [], $success = null, $error = null)
     {
-        $client = new Client(Arrays::arrayMergeRecursive(['verify' => false], $options));
+        $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
             'query' => $get,
             'body' => $body,

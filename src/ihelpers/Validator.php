@@ -150,7 +150,7 @@ class Validator
         $this->_clear();
         if (!empty($rules)) {
             foreach ($rules as $rule) {
-                if (!Arrays::arrayKeysExists([0, 1], $rule)) {
+                if (!Arrays::keyExistsAll([0, 1], $rule)) {
                     throw new Exception('rules error');
                 }
                 $fieldArray = is_array($rule[0]) ? $rule[0] : explode(',', $rule[0]);
@@ -185,7 +185,7 @@ class Validator
 
     protected function _inValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['range'], $rule)) {
+        if (!array_key_exists('range', $rule)) {
             throw new Exception('range error');
         }
         $value = I::get($data, $field);
@@ -199,7 +199,7 @@ class Validator
 
     protected function _matchValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['pattern'], $rule)) {
+        if (!array_key_exists('pattern', $rule)) {
             throw new Exception('pattern error');
         }
         $value = I::get($data, $field);
@@ -229,7 +229,7 @@ class Validator
     protected function _uniqueValidator($data, $field, $rule)
     {
         $value = I::get($data, $field);
-        if (Arrays::arrayKeysExists(['model'], $rule)) {
+        if (array_key_exists('model', $rule)) {
 
         } else {
             $function = I::get($rule, 'function');
@@ -245,7 +245,7 @@ class Validator
 
     protected function _callValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['function'], $rule)) {
+        if (!array_key_exists('function', $rule)) {
             throw new Exception('function error');
         }
         $function = I::get($rule, 'function');
@@ -260,7 +260,7 @@ class Validator
 
     protected function _defaultValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['value'], $rule)) {
+        if (!array_key_exists('value', $rule)) {
             throw new Exception('value error');
         }
         $value = I::get($rule, 'value');
@@ -275,7 +275,7 @@ class Validator
 
     protected function _setValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['value'], $rule)) {
+        if (!array_key_exists('value', $rule)) {
             throw new Exception('value error');
         }
         $value = I::get($rule, 'value');
@@ -284,7 +284,7 @@ class Validator
 
     protected function _filterValidator($data, $field, $rule)
     {
-        if (!Arrays::arrayKeysExists(['function'], $rule)) {
+        if (!array_key_exists('function', $rule)) {
             throw new Exception('function error');
         }
         $function = I::get($rule, 'function');

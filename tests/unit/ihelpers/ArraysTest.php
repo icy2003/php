@@ -56,18 +56,11 @@ class ArraysTest extends \Codeception\Test\Unit
                 ['id' => 2, 'name' => 'jerry'],
             ]
         );
-        parent::assertEquals(Arrays::columns(
-            ['id' => 1, 'name' => 'tom', 'type' => 'cat'],
-            ['id', 'name'],
-            1
-        ),
-            ['id' => 1, 'name' => 'tom']
-        );
     }
 
-    public function testArrayColumn()
+    public function testColumn()
     {
-        parent::assertEquals(Arrays::arrayColumn(
+        parent::assertEquals(Arrays::column(
             [
                 ['id' => 1, 'name' => 'tom'],
                 ['id' => 2, 'name' => 'jerry'],
@@ -76,7 +69,7 @@ class ArraysTest extends \Codeception\Test\Unit
         ),
             ['tom', 'jerry']
         );
-        parent::assertEquals(Arrays::arrayColumn(
+        parent::assertEquals(Arrays::column(
             [
                 ['id' => 1, 'name' => 'tom'],
                 ['id' => 2, 'name' => 'jerry'],
@@ -88,21 +81,33 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testArrayKeyExists()
+    public function testKeyExistsAll()
     {
-        parent::assertTrue(Arrays::arrayKeysExists(
+        parent::assertTrue(Arrays::keyExistsAll(
             ['id', 'name'],
             ['id' => 1, 'name' => 'tom', 'type' => 'cat']
         ));
-        parent::assertFalse(Arrays::arrayKeysExists(
+        parent::assertFalse(Arrays::keyExistsAll(
             ['image'],
             ['id' => 1, 'name' => 'tom', 'type' => 'cat']
         ));
     }
 
-    public function testArrayCombines()
+    public function testKeyExistsSome()
     {
-        parent::assertEquals(Arrays::arrayCombines(
+        parent::assertTrue(Arrays::keyExistsSome(
+            ['id', 'name', 'name2'],
+            ['id' => 1, 'name' => 'tom', 'type' => 'cat']
+        ));
+        parent::assertFalse(Arrays::keyExistsSome(
+            ['image'],
+            ['id' => 1, 'name' => 'tom', 'type' => 'cat']
+        ));
+    }
+
+    public function testCombines()
+    {
+        parent::assertEquals(Arrays::combines(
             ['id', 'name'],
             [
                 [1, 'tom'],
@@ -116,22 +121,22 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testArrayMergeRecursive()
+    public function testMerge()
     {
-        parent::assertEquals(Arrays::arrayMergeRecursive(
+        parent::assertEquals(Arrays::merge(
             ['tom'],
             ['jerry']
         ),
             ['tom', 'jerry']
         );
-        parent::assertEquals(Arrays::arrayMergeRecursive(
+        parent::assertEquals(Arrays::merge(
             ['tom'],
             ['jerry'],
             ['speike']
         ),
             ['tom', 'jerry', 'speike']
         );
-        parent::assertEquals(Arrays::arrayMergeRecursive(
+        parent::assertEquals(Arrays::merge(
             ['name' => 'tom'],
             ['name' => 'jerry']
         ),
@@ -139,23 +144,23 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testRange()
+    public function testRangeGenerator()
     {
         $array1 = [];
-        foreach (Arrays::range(1, 3) as $value) {
+        foreach (Arrays::rangeGenerator(1, 3) as $value) {
             $array1[] = $value;
         }
         $array2 = [];
-        foreach (Arrays::range(1, 5, 2) as $value) {
+        foreach (Arrays::rangeGenerator(1, 5, 2) as $value) {
             $array2[] = $value;
         }
         parent::assertEquals($array1, [1, 2, 3]);
         parent::assertEquals($array2, [1, 3, 5]);
     }
 
-    public function testArrayTransposed()
+    public function testTransposed()
     {
-        parent::assertEquals(Arrays::arrayTransposed(
+        parent::assertEquals(Arrays::transposed(
             [
                 [1, 2, 3],
                 [4, 5, 6],
@@ -169,9 +174,9 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testDetect()
+    public function testDetectFirst()
     {
-        parent::assertEquals(Arrays::detect(
+        parent::assertEquals(Arrays::detectFirst(
             [1, 2, 3],
             function ($v) {
                 return $v > 1;
@@ -181,9 +186,9 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testAll()
+    public function testDetectAll()
     {
-        parent::assertEquals(Arrays::all(
+        parent::assertEquals(Arrays::detectAll(
             [1, 2, 3],
             function ($v) {
                 return $v > 1;
@@ -191,7 +196,7 @@ class ArraysTest extends \Codeception\Test\Unit
         ),
             [1 => 2, 2 => 3]
         );
-        parent::assertEquals(Arrays::all(
+        parent::assertEquals(Arrays::detectAll(
             [1, 2, 3],
             function ($v) {
                 return $v > 1;
@@ -204,18 +209,18 @@ class ArraysTest extends \Codeception\Test\Unit
         );
     }
 
-    public function testArrayKeyLast()
+    public function testKeyLast()
     {
-        parent::assertEquals(Arrays::arrayKeyLast(
+        parent::assertEquals(Arrays::keyLast(
             ['id' => 1, 'name' => 'tom']
         ),
             'name'
         );
     }
 
-    public function testArrayKeyFirst()
+    public function testKeyFirst()
     {
-        parent::assertEquals(Arrays::arrayKeyFirst(
+        parent::assertEquals(Arrays::keyFirst(
             [1, 2, 3]
         ),
             0

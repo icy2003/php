@@ -217,7 +217,7 @@ class Markdown
         };
         $string = '';
         $string .= $lineFunc($title) . PHP_EOL;
-        $string .= $lineFunc(Arrays::arrayFill(0, count($title), ':-:')) . PHP_EOL;
+        $string .= $lineFunc(Arrays::fill(0, count($title), ':-:')) . PHP_EOL;
         foreach ($rows as $row) {
             $string .= $lineFunc($row) . PHP_EOL;
         }
