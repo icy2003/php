@@ -40,6 +40,44 @@ trait UtilTrait
     protected $_apiKey;
 
     /**
+     * 证书路径
+     *
+     * @var string
+     */
+    protected $_certPath;
+
+    /**
+     * 设置证书路径
+     *
+     * @param string $certPath
+     *
+     * @return void
+     */
+    public function setCertPath($certPath)
+    {
+        $this->_certPath = $certPath;
+    }
+
+    /**
+     * 证书密钥路径
+     *
+     * @var string
+     */
+    protected $_certKeyPath;
+
+    /**
+     * 设置证书密钥路径
+     *
+     * @param string $certKeyPath
+     *
+     * @return void
+     */
+    public function setCertKeyPath($certKeyPath)
+    {
+        $this->_certKeyPath = $certKeyPath;
+    }
+
+    /**
      * 获取终端 IP
      *
      * @return string

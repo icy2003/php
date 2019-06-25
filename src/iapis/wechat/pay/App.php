@@ -10,6 +10,7 @@ namespace icy2003\php\iapis\wechat\pay;
 
 use Exception;
 use icy2003\php\I;
+use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Request;
 use icy2003\php\ihelpers\Strings;
@@ -40,11 +41,11 @@ class App
     }
 
     /**
-     * 设备号
+     * 数据包
      *
-     * @var string
+     * @var array
      */
-    protected $_deviceInfo = 'WEB';
+    protected $_values = [];
 
     /**
      * 设置设备号
@@ -57,15 +58,8 @@ class App
      */
     public function setDeviceInfo($deviceInfo)
     {
-        $this->_deviceInfo = $deviceInfo;
+        $this->_values['device_info'] = $deviceInfo;
     }
-
-    /**
-     * 签名类型
-     *
-     * @var string
-     */
-    protected $_signType = 'MD5';
 
     /**
      * 设置签名类型
@@ -76,17 +70,10 @@ class App
      *
      * @return void
      */
-    public function setSignType($signType)
+    public function setSignType($signType = 'MD5')
     {
-        $this->_signType = $signType;
+        $this->_values['sign_type'] = $signType;
     }
-
-    /**
-     * 商品描述
-     *
-     * @var string
-     */
-    protected $_body;
 
     /**
      * 设置商品描述
@@ -99,15 +86,8 @@ class App
      */
     public function setBody($body)
     {
-        $this->_body = $body;
+        $this->_values['body'] = $body;
     }
-
-    /**
-     * 商品详情
-     *
-     * @var string
-     */
-    protected $_detail;
 
     /**
      * 设置商品详情
@@ -121,15 +101,8 @@ class App
      */
     public function setDetail($detail)
     {
-        $this->_detail = $detail;
+        $this->_values['detail'] = $detail;
     }
-
-    /**
-     * 附加数据
-     *
-     * @var string
-     */
-    protected $_attach;
 
     /**
      * 设置附加数据
@@ -142,15 +115,8 @@ class App
      */
     public function setAttach($attach)
     {
-        $this->_attach = $attach;
+        $this->_values['attach'] = $attach;
     }
-
-    /**
-     * 商户订单号
-     *
-     * @var string
-     */
-    protected $_outTradeNo;
 
     /**
      * 设置商户订单号
@@ -164,15 +130,8 @@ class App
      */
     public function setOutTradeNo($outTradeNo)
     {
-        $this->_outTradeNo = $outTradeNo;
+        $this->_values['out_trade_no'] = $outTradeNo;
     }
-
-    /**
-     * 货币类型
-     *
-     * @var string
-     */
-    protected $_feeType = 'CNY';
 
     /**
      * 设置货币类型
@@ -184,17 +143,10 @@ class App
      *
      * @return void
      */
-    public function setFeeType($feeType)
+    public function setFeeType($feeType = 'CNY')
     {
-        $this->_feeType = $feeType;
+        $this->_values['fee_type'] = $feeType;
     }
-
-    /**
-     * 总金额
-     *
-     * @var integer
-     */
-    protected $_totalFee;
 
     /**
      * 设置总金额
@@ -208,15 +160,8 @@ class App
      */
     public function setTotalFee($totalFee)
     {
-        $this->_totalFee = $totalFee;
+        $this->_values['total_fee'] = $totalFee;
     }
-
-    /**
-     * 交易起始时间
-     *
-     * @var string
-     */
-    protected $_timeStart;
 
     /**
      * 设置交易起始时间
@@ -230,15 +175,8 @@ class App
      */
     public function setTimeStart($timeStart)
     {
-        $this->_timeStart = $timeStart;
+        $this->_values['time_start'] = $timeStart;
     }
-
-    /**
-     * 交易结束时间
-     *
-     * @var string
-     */
-    protected $_timeExpire;
 
     /**
      * 设置交易结束时间
@@ -254,15 +192,8 @@ class App
      */
     public function setTimeExpire($timeExpire)
     {
-        $this->_timeExpire = $timeExpire;
+        $this->_values['time_expire'] = $timeExpire;
     }
-
-    /**
-     * 订单优惠标记
-     *
-     * @var string
-     */
-    protected $_goodsTag;
 
     /**
      * 设置订单优惠标记
@@ -276,15 +207,8 @@ class App
      */
     public function setGoodsTag($goodsTag)
     {
-        $this->_goodsTag = $goodsTag;
+        $this->_values['goods_tag'] = $goodsTag;
     }
-
-    /**
-     * 通知地址
-     *
-     * @var string
-     */
-    protected $_notifyUrl;
 
     /**
      * 设置通知地址
@@ -297,15 +221,8 @@ class App
      */
     public function setNotifyUrl($notifyUrl)
     {
-        $this->_notifyUrl = $notifyUrl;
+        $this->_values['notify_url'] = $notifyUrl;
     }
-
-    /**
-     * 指定支付方式
-     *
-     * @var string
-     */
-    protected $_limitPay;
 
     /**
      * 设置指定支付方式
@@ -318,15 +235,8 @@ class App
      */
     public function setLimitPay($limitPay)
     {
-        $this->_limitPay = $limitPay;
+        $this->_values['limit_pay'] = $limitPay;
     }
-
-    /**
-     * 开发票入口开放标识
-     *
-     * @var string
-     */
-    protected $_receipt;
 
     /**
      * 设置开发票入口开放标识
@@ -340,7 +250,7 @@ class App
      */
     public function setReceipt($receipt)
     {
-        $this->_receipt = $receipt;
+        $this->_values['receipt'] = $receipt;
     }
 
     /**
@@ -352,38 +262,38 @@ class App
      */
     public function pay()
     {
-        if (null === $this->_body) {
+        if (null === ($body = I::get($this->_values, 'body'))) {
             throw new Exception("缺少统一支付接口必填参数：body");
         }
-        if (null === $this->_outTradeNo) {
+        if (null === ($outTradeNo = I::get($this->_values, 'out_trade_no'))) {
             throw new Exception("缺少统一支付接口必填参数：out_trade_no");
         }
-        if (null === $this->_totalFee) {
+        if (null === ($totalFee = I::get($this->_values, 'total_fee'))) {
             throw new Exception("缺少统一支付接口必填参数：total_fee");
         }
-        if (null === $this->_notifyUrl) {
+        if (null === ($notifyUrl = I::get($this->_values, 'notify_url'))) {
             throw new Exception("缺少统一支付接口必填参数：notify_url");
         }
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
-            'device_info' => $this->_deviceInfo,
+            'device_info' => I::get($this->_values, 'device_info'),
             'nonce_str' => Strings::random(),
-            'sign_type' => $this->_signType,
-            'body' => $this->_body,
-            'detail' => $this->_detail,
-            'attach' => $this->_attach,
-            'out_trade_no' => $this->_outTradeNo,
-            'fee_type' => $this->_feeType,
-            'total_fee' => $this->_totalFee,
+            'sign_type' => I::get($this->_values, 'sign_type'),
+            'body' => $body,
+            'detail' => I::get($this->_values, 'detail'),
+            'attach' => I::get($this->_values, 'attach'),
+            'out_trade_no' => $outTradeNo,
+            'fee_type' => I::get($this->_values, 'fee_type'),
+            'total_fee' => $totalFee,
             'spbill_create_ip' => $this->getIp(),
-            'time_start' => $this->_timeStart,
-            'time_expire' => $this->_timeExpire,
-            'goods_tag' => $this->_goodsTag,
-            'notify_url' => $this->_notifyUrl,
+            'time_start' => I::get($this->_values, 'time_start'),
+            'time_expire' => I::get($this->_values, 'time_expire'),
+            'goods_tag' => I::get($this->_values, 'goods_tag'),
+            'notify_url' => $notifyUrl,
             'trade_type' => 'APP',
-            'limit_pay' => $this->_limitPay,
-            'receipt' => $this->_receipt,
+            'limit_pay' => I::get($this->_values, 'limit_pay'),
+            'receipt' => I::get($this->_values, 'receipt'),
         ]);
         $values['sign'] = $this->getSign($values);
         $responseXml = Http::body('https://api.mch.weixin.qq.com/pay/unifiedorder', Xml::fromArray($values));
@@ -405,14 +315,14 @@ class App
     }
 
     /**
-     * 支付结果通知校验数据
+     * 支付结果通知以及退款结果通知
      *
      * - 如果校验成功，会输出成功给微信，并返回数据
      * - 如果校验失败，返回 false
      *
      * @return boolean
      */
-    public function payNotify()
+    public function notify()
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
@@ -430,16 +340,9 @@ class App
     }
 
     /**
-     * 微信订单号
+     * 设置微信订单号
      *
      * - 微信的订单号，优先使用
-     *
-     * @var string
-     */
-    protected $_transactionId;
-
-    /**
-     * 设置微信订单号
      *
      * @param string $transactionId
      *
@@ -447,7 +350,7 @@ class App
      */
     public function setTransactionId($transactionId)
     {
-        $this->_transactionId = $transactionId;
+        $this->_values['transaction_id'] = $transactionId;
     }
 
     /**
@@ -461,12 +364,10 @@ class App
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
+            'transaction_id' => I::get($this->_values, 'transaction_id'),
+            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
         ]);
-        if ($this->_transactionId) {
-            $values['transaction_id'] = $this->_transactionId;
-        } elseif ($this->_outTradeNo) {
-            $values['out_trade_no'] = $this->_outTradeNo;
-        } else {
+        if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no'], $values)) {
             throw new Exception("transaction_id 和 out_trade_no 必须二选一");
         }
         $values['sign'] = $this->getSign($values);
@@ -481,26 +382,19 @@ class App
      */
     public function closeOrder()
     {
+        if (null === ($outTradeNo = I::get($this->_values, 'out_trade_no'))) {
+            throw new Exception("缺少必填参数：out_trade_no");
+        }
         $values = [
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
-            'out_trade_no' => $this->_outTradeNo,
+            'out_trade_no' => $outTradeNo,
             'nonce_str' => Strings::random(),
         ];
-        if (null === $this->_outTradeNo) {
-            throw new Exception("缺少必填参数：out_trade_no");
-        }
         $values['sign'] = $this->getSign($values);
         $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/closeorder', Xml::fromArray($values));
         return Xml::toArray($responseBody);
     }
-
-    /**
-     * 商户退款单号
-     *
-     * @var string
-     */
-    protected $_outRefundNo;
 
     /**
      * 设置商户退款单号
@@ -514,16 +408,8 @@ class App
      */
     public function setOutRefundNo($outRefundNo = null)
     {
-        null === $outRefundNo && $this->_outRefundNo = $this->_outTradeNo;
-        null === $this->_outRefundNo && $this->_outRefundNo = $outRefundNo;
+        $this->_values['out_refund_no'] = null === $outRefundNo ? I::get($this->_values, 'out_trade_no') : $outRefundNo;
     }
-
-    /**
-     * 退款金额
-     *
-     * @var integer
-     */
-    protected $_refundFee;
 
     /**
      * 设置退款金额
@@ -538,16 +424,8 @@ class App
      */
     public function setRefundFee($refundFee = null)
     {
-        null === $refundFee && $refundFee = $this->_totalFee;
-        null === $this->_refundFee && $this->_refundFee = $refundFee;
+        $this->_values['refund_fee'] = null === $refundFee ? I::get($this->_values, 'total_fee') : $refundFee;
     }
-
-    /**
-     * 退款货币种类
-     *
-     * @var string
-     */
-    protected $_refundFeeType = 'CNY';
 
     /**
      * 设置退款货币种类
@@ -560,17 +438,10 @@ class App
      *
      * @return void
      */
-    public function setRefundFeeType($refundFeeType)
+    public function setRefundFeeType($refundFeeType = 'CNY')
     {
-        $this->_refundFeeType = $refundFeeType;
+        $this->_values['refund_fee_type'] = $refundFeeType;
     }
-
-    /**
-     * 退款原因
-     *
-     * @var string
-     */
-    protected $_refundDesc;
 
     /**
      * 设置退款原因
@@ -584,15 +455,8 @@ class App
      */
     public function setRefundDesc($refundDesc)
     {
-        $this->_refundDesc = $refundDesc;
+        $this->_values['refund_desc'] = $refundDesc;
     }
-
-    /**
-     * 退款资金来源
-     *
-     * @var string
-     */
-    protected $_refundAccount;
 
     /**
      * 设置退款资金来源
@@ -607,45 +471,7 @@ class App
      */
     public function setRefundAccount($refundAccount)
     {
-        $this->_refundAccount = $refundAccount;
-    }
-
-    /**
-     * 证书路径
-     *
-     * @var string
-     */
-    protected $_certPath;
-
-    /**
-     * 设置证书路径
-     *
-     * @param string $certPath
-     *
-     * @return void
-     */
-    public function setCertPath($certPath)
-    {
-        $this->_certPath = $certPath;
-    }
-
-    /**
-     * 证书密钥路径
-     *
-     * @var string
-     */
-    protected $_certKeyPath;
-
-    /**
-     * 设置证书密钥路径
-     *
-     * @param string $certKeyPath
-     *
-     * @return void
-     */
-    public function setCertKeyPath($certKeyPath)
-    {
-        $this->_certKeyPath = $certKeyPath;
+        $this->_values['refund_account'] = $refundAccount;
     }
 
     /**
@@ -655,33 +481,31 @@ class App
      */
     public function refund()
     {
+        if (null === $this->_certPath) {
+            throw new Exception("请使用 setCertPath 提供证书路径");
+        }
+        if (null === $this->_certKeyPath) {
+            throw new Exception("请使用 setCertKeyPath 提供证书密钥路径");
+        }
         $this->setOutRefundNo();
         $this->setRefundFee();
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
-            'sign_type' => $this->_signType,
-            'out_refund_no' => $this->_outRefundNo,
-            'total_fee' => $this->_totalFee,
-            'refund_fee' => $this->_refundFee,
-            'refund_fee_type' => $this->_refundFeeType,
-            'refund_desc' => $this->_refundDesc,
-            'refund_account' => $this->_refundAccount,
-            'notify_url' => $this->_notifyUrl,
+            'sign_type' => I::get($this->_values, 'sign_type'),
+            'out_refund_no' => I::get($this->_values, 'out_refund_no'),
+            'total_fee' => I::get($this->_values, 'total_fee'),
+            'refund_fee' => I::get($this->_values, 'refund_fee'),
+            'refund_fee_type' => I::get($this->_values, 'refund_fee_type'),
+            'refund_desc' => I::get($this->_values, 'refund_desc'),
+            'refund_account' => I::get($this->_values, 'refund_account'),
+            'notify_url' => I::get($this->_values, 'notify_url'),
+            'transaction_id' => I::get($this->_values, 'transaction_id'),
+            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
         ]);
-        if ($this->_transactionId) {
-            $values['transaction_id'] = $this->_transactionId;
-        } elseif ($this->_outTradeNo) {
-            $values['out_trade_no'] = $this->_outTradeNo;
-        } else {
+        if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no'], $values)) {
             throw new Exception("transaction_id 和 out_trade_no 必须二选一");
-        }
-        if (null === $this->_certPath) {
-            throw new Exception("请使用 setCertPath 提供证书路径");
-        }
-        if (null === $this->_certKeyPath) {
-            throw new Exception("请使用 setCertKeyPath 提供证书密钥路径");
         }
         $values['sign'] = $this->getSign($values);
         $responseBody = Http::body('https://api.mch.weixin.qq.com/secapi/pay/refund', Xml::fromArray($values), [], [
@@ -692,14 +516,9 @@ class App
     }
 
     /**
-     * 偏移量
-     *
-     * @var integer
-     */
-    protected $_offset;
-
-    /**
      * 设置偏移量
+     *
+     * - 查询退款：偏移量，当部分退款次数超过10次时可使用，表示返回的查询结果从这个偏移量开始取记录
      *
      * @param integer $offset
      *
@@ -707,18 +526,13 @@ class App
      */
     public function setOffset($offset)
     {
-        $this->_offset = $offset;
+        $this->_values['offset'] = $offset;
     }
 
     /**
-     * 微信退款单号
-     *
-     * @var string
-     */
-    protected $_refundId;
-
-    /**
      * 设置微信退款单号
+     *
+     * - 微信生成的退款单号，在申请退款接口有返回
      *
      * @param string $refundId
      *
@@ -726,7 +540,7 @@ class App
      */
     public function setRefundId($refundId)
     {
-        $this->_refundId = $refundId;
+        $this->_values['refund_id'] = $refundId;
     }
 
     /**
@@ -740,21 +554,231 @@ class App
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
-            'offset' => $this->_offset,
+            'offset' => I::get($this->_values, 'offset'),
+            'transaction_id' => I::get($this->_values, 'transaction_id'),
+            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
+            'out_refund_no' => I::get($this->_values, 'out_refund_no'),
+            'refund_id' => I::get($this->_values, 'refund_id'),
         ]);
-        if ($this->_transactionId) {
-            $values['transaction_id'] = $this->_transactionId;
-        } elseif ($this->_outTradeNo) {
-            $values['out_trade_no'] = $this->_outTradeNo;
-        } elseif ($this->_outRefundNo) {
-            $values['out_refund_no'] = $this->_outRefundNo;
-        } elseif ($this->_refundId) {
-            $values['refund_id'] = $this->_refundId;
-        } else {
+        if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no', 'out_refund_no', 'refund_id'], $values)) {
             throw new Exception("transaction_id、out_trade_no、out_refund_no 和 refund_id 必须四选一");
         }
         $values['sign'] = $this->getSign($values);
         $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/refundquery', Xml::fromArray($values));
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 设置对账单日期
+     *
+     * - 下载对账单的日期，格式：20140603
+     *
+     * @param string $billDate
+     *
+     * @return void
+     */
+    public function setBillDate($billDate)
+    {
+        $this->_values['bill_date'] = $billDate;
+    }
+
+    /**
+     * 设置账单类型
+     *
+     * - ALL（默认值），返回当日所有订单信息（不含充值退款订单）
+     * - SUCCESS，返回当日成功支付的订单（不含充值退款订单）
+     * - REFUND，返回当日退款订单（不含充值退款订单）
+     * - RECHARGE_REFUND，返回当日充值退款订单
+     *
+     * @param string $billType
+     *
+     * @return void
+     */
+    public function setBillType($billType = 'ALL')
+    {
+        $this->_values['bill_type'] = $billType;
+    }
+
+    /**
+     * 压缩账单
+     *
+     * - 非必传参数，固定值：GZIP，返回格式为.gzip的压缩包账单。不传则默认为数据流形式
+     *
+     * @param string $tarType
+     *
+     * @return void
+     */
+    public function setTarType($tarType = 'GZIP')
+    {
+        $this->_values['tar_type'] = $tarType;
+    }
+
+    /**
+     * 下载对账单
+     *
+     * @return array
+     */
+    public function downloadBill()
+    {
+        if (null === ($billDate = I::get($this->_values, 'bill_date'))) {
+            throw new Exception("缺少 bill_date 参数！");
+        }
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+            'bill_date' => $billDate,
+            'bill_type' => I::get($this->_values, 'bill_type'),
+            'tar_type' => I::get($this->_values, 'tar_type'),
+        ]);
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/downloadbill', Xml::fromArray($values));
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 设置资金账户类型
+     *
+     * - 账单的资金来源账户：
+     *      1. Basic  基本账户
+     *      2. Operation 运营账户
+     *      3. Fees 手续费账户
+     *
+     * @param string $accountType
+     *
+     * @return void
+     */
+    public function setAccountType($accountType)
+    {
+        $this->_values['account_type'] = $accountType;
+    }
+
+    /**
+     * 下载资金账单
+     *
+     * @return array
+     */
+    public function downloadFundFlow()
+    {
+        if (null === ($accoutType = I::get($this->_values, 'account_type'))) {
+            throw new Exception("缺少 account_type 参数！");
+        }
+        if (null === $this->_certPath) {
+            throw new Exception("请使用 setCertPath 提供证书路径");
+        }
+        if (null === $this->_certKeyPath) {
+            throw new Exception("请使用 setCertKeyPath 提供证书密钥路径");
+        }
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+            'sign_type' => 'HMAC-SHA256',
+            'bill_date' => I::get($this->_values, 'bill_date'),
+            'account_type' => $accoutType,
+            'tar_type' => I::get($this->_values, 'tar_type'),
+        ]);
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/downloadfundflow', Xml::fromArray($values), [], [
+            'cert' => $this->_certPath,
+            'ssl_key' => $this->_certKeyPath,
+        ]);
+        return Xml::toArray($responseBody);
+    }
+
+    /**
+     * 交易保障
+     *
+     * @todo 我不知道这货干嘛用的
+     *
+     * @return false
+     */
+    public function report()
+    {
+        return false;
+    }
+
+    /**
+     * 设置开始时间
+     *
+     * - 按用户评论时间批量拉取的起始时间，格式为yyyyMMddHHmmss
+     *
+     * @param string $beginTime
+     *
+     * @return void
+     */
+    public function setBeginTime($beginTime)
+    {
+        $this->_values['begin_time'] = $beginTime;
+    }
+
+    /**
+     * 设置结束时间
+     *
+     * - 按用户评论时间批量拉取的结束时间，格式为yyyyMMddHHmmss
+     *
+     * @param string $endTime
+     *
+     * @return void
+     */
+    public function setEndTime($endTime)
+    {
+        $this->_values['end_time'] = $endTime;
+    }
+
+    /**
+     * 设置条数
+     *
+     * - 一次拉取的条数, 最大值是200，默认是200
+     *
+     * @param integer $limit
+     *
+     * @return void
+     */
+    public function setLimit($limit = 200)
+    {
+        $this->_values['limit'] = $limit;
+    }
+
+    /**
+     * 拉取订单评价数据
+     *
+     * @todo 此接口有问题，但我也不知道为什么
+     *
+     * @return array
+     */
+    public function batchQueryComment()
+    {
+        if (null === ($beginTime = I::get($this->_values, 'begin_time'))) {
+            throw new Exception("缺少 begin_time 参数！");
+        }
+        if (null === ($endTime = I::get($this->_values, 'end_time'))) {
+            throw new Exception("缺少 end_time 参数！");
+        }
+        if (null === ($offset = I::get($this->_values, 'offset'))) {
+            throw new Exception("缺少 offset 参数！");
+        }
+        if (null === $this->_certPath) {
+            throw new Exception("请使用 setCertPath 提供证书路径");
+        }
+        if (null === $this->_certKeyPath) {
+            throw new Exception("请使用 setCertKeyPath 提供证书密钥路径");
+        }
+        $values = array_filter([
+            'appid' => $this->_appId,
+            'mch_id' => $this->_mchId,
+            'nonce_str' => Strings::random(),
+            'sign_type' => 'HMAC-SHA256',
+            'begin_time' => $beginTime,
+            'end_time' => $endTime,
+            'limit' => I::get($this->_values, 'limit'),
+        ]);
+        $values['offset'] = $offset;
+        $values['sign'] = $this->getSign($values);
+        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/batchquerycomment', Xml::fromArray($values), [], [
+            'cert' => $this->_certPath,
+            'ssl_key' => $this->_certKeyPath,
+        ]);
         return Xml::toArray($responseBody);
     }
 }
