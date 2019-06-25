@@ -192,7 +192,7 @@ class Strings
      */
     public static function startsWith($string, $search)
     {
-        return (string)$search !== "" && mb_strpos($string, $search) === 0;
+        return (string) $search !== "" && mb_strpos($string, $search) === 0;
     }
 
     /**
@@ -205,7 +205,7 @@ class Strings
      */
     public static function endsWith($string, $search)
     {
-        return (string)$search !== "" && mb_substr($string, -static::length($search)) === $search;
+        return (string) $search !== "" && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
@@ -218,7 +218,7 @@ class Strings
      */
     public static function contains($string, $search)
     {
-        return (string)$search !== "" && mb_strpos($string, $search) !== false;
+        return (string) $search !== "" && mb_strpos($string, $search) !== false;
     }
 
     /**
@@ -352,6 +352,29 @@ class Strings
             }
         }
         return $isEqual;
+    }
+
+    /**
+     * 拆分成数组
+     *
+     * @param array|string $mixed 数组或者字符串
+     * @param string $delimiter 分隔符，默认英文逗号（,）
+     * @param boolean $combine 是否合并相同元素，默认 false，即不合并
+     *
+     * @return array
+     */
+    public static function toArray($mixed, $delimiter = ',', $combine = false)
+    {
+        $array = [];
+        if (is_string($mixed)) {
+            $array = explode($delimiter, $mixed);
+        } elseif (is_array($mixed)) {
+            $array = $mixed;
+        }
+        if (true === $combine) {
+            $array = Arrays::toPart($array);
+        }
+        return $array;
     }
 
 }
