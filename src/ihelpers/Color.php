@@ -9,6 +9,7 @@
 
 namespace icy2003\php\ihelpers;
 
+use Exception;
 use icy2003\php\I;
 
 /**
@@ -250,31 +251,6 @@ class Color
     ];
 
     /**
-     * 单例对象
-     *
-     * @var static
-     */
-    protected static $_instance;
-
-    /**
-     * 构造函数
-     *
-     * @return void
-     */
-    private function __construct()
-    {
-    }
-
-    /**
-     * 克隆函数
-     *
-     * @return void
-     */
-    private function __clone()
-    {
-    }
-
-    /**
      * 颜色模式
      *
      * @var string
@@ -289,100 +265,104 @@ class Color
     protected $_color;
 
     /**
+     * 颜色转换后的值
+     *
+     * @var mixed
+     */
+    protected $_data;
+
+    /**
      * 创建单例
      *
-     * @param mixed $color 颜色值。支持三种颜色模式互转：十六进制、RGB、CMYK，也支持颜色名（'red'）转成这三种：
+     * @param mixed $color 颜色值。
      *
-     *              1、十六进制。传入十六进制数字（0xFF0000）或字符串（'FF0000'）
-     *
-     *              2、RGB。传入三个元素的数组（[255, 0, 0]）
-     *
-     *              3、CMYK。传入四个元素的数组（[0.0, 90.2, 82.9, 0.0]）
-     *
-     * @return static
+     * - 支持三种颜色模式互转：十六进制、RGB、CMYK，也支持颜色名（'red'）转成这三种：
+     *      1. 十六进制。传入十六进制数字（0xFF0000）或字符串（'FF0000'）
+     *      2. RGB。传入三个元素的数组（[255, 0, 0]）
+     *      3. CMYK。传入四个元素的数组（[0.0, 90.2, 82.9, 0.0]）
      */
-    public static function create($color)
+    public function __construct($color)
     {
-        if (!static::$_instance instanceof static ) {
-            static::$_instance = new static();
-            if (is_array($color)) {
-                static::$_instance->_color = $color;
-                if (3 === count($color)) {
-                    static::$_instance->_type = 'rgb';
-                } elseif (4 === count($color)) {
-                    static::$_instance->_type = 'cmyk';
-                }
-            } else {
-                // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
-                $hex = I::get(static::$_names, $color, $color);
-                if ($hex > 0xFFFFFF || $hex < 0) {
-                    throw new \Exception('错误的颜色值：' . $color);
-                }
-                // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
-                if (is_string($hex)) {
-                    $hex = hexdec($hex);
-                }
-                static::$_instance->_type = 'hex';
-                static::$_instance->_color = $hex;
+        if (is_array($color)) {
+            $this->_color = $color;
+            if (3 === count($color)) {
+                $this->_type = 'rgb';
+            } elseif (4 === count($color)) {
+                $this->_type = 'cmyk';
             }
-            if ('unknow' === static::$_instance->_type) {
-                throw new \Exception('错误的颜色类型');
+        } else {
+            // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
+            $hex = I::get(static::$_names, $color, $color);
+            if ($hex > 0xFFFFFF || $hex < 0) {
+                throw new Exception('错误的颜色值：' . $color);
             }
+            // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
+            if (is_string($hex)) {
+                $hex = hexdec($hex);
+            }
+            $this->_type = 'hex';
+            $this->_color = $hex;
         }
-        return static::$_instance;
+        if ('unknow' === $this->_type) {
+            throw new Exception('错误的颜色类型');
+        }
     }
 
     /**
      * 转成 RGB
      *
-     * @return array
+     * @return static
      */
     public function toRGB()
     {
         if ('rgb' === $this->_type) {
-            return array_map(function ($i) {
+            $this->_data = array_map(function ($i) {
                 return (0.5 + $i) | 0;
             }, $this->_color);
         } elseif ('hex' === $this->_type) {
             $red = (($this->_color & 0xFF0000) >> 16);
             $green = (($this->_color & 0x00FF00) >> 8);
             $blue = (($this->_color & 0x0000FF));
-            return [$red, $green, $blue];
+            $this->_data = [$red, $green, $blue];
         } elseif ('cmyk' === $this->_type) {
             $cyan = ($this->_color[0] * (1 - $this->_color[3]) + $this->_color[3]);
             $magenta = ($this->_color[1] * (1 - $this->_color[3]) + $this->_color[3]);
             $yellow = ($this->_color[2] * (1 - $this->_color[3]) + $this->_color[3]);
-            return [(1 - $cyan) * 255, (1 - $magenta) * 255, (1 - $yellow) * 255];
+            $this->_data = [(1 - $cyan) * 255, (1 - $magenta) * 255, (1 - $yellow) * 255];
         }
+
+        return $this;
     }
 
     /**
      * 转成十六进制字符串
      *
-     * @return string
+     * @return static
      */
     public function toHex()
     {
         if ('hex' === $this->_type) {
-            return $this->_color;
+            $this->_data = $this->_color;
         } elseif ('rgb' === $this->_type) {
-            return strtoupper(dechex($this->_color[0] << 16 | $this->_color[1] << 8 | $this->_color[2]));
+            $this->_data = strtoupper(dechex($this->_color[0] << 16 | $this->_color[1] << 8 | $this->_color[2]));
         } elseif ('cmyk' === $this->_type) {
-            $this->_color = $this->toRGB();
+            $this->_color = $this->toRGB()->data();
             $this->_type = 'rgb';
-            return $this->toHex();
+            $this->_data = $this->toHex()->data();
         }
+
+        return $this;
     }
 
     /**
      * 转成 CMYK
      *
-     * @return array
+     * @return static
      */
     public function toCMYK()
     {
         if ('cmyk' === $this->_type) {
-            return array_map(function ($i) {
+            $this->_data = array_map(function ($i) {
                 return sprintf('%01.4f', $i);
             }, $this->_color);
         } elseif ('rgb' === $this->_type) {
@@ -412,11 +392,33 @@ class Color
             $key = $var_K;
             $this->_color = [$cyan, $magenta, $yellow, $key];
             $this->_type = 'cmyk';
-            return $this->toCMYK();
+            $this->data = $this->toCMYK()->data();
         } elseif ('hex' === $this->_type) {
-            $this->_color = $this->toRGB();
+            $this->_color = $this->toRGB()->data();
             $this->_type = 'rgb';
-            return $this->toCMYK();
+            $this->_data = $this->toCMYK()->data();
         }
+
+        return $this;
+    }
+
+    /**
+     * 返回颜色值
+     *
+     * @return mixed
+     */
+    public function data()
+    {
+        return $this->_data;
+    }
+
+    /**
+     * __toString
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return implode(',', $this->data());
     }
 }
