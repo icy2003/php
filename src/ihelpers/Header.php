@@ -9,6 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * 对 header 函数的一些封装
  */
@@ -86,4 +88,23 @@ class Header
         header('Content-Type: text/html; charset=utf-8');
     }
 
+    /**
+     * 设置可跨域的域名
+     *
+     * @param array|string $urls 跨域域名列表，格式例如：http://127.0.0.1:8080
+     *
+     * @return void
+     */
+    public static function allowOrigin($urls = null)
+    {
+        if (null === $urls) {
+            header('Access-Control-Allow-Origin:*');
+        } else {
+            $origin = I::get($_SERVER, 'HTTP_ORIGIN');
+            $urls = Strings::toArray($urls);
+            if (is_array($urls) && in_array($origin, $urls)) {
+                header('Access-Control-Allow-Origin:' . $origin);
+            }
+        }
+    }
 }
