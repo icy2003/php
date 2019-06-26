@@ -124,7 +124,7 @@ class Arrays
     }
 
     /**
-     * 检查数组里是否有指定的所有键名或索引
+     * 检查数组里是否有指定的某些键名或索引
      *
      * @param array $keys 要检查的键
      * @param array $array
@@ -135,6 +135,34 @@ class Arrays
     public static function keyExistsSome($keys, $array, &$find = null)
     {
         return !I::isEmpty($find = array_intersect($keys, array_keys($array)));
+    }
+
+    /**
+     * 检查数组里是否有指定的所有值
+     *
+     * @param array $values 要检查的值
+     * @param array $array
+     * @param array $diff 引用返回不包含的值
+     *
+     * @return array
+     */
+    public static function valueExistsAll($values, $array, &$diff = null)
+    {
+        return I::isEmpty($diff = array_diff($values, array_values($array)));
+    }
+
+    /**
+     * 检查数组里是否有指定的某些值
+     *
+     * @param array $values 要检查的值
+     * @param array $array
+     * @param array $find 引用返回包含的值
+     *
+     * @return array
+     */
+    public static function valueExistsSome($values, $array, &$find = null)
+    {
+        return !I::isEmpty($find = array_intersect($values, array_values($array)));
     }
 
     /**
@@ -609,5 +637,22 @@ class Arrays
     public static function colRowCount($array)
     {
         return [self::count(self::first($array)), self::count($array)];
+    }
+
+    /**
+     * 将 CSV 文本转成数组
+     *
+     * @param string $csvString
+     *
+     * @return array
+     */
+    public static function fromCsv($csvString)
+    {
+        $lines = explode(PHP_EOL, $csvString);
+        $array = [];
+        foreach ($lines as $line) {
+            $array[] = explode(',', $line);
+        }
+        return $array;
     }
 }
