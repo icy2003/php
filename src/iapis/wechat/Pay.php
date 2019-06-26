@@ -164,7 +164,7 @@ class Pay
      */
     public function isSuccess()
     {
-        return 'SUCCESS' === I::get($this->_result, 'return_code') && 'SUCCESS' === I::get($this->_values, 'result_code');
+        return 'SUCCESS' === I::get($this->_result, 'return_code');
     }
 
     /**
