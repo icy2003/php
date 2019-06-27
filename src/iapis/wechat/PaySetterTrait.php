@@ -367,11 +367,19 @@ trait PaySetterTrait
      * 场景信息
      *
      * - 该字段常用于线下活动时的场景信息上报，支持上报实际门店信息，商户也可以按需求自己上报相关信息
-     * - 涉及字段：
-     *      1. id：门店编号，由商户自定义
-     *      2. name：门店名称 ，由商户自定义
-     *      3. area_code：门店所在地行政区划码，详细见《[最新县及县以上行政区划代码](https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv)》
-     *      4. address：门店详细地址 ，由商户自定义
+     * - NATIVE（扫码支付）涉及字段：
+     *      - store_info：
+     *          - id：门店编号，由商户自定义
+     *          - name：门店名称 ，由商户自定义
+     *          - area_code：门店所在地行政区划码，详细见《[最新县及县以上行政区划代码](https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv)》
+     *          - address：门店详细地址 ，由商户自定义
+     * - MWEB（H5支付）涉及字段：
+     *      - h5_info：
+     *          - type：场景类型，如：IOS、Android、Wap
+     *          - app_name：应用名
+     *          - package_name：安卓填，包名
+     *          - bundle_id：IOS填，bundle_id
+     *          - wap_name：WAP网站填，WAP 网站名
      *
      * @param array $sceneInfo
      *

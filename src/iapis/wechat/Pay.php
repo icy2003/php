@@ -138,6 +138,12 @@ class Pay
             } else {
                 $values['openid'] = $openId;
             }
+        } elseif ('MWEB' === $tradeType) {
+            if (null === ($sceneInfo = I::get($this->_values, 'scene_info'))) {
+                throw new Exception('缺少统一支付接口必填参数：scene_info');
+            } else {
+                $values['scene_info'] = $sceneInfo;
+            }
         }
         $values['sign'] = $this->getSign($values);
         $responseXml = Http::body('https://api.mch.weixin.qq.com/pay/unifiedorder', Xml::fromArray($values));
@@ -188,6 +194,11 @@ class Pay
                 'timestamp' => time(),
             ];
             $array['sign'] = $this->getSign($array);
+        }
+        if ('MWEB' === I::get($this->_values, 'trade_type')) {
+            $array = [
+                'mweb_url' => I::get($this->_result, 'mweb_url'),
+            ];
         }
         return $array;
     }
