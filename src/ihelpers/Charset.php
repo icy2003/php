@@ -43,13 +43,8 @@ class Charset
      */
     public static function toUtf($string, $charset = '')
     {
-        $charset = $charset ?: static::detect($string);
-        $converted = @iconv($charset, 'UTF-8//TRANSLIT//IGNORE', $string);
-        if (false === $converted) {
-            $converted = mb_convert_encoding($string, 'UTF-8');
-        }
-
-        return $converted;
+        $charset = $charset ?: self::detect($string);
+        return self::convertTo($string, 'UTF-8');
     }
 
     /**
@@ -62,13 +57,8 @@ class Charset
      */
     public static function toCn($string, $charset = '')
     {
-        $charset = $charset ?: static::detect($string);
-        $converted = @iconv($charset, 'EUC-CN//TRANSLIT//IGNORE', $string);
-        if (false === $converted) {
-            $converted = mb_convert_encoding($string, 'EUC-CN');
-        }
-
-        return $converted;
+        $charset = $charset ?: self::detect($string);
+        return self::convertTo($string, 'EUC-CN');
     }
 
     /**
@@ -80,6 +70,25 @@ class Charset
      */
     public static function isUtf8($string)
     {
-        return 'UTF-8' === static::detect($string);
+        return 'UTF-8' === self::detect($string);
+    }
+
+    /**
+     * 转换编码
+     *
+     * @param string $string 待转换的字符串
+     * @param string $to 目标编码
+     *
+     * @return string
+     */
+    public static function convertTo($string, $targetCharset)
+    {
+        $charset = self::detect($string);
+        $converted = @iconv($charset, $targetCharset . '//TRANSLIT//IGNORE', $string);
+        if (false === $converted) {
+            $converted = mb_convert_encoding($string, $targetCharset);
+        }
+
+        return $converted;
     }
 }
