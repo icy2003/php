@@ -65,25 +65,27 @@ class I
      * @param mixed $value 值
      * @param boolean $overWrite 如果对应的值存在，是否用给定的值覆盖，默认 true，即：是
      *
-     * @return void
+     * @return mixed
      */
     public static function set(&$mixed, $key, $value, $overWrite = true)
     {
-        if (is_array($mixed)) {
-            if (false === isset($mixed[$key]) || true === $overWrite) {
+        $get = self::get($mixed, $key);
+        if (null === $get || true === $overWrite) {
+            if (is_array($mixed)) {
                 $mixed[$key] = $value;
-            }
-        } elseif (is_object($mixed)) {
-            $originValue = self::get($mixed, $key);
-            if (null === $originValue || true === $overWrite) {
+            } elseif (is_object($mixed)) {
                 $method = 'set' . ucfirst(Strings::underline2camel($key));
                 if (method_exists($mixed, $method)) {
                     $mixed->$method($value);
                 } elseif (property_exists($mixed, $key)) {
                     $mixed->$key = $value;
+                } else {
+                    throw new Exception('无法设置值');
                 }
             }
+            return $value;
         }
+        return $get;
     }
 
     /**
