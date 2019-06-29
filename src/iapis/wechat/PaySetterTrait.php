@@ -49,11 +49,12 @@ trait PaySetterTrait
      *
      * @param string $certPath
      *
-     * @return void
+     * @return static
      */
     public function setCertPath($certPath)
     {
         $this->_certPath = $certPath;
+        return $this;
     }
 
     /**
@@ -68,11 +69,12 @@ trait PaySetterTrait
      *
      * @param string $certKeyPath
      *
-     * @return void
+     * @return static
      */
     public function setCertKeyPath($certKeyPath)
     {
         $this->_certKeyPath = $certKeyPath;
+        return $this;
     }
 
     /**
