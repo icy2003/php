@@ -522,12 +522,12 @@ class Arrays
      */
     public static function first($array, $pos = 1)
     {
-        if (0 === count($array)) {
+        if (0 === ($count = self::count($array))) {
             return null;
         }
-        $p = $pos % count($array);
+        $p = $pos % $count;
         if (0 === $p) {
-            $p = count($array);
+            $p = $count;
         }
         for ($i = 1; $i < $p; $i++) {
             next($array);
@@ -549,12 +549,12 @@ class Arrays
      */
     public static function last($array, $pos = 1)
     {
-        if (0 === count($array)) {
+        if (0 === ($count = self::count($array))) {
             return null;
         }
-        $p = $pos % count($array);
+        $p = $pos % $count;
         if (0 === $p) {
-            $p = count($array);
+            $p = $count;
         }
         end($array);
         for ($i = 1; $i < $p; $i++) {
