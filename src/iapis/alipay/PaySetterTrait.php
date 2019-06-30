@@ -23,6 +23,11 @@ trait PaySetterTrait
      */
     protected $_appId;
 
+    /**
+     * 私钥
+     *
+     * @var string
+     */
     protected $_rsaPrivateKey;
 
     /**

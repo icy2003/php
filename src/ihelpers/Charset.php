@@ -77,7 +77,7 @@ class Charset
      * 转换编码
      *
      * @param string $string 待转换的字符串
-     * @param string $to 目标编码
+     * @param string $targetCharset 目标编码
      *
      * @return string
      */

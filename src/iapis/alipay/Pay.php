@@ -1,14 +1,26 @@
 <?php
-
+/**
+ * Class Pay
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 namespace icy2003\php\iapis\alipay;
 
 use Exception;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Base64;
 use icy2003\php\ihelpers\Charset;
+use icy2003\php\ihelpers\Crypto;
 use icy2003\php\ihelpers\Json;
 use icy2003\php\ihelpers\Strings;
 
+/**
+ * 支付宝支付
+ *
+ * - 参看[支付宝支付开发文档](https://docs.open.alipay.com/)
+ */
 class Pay
 {
     use PaySetterTrait;
@@ -80,13 +92,15 @@ class Pay
             }
         }
         $string = implode('&', $array);
-        $res = '-----BEGIN RSA PRIVATE KEY-----' . PHP_EOL .
-        wordwrap($this->_rsaPrivateKey, 64, PHP_EOL, true) . PHP_EOL .
-            '-----END RSA PRIVATE KEY-----';
-        if ('RSA2' === I::get($this->_values, 'sign_type', 'RSA2')) {
-            openssl_sign($string, $sign, $res, OPENSSL_ALGO_SHA256);
+        $crypto = new Crypto();
+        $crypto->setPair([null, $this->_rsaPrivateKey]);
+        $signType = I::get($this->_values, 'sign_type', 'RSA2');
+        if ('RSA' === $signType) {
+            $sign = $crypto->getSignature($string, OPENSSL_ALGO_SHA1);
+        } elseif ('RSA2' === $signType) {
+            $sign = $crypto->getSignature($string, OPENSSL_ALGO_SHA256);
         } else {
-            openssl_sign($string, $sign, $res);
+            throw new Exception("不支持的签名类型");
         }
         $sign = Base64::encode($sign);
         return $sign;
