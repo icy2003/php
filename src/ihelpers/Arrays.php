@@ -10,6 +10,7 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
+use LogicException;
 
 /**
  * 数组类
@@ -47,7 +48,9 @@ class Arrays
     }
 
     /**
-     * 选取数组中某几项字段
+     * 选取二维（或者更高）数组中指定键的某几列
+     *
+     * - 简单理解就是：从数据库里查出来几条数据，只拿其中的几个属性
      *
      * @param array $array
      * @param array $keys 某几项字段，支持 I::get 的键格式
@@ -69,10 +72,11 @@ class Arrays
     }
 
     /**
-     * 返回数组中指定的一列
+     * 返回二维（或者更高）数组中指定键的一列的所有值
      *
      * - array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
      * - 如果需要取某几项，使用 Arrays::columns
+     * - 简单理解就是：从数据库里查出来几条数据，只要其中某个属性的所有值
      *
      * @see http://php.net/array_column
      *
@@ -101,6 +105,32 @@ class Arrays
 
             return $result;
         }
+    }
+
+    /**
+     * 获取指定某些键的项
+     *
+     * @param array $array
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function values($array, $keys)
+    {
+        return array_intersect_key($array, array_flip($keys));
+    }
+
+    /**
+     * 获取指定除了某些键的项
+     *
+     * @param array $array
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function valuesExcepted($array, $keys)
+    {
+        return array_diff_key($array, array_flip($keys));
     }
 
     /**
@@ -167,6 +197,8 @@ class Arrays
 
     /**
      * 参照 PHP 的 array_combine 函数，array_combine 得到的是一行记录的格式，该函数得到多行
+     *
+     * - arrays 里的每个数组会和 keys 使用 self::combine 合并，最终合并成为一个二维数组
      *
      * @param array $keys 作为键的字段
      * @param array $arrays
@@ -270,14 +302,14 @@ class Arrays
     {
         if ($start < $end) {
             if ($step <= 0) {
-                throw new \LogicException('步长必须大于 0');
+                throw new LogicException('步长必须大于 0');
             }
             for ($i = $start; $i <= $end; $i += $step) {
                 yield $i;
             }
         } elseif ($start > $end) {
             if ($step >= 0) {
-                throw new \LogicException('步长必须小于 0');
+                throw new LogicException('步长必须小于 0');
             }
             for ($i = $start; $i >= $end; $i += $step) {
                 yield $i;
