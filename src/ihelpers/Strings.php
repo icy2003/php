@@ -190,7 +190,7 @@ class Strings
      *
      * @return boolean
      */
-    public static function startsWith($string, $search)
+    public static function isStartsWith($string, $search)
     {
         return (string) $search !== "" && mb_strpos($string, $search) === 0;
     }
@@ -203,7 +203,7 @@ class Strings
      *
      * @return boolean
      */
-    public static function endsWith($string, $search)
+    public static function isEndsWith($string, $search)
     {
         return (string) $search !== "" && mb_substr($string, -static::length($search)) === $search;
     }
@@ -216,9 +216,41 @@ class Strings
      *
      * @return boolean
      */
-    public static function contains($string, $search)
+    public static function isContains($string, $search)
     {
         return (string) $search !== "" && mb_strpos($string, $search) !== false;
+    }
+
+    /**
+     * 在字符串里找子串的前部分
+     *
+     * @param string $string
+     * @param string $search
+     *
+     * @return string
+     */
+    public static function partBefore($string, $search)
+    {
+        if (self::isContains($string, $search)) {
+            return mb_substr($string, 0, mb_strpos($string, $search));
+        }
+        return "";
+    }
+
+    /**
+     * 在字符串里找子串的后部分
+     *
+     * @param string $string
+     * @param string $search
+     *
+     * @return string
+     */
+    public static function partAfter($string, $search)
+    {
+        if (self::isContains($string, $search)) {
+            return mb_substr($string, mb_strpos($string, $search) + 1, self::length($string) - 1);
+        }
+        return "";
     }
 
     /**
@@ -228,9 +260,9 @@ class Strings
      *
      * @return string
      */
-    public static function strReverse($string)
+    public static function reverse($string)
     {
-        return implode('', array_reverse(self::strSplit($string)));
+        return implode('', array_reverse(self::split($string)));
     }
 
     /**
@@ -240,7 +272,7 @@ class Strings
      *
      * @return array
      */
-    public static function strSplit($string)
+    public static function split($string)
     {
         return preg_split('/(?<!^)(?!$)/u', $string);
     }
@@ -296,7 +328,7 @@ class Strings
      */
     public static function isVariable($name, $boundary = ['{{', '}}'])
     {
-        return self::startsWith($name, $boundary[0]) && self::endsWith($name, $boundary[1]);
+        return self::isStartsWith($name, $boundary[0]) && self::isEndsWith($name, $boundary[1]);
     }
 
     /**
@@ -325,24 +357,23 @@ class Strings
      *
      * @param string $string1 第一个字符串
      * @param string $string2 第二个字符串
-     * @param boolean $ignoreCase 是否忽略大小写，默认 true，即：是
      * @param array $array 看起来像的字符的列表，默认 ['0o', 'yv', 'ij', '1l']
      *
      * @return boolean
      */
-    public static function lookLike($string1, $string2, $ignoreCase = true, $array = ['0o', 'yv', 'ij', '1l'])
+    public static function looksLike($string1, $string2, $array = ['0oO', 'yv', 'ij', '1lI'])
     {
-        $array1 = self::strSplit($string1);
-        $array2 = self::strSplit($string2);
+        $array1 = self::split($string1);
+        $array2 = self::split($string2);
         foreach ($array1 as $index => $char1) {
-            $char1 = true === $ignoreCase ? strtolower($char1) : $char1;
-            $char2 = true === $ignoreCase ? strtolower($array2[$index]) : $array2[$index];
+            $char1 = strtolower($char1);
+            $char2 = strtolower($array2[$index]);
             $isEqual = false;
             if ($char1 == $char2) {
                 $isEqual = true;
             }
             foreach ($array as $row) {
-                if (Strings::contains($row, $char1) && Strings::contains($row, $char2)) {
+                if (Strings::isContains($row, $char1) && Strings::isContains($row, $char2)) {
                     $isEqual = true;
                     break;
                 }

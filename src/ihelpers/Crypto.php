@@ -197,7 +197,7 @@ class Crypto
         }
         if (false !== $pair[0]) {
             $this->_pemPublic = $pair[0];
-            if (false === Strings::contains($this->_pemPublic, "\n")) {
+            if (false === Strings::isContains($this->_pemPublic, "\n")) {
                 $this->_pemPublic = "-----BEGIN PUBLIC KEY-----\n" .
                 chunk_split($this->_pemPublic, 64, "\n") .
                     '-----END PUBLIC KEY-----';
@@ -205,7 +205,7 @@ class Crypto
         }
         if (false !== $pair[1]) {
             $this->_pemPrivate = $pair[1];
-            if (false === Strings::contains($this->_pemPrivate, "\n")) {
+            if (false === Strings::isContains($this->_pemPrivate, "\n")) {
                 $this->_pemPrivate = "-----BEGIN PRIVATE KEY-----\n" .
                 chunk_split($this->_pemPrivate, 64, "\n") .
                     '-----END PRIVATE KEY-----';

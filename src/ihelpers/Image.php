@@ -360,7 +360,7 @@ class Image
                 imagestring($image, 1, mt_rand(-10, $size[0]), mt_rand(-10, $size[1]), Strings::random(1), $noiseColor);
             }
         }
-        $codeArray = Strings::strSplit($code);
+        $codeArray = Strings::split($code);
         for ($i = 0; $i < $codeLength; ++$i) {
             $color = imagecolorallocate($image, mt_rand(0, 100), mt_rand(20, 120), mt_rand(50, 150));
             imagettftext($image, $fontSize, mt_rand(-10, 10), $margin, mt_rand($base - $baseOffset, $base + $baseOffset), $color, $fontPath, $codeArray[$i]);
