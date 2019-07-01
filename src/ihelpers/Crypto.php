@@ -397,9 +397,15 @@ class Crypto
      */
     protected $_pemCert;
     /**
+     * pem 格式 csr（证书请求）
+     *
+     * @var string
+     */
+    protected $_pemCsr;
+    /**
      * p12 格式的私钥
      *
-     * @var [type]
+     * @var string
      */
     protected $_p12Private;
 
@@ -421,6 +427,7 @@ class Crypto
         $x509 = openssl_csr_sign($csr, null, $this->_pemPrivate, 365, $this->_config);
         // 将 x509 以PEM编码的格式导出
         openssl_x509_export($x509, $this->_pemCert);
+        openssl_csr_export($csr, $this->_pemCsr);
         // 将 PKCS#12 兼容证书存储文件导出到变量
         openssl_pkcs12_export($x509, $this->_p12Private, $this->_pemPrivate, $this->_password);
         return $this;
@@ -432,6 +439,7 @@ class Crypto
      * - pemPublic：pem 格式的公钥
      * - pemPrivate：pem 格式的私钥
      * - pemCert：pem 格式的证书
+     * - pemCsr：pem 格式的CSR（证书请求）
      * - p12Private：p12 格式的私钥
      *
      * @return array
@@ -442,6 +450,7 @@ class Crypto
             'pemPublic' => $this->_pemPublic,
             'pemPrivate' => $this->_pemPrivate,
             'pemCert' => $this->_pemCert,
+            'pemCsr' => $this->_pemCsr,
             'p12Private' => $this->_p12Private,
         ];
     }
