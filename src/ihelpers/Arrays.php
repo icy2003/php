@@ -687,4 +687,31 @@ class Arrays
         }
         return $array;
     }
+
+    /**
+     * 在数组中搜索给定的值，如果成功则返回首个相应的键名
+     *
+     * - 第一参数如果是布尔值，则此方法等同于 array_search
+     * - 第一参数如果是回调函数，则找到的条件为：回调值为 true
+     * - 第三参数如果是 false，则回调值只需要 true 值即可（例如：1）
+     *
+     * @param mixed|callback $search 搜索的值
+     * @param array $array 这个数组
+     * @param boolean $isStrict 是否检查完全相同的元素
+     *
+     * @return mixed
+     */
+    public static function search($search, $array, $isStrict = false)
+    {
+        if (false === is_callable($search)) {
+            return array_search($search, $array, $isStrict);
+        }
+        foreach ($array as $key => $row) {
+            $result = I::trigger($search, [$row]);
+            if (true === $isStrict && true === $result || false === $isStrict && true == $result) {
+                return $key;
+            }
+        }
+        return false;
+    }
 }
