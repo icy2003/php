@@ -9,6 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * 字符串类
  */
@@ -315,7 +317,10 @@ class Strings
      */
     public static function toVariable($name, $boundary = ['{{', '}}'])
     {
-        return $boundary[0] . $name . $boundary[1];
+        if (is_string($boundary)) {
+            $boundary = [$boundary, $boundary];
+        }
+        return self::isContains($name, $boundary[0]) ? $name : $boundary[0] . $name . $boundary[1];
     }
 
     /**
@@ -437,6 +442,23 @@ class Strings
     public static function toNumber($string)
     {
         return $string + 0;
+    }
+
+    /**
+     * 用回调将分隔符拆分出来的字符串执行后，用分隔符合并回去
+     *
+     * @param callback $callback 回调
+     * @param string $string
+     * @param string $delimiter 分隔符，默认英文逗号（,）
+     */
+    public static function map($callback, $string, $delimiter = ',')
+    {
+        $arr = [];
+        $parts = explode($delimiter, $string);
+        foreach ($parts as $part) {
+            $arr[] = I::trigger($callback, [$part]);
+        }
+        return implode($delimiter, $arr);
     }
 
 }
