@@ -22,39 +22,76 @@ class I
     /**
      * 获取值
      *
-     * @param object|array $mixed 对象或数组。
-     * @param string $keyString 点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套。
-     * - 对于一个多维数组 `$array` 来说，`a.b.cd_ef` 会拿 `$array['a']['b']['cd_ef']` 的值。
-     * - 如果 `$array['a']` 是对象，则先检查 `getB` 方法，然后检查 `b`属性。
-     * - 如果 `$array['a']['b']` 是对象，则检查 `getCdEf` 方法，然后检查 `cd_ef` 属性。
-     * @param mixed $defaultValue 拿不到值时会直接返回该默认值。
+     * 支持类型：数组对象和 null、数字和字符串、布尔值、回调函数，依据数据类型有不同的含义（但是都很合理）
+     *
+     * @param mixed $mixed 混合类型
+     *      - 当 $mixed 为**数组或对象**时，此方法用于按照层级获取值，用法如下：
+     *          1. 对于一个多维数组 $array 来说，a.b.cd_ef 会拿 $array['a']['b']['cd_ef'] 的值
+     *          2. 如果 $array['a'] 是对象，则先检查 getB 方法，然后检查 b 属性
+     *          3. 如果 $array['a']['b'] 是对象，则检查 getCdEf 方法，然后检查 cd_ef 属性
+     *      - 当 $mixed 为**布尔值**（即表达式）时，等价于三元操作符，例如 I::get(1 > 2, '真', '假')
+     *      - 当 $mixed 为**字符串或数字**时，等价于 Strings::sub，截取字符串
+     *      - 当 $mixed 为 **null** 时，含义可被描述为：在使用 I::get($array, 'a.b', 1)，$array 意外的是 null，返回 1 是理所当然的
+     *      - 当 $mixed 为**回调函数**，$mixed 的执行结果将作为 I::get 的返回值
+     * @param mixed $keyString 取决于 $mixed 的类型：
+     *      - 当 $mixed 为**数组或对象**时，$keyString 表示：点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套
+     *      - 当 $mixed 为**布尔值**（即表达式）时，$keyString 表示：$mixed 为 true 时返回的值
+     *      - 当 $mixed 为**字符串或数字**时，$keyString 强制转为整型，表示：截取 $mixed 时，子串的起始位置
+     *      - 当 $mixed 为 **null** 时，此参数无效
+     *      - 当 $mixed 为**回调函数**，如果 $mixed 的返回值代表 true（如：1），则执行此回调
+     * @param mixed $defaultValue 取决于 $mixed 的类型：
+     *      - 当 $mixed 为**数组或对象**时，$defaultValue 表示：拿不到值时会直接返回该默认值
+     *      - 当 $mixed 为**布尔值**（即表达式）时，$defaultValue 表示：$mixed 为 false 时返回的值
+     *      - 当 $mixed 为**字符串或数字**时，$defaultValue 表示：截取 $mixed 时，子串的长度，null 时表示长度为 1
+     *      - 当 $mixed 为 **null** 时，返回 $defaultValue
+     *      - 当 $mixed 为**回调函数**，如果 $mixed 的返回值代表 false（如：0），则执行此回调
      *
      * @return mixed
      */
     public static function get($mixed, $keyString, $defaultValue = null)
     {
-        $keyArray = explode('.', $keyString);
-        foreach ($keyArray as $key) {
-            if (is_array($mixed)) {
-                if (array_key_exists($key, $mixed)) {
-                    $mixed = $mixed[$key];
+        if (true === $mixed) {
+            return $keyString;
+        } elseif (false === $mixed) {
+            return $defaultValue;
+        } elseif (is_array($mixed) || is_object($mixed)) {
+            $keyArray = explode('.', $keyString);
+            foreach ($keyArray as $key) {
+                if (is_array($mixed)) {
+                    if (array_key_exists($key, $mixed)) {
+                        $mixed = $mixed[$key];
+                    } else {
+                        return $defaultValue;
+                    }
+                } elseif (is_object($mixed)) {
+                    $method = 'get' . ucfirst(Strings::underline2camel($key));
+                    if (method_exists($mixed, $method)) {
+                        $mixed = $mixed->$method();
+                    } elseif (property_exists($mixed, $key)) {
+                        $mixed = $mixed->$key;
+                    } else {
+                        return $defaultValue;
+                    }
                 } else {
                     return $defaultValue;
                 }
-            } elseif (is_object($mixed)) {
-                $method = 'get' . ucfirst(Strings::underline2camel($key));
-                if (method_exists($mixed, $method)) {
-                    $mixed = $mixed->$method();
-                } elseif (property_exists($mixed, $key)) {
-                    $mixed = $mixed->$key;
-                } else {
-                    return $defaultValue;
-                }
-            } else {
-                return $defaultValue;
             }
+            return $mixed;
+        } elseif (is_string($mixed) || is_numeric($mixed)) {
+            $pos = (int) $keyString;
+            $length = null === $defaultValue ? 1 : (int) $defaultValue;
+            return Strings::sub($mixed, $pos, $length);
+        } elseif (null === $mixed) {
+            return $defaultValue;
+        } elseif (is_callable($mixed)) {
+            $result = self::trigger($mixed);
+            if ($result) {
+                self::trigger($keyString);
+            } else {
+                self::trigger($defaultValue);
+            }
+            return $result;
         }
-        return $mixed;
     }
 
     /**
