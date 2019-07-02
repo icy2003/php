@@ -1,55 +1,53 @@
 <?php
-
+/**
+ * Class Reflector
+ *
+ * @link https://www.icy2003.com/
+ * @author icy2003 <2317216477@qq.com>
+ * @copyright Copyright (c) 2017, icy2003
+ */
 namespace icy2003\php\ihelpers;
 
 use ReflectionClass;
 
-class Reflecter
+/**
+ * 反射类扩展
+ */
+class Reflector
 {
-    protected static $_instance;
 
-    private function __construct()
-    {
-    }
-
-    private function __clone()
-    {
-    }
     /**
-     * @param mixed $object @see http://php.net/manual/zh/reflectionclass.construct.php
+     * 加载一个类对象
      *
-     * @return static
+     * @param object $object
      */
-    public static function create()
+    public function __construct($object)
     {
-        if (!static::$_instance instanceof static ) {
-            static::$_instance = new static();
-        }
-        return static::$_instance;
-    }
-
-    public function load($object)
-    {
-        $this->__reflecter = new ReflectionClass($object);
-        return $this;
+        $this->__reflector = new ReflectionClass($object);
     }
 
     /**
      *
-     * @var \ReflectionClass $reflecter
+     * 反射对象
+     *
+     * @var \ReflectionClass $__reflector
      */
-    private $__reflecter;
+    private $__reflector;
 
     /**
+     *
+     * ReflectionClass 类调用方法
+     *
      * @see http://php.net/manual/zh/class.reflectionclass.php
      *
      * @param string $name 反射类可调用的方法
      * @param mixed $arguments 对应的参数
+     *
      * @return mixed
      */
     public function __call($name, $arguments)
     {
-        return $this->__reflecter->$name($arguments);
+        return $this->__reflector->$name($arguments);
     }
     /**
      * 获取当前类的所有方法
@@ -62,8 +60,8 @@ class Reflecter
         $callback = null === $callback ? function () {
             return true;
         } : $callback;
-        $currentClass = $this->__reflecter->getName();
-        $methods = $this->__reflecter->getMethods();
+        $currentClass = $this->__reflector->getName();
+        $methods = $this->__reflector->getMethods();
         $result = [];
         foreach ($methods as $method) {
             if ($currentClass === $method->class && $callback($method->name)) {
