@@ -265,46 +265,63 @@ class Color
     protected $_color;
 
     /**
-     * 颜色转换后的值
-     *
-     * @var mixed
+     * 自动类型：只支持 RGB、HEX、CMYK 的鉴别
      */
-    protected $_data;
+    const TYPE_AUTO = null;
+    /**
+     * RGB
+     */
+    const TYPE_RGB = 'rgb';
+    /**
+     * HEX
+     */
+    const TYPE_HEX = 'hex';
+    /**
+     * CMYK
+     */
+    const TYPE_CMYK = 'cmyk';
 
     /**
-     * 创建单例
+     * 创建颜色
      *
      * @param mixed $color 颜色值。
+     * @param string $type 颜色类型
      *
+     * - 如果给定 $type，则当前颜色被认作是 $type
      * - 支持三种颜色模式互转：十六进制、RGB、CMYK，也支持颜色名（'red'）转成这三种：
      *      1. 十六进制。传入十六进制数字（0xFF0000）或字符串（'FF0000'）
      *      2. RGB。传入三个元素的数组（[255, 0, 0]）
      *      3. CMYK。传入四个元素的数组（[0.0, 90.2, 82.9, 0.0]）
      */
-    public function __construct($color)
+    public function __construct($color, $type = self::TYPE_AUTO)
     {
-        if (is_array($color)) {
-            $this->_color = $color;
-            if (3 === count($color)) {
-                $this->_type = 'rgb';
-            } elseif (4 === count($color)) {
-                $this->_type = 'cmyk';
+        if (self::TYPE_AUTO === $type) {
+            if (is_array($color)) {
+                $this->_color = $color;
+                if (3 === count($color)) {
+                    $this->_type = self::TYPE_RGB;
+                } elseif (4 === count($color)) {
+                    $this->_type = self::TYPE_CMYK;
+                }
+            } else {
+                // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
+                $hex = I::get(static::$_names, $color, $color);
+                if ($hex > 0xFFFFFF || $hex < 0) {
+                    throw new Exception('错误的颜色值：' . $color);
+                }
+                // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
+                if (is_string($hex)) {
+                    $hex = hexdec($hex);
+                }
+                $this->_type = self::TYPE_HEX;
+                $this->_color = $hex;
+            }
+            if ('unknow' === $this->_type) {
+                throw new Exception('错误的颜色类型');
             }
         } else {
-            // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
-            $hex = I::get(static::$_names, $color, $color);
-            if ($hex > 0xFFFFFF || $hex < 0) {
-                throw new Exception('错误的颜色值：' . $color);
-            }
-            // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
-            if (is_string($hex)) {
-                $hex = hexdec($hex);
-            }
-            $this->_type = 'hex';
-            $this->_color = $hex;
-        }
-        if ('unknow' === $this->_type) {
-            throw new Exception('错误的颜色类型');
+            $this->_color = $color;
+            $this->_type = $type;
         }
     }
 
@@ -315,20 +332,24 @@ class Color
      */
     public function toRGB()
     {
-        if ('rgb' === $this->_type) {
-            $this->_data = array_map(function ($i) {
+        $type = $this->_type;
+        $this->_type = self::TYPE_RGB;
+        if (self::TYPE_RGB === $type) {
+            $this->_color = array_map(function ($i) {
                 return (0.5 + $i) | 0;
             }, $this->_color);
-        } elseif ('hex' === $this->_type) {
-            $red = (($this->_color & 0xFF0000) >> 16);
-            $green = (($this->_color & 0x00FF00) >> 8);
-            $blue = (($this->_color & 0x0000FF));
-            $this->_data = [$red, $green, $blue];
-        } elseif ('cmyk' === $this->_type) {
-            $cyan = ($this->_color[0] * (1 - $this->_color[3]) + $this->_color[3]);
-            $magenta = ($this->_color[1] * (1 - $this->_color[3]) + $this->_color[3]);
-            $yellow = ($this->_color[2] * (1 - $this->_color[3]) + $this->_color[3]);
-            $this->_data = [(1 - $cyan) * 255, (1 - $magenta) * 255, (1 - $yellow) * 255];
+        } elseif (self::TYPE_HEX === $type) {
+            $red = ($this->_color & 0xFF0000) >> 16;
+            $green = ($this->_color & 0x00FF00) >> 8;
+            $blue = ($this->_color & 0x0000FF);
+            $this->_color = [$red, $green, $blue];
+            $this->toRGB();
+        } elseif (self::TYPE_CMYK === $type) {
+            $cyan = $this->_color[0] * (1 - $this->_color[3]) + $this->_color[3];
+            $magenta = $this->_color[1] * (1 - $this->_color[3]) + $this->_color[3];
+            $yellow = $this->_color[2] * (1 - $this->_color[3]) + $this->_color[3];
+            $this->_color = [(1 - $cyan) * 255, (1 - $magenta) * 255, (1 - $yellow) * 255];
+            $this->toRGB();
         }
 
         return $this;
@@ -341,14 +362,15 @@ class Color
      */
     public function toHex()
     {
-        if ('hex' === $this->_type) {
-            $this->_data = $this->_color;
-        } elseif ('rgb' === $this->_type) {
-            $this->_data = strtoupper(dechex($this->_color[0] << 16 | $this->_color[1] << 8 | $this->_color[2]));
-        } elseif ('cmyk' === $this->_type) {
-            $this->_color = $this->toRGB()->data();
-            $this->_type = 'rgb';
-            $this->_data = $this->toHex()->data();
+        $type = $this->_type;
+        $this->_type = self::TYPE_HEX;
+        if (self::TYPE_HEX === $type) {
+            // 什么也不做
+        } elseif (self::TYPE_RGB === $type) {
+            $this->_color = strtoupper(dechex($this->_color[0] << 16 | $this->_color[1] << 8 | $this->_color[2]));
+            $this->toHex();
+        } elseif (self::TYPE_CMYK === $type) {
+            $this->toRGB()->toHex();
         }
 
         return $this;
@@ -361,11 +383,13 @@ class Color
      */
     public function toCMYK()
     {
-        if ('cmyk' === $this->_type) {
-            $this->_data = array_map(function ($i) {
+        $type = $this->_type;
+        $this->_type = self::TYPE_CMYK;
+        if (self::TYPE_CMYK === $type) {
+            $this->_color = array_map(function ($i) {
                 return sprintf('%01.4f', $i);
             }, $this->_color);
-        } elseif ('rgb' === $this->_type) {
+        } elseif (self::TYPE_RGB === $type) {
             $cyan = 1 - ($this->_color[0] / 255);
             $magenta = 1 - ($this->_color[1] / 255);
             $yellow = 1 - ($this->_color[2] / 255);
@@ -391,12 +415,9 @@ class Color
 
             $key = $var_K;
             $this->_color = [$cyan, $magenta, $yellow, $key];
-            $this->_type = 'cmyk';
-            $this->data = $this->toCMYK()->data();
-        } elseif ('hex' === $this->_type) {
-            $this->_color = $this->toRGB()->data();
-            $this->_type = 'rgb';
-            $this->_data = $this->toCMYK()->data();
+            $this->toCMYK();
+        } elseif (self::TYPE_HEX === $type) {
+            $this->toRGB()->toCMYK();
         }
 
         return $this;
@@ -407,9 +428,9 @@ class Color
      *
      * @return mixed
      */
-    public function data()
+    public function get()
     {
-        return $this->_data;
+        return $this->_color;
     }
 
     /**
@@ -419,6 +440,6 @@ class Color
      */
     public function __toString()
     {
-        return implode(',', $this->data());
+        return is_string($this->_color) ? $this->_color : implode(',', $this->_color);
     }
 }

@@ -8,6 +8,7 @@
  */
 namespace icy2003\php\ihelpers;
 
+use Exception;
 use icy2003\php\I;
 
 /**
@@ -15,29 +16,21 @@ use icy2003\php\I;
  */
 class Image
 {
-    /**
-     * 单例对象
-     *
-     * @var static
-     */
-    protected static $_instance;
 
     /**
-     * 构造函数
+     * 加载图片
+     *
+     * @param string $image 图片路径
      *
      * @return void
      */
-    private function __construct()
+    public function __construct($image)
     {
-    }
-
-    /**
-     * 克隆函数
-     *
-     * @return void
-     */
-    private function __clone()
-    {
+        $attributes = $this->__parseImage($image);
+        array_map(function ($value, $key) {
+            $this->_attributes[$key] = $value;
+        }, array_values($attributes), array_keys($attributes));
+        $this->_imageIn = $this->_attributes['object'];
     }
 
     /**
@@ -62,26 +55,6 @@ class Image
     protected $_attributes = [];
 
     /**
-     * 创建单例
-     *
-     * @param string $image 图片路径
-     *
-     * @return static
-     */
-    public static function create($image)
-    {
-        if (!static::$_instance instanceof static ) {
-            static::$_instance = new static();
-            $attributes = static::$_instance->__parseImage($image);
-            array_map(function ($value, $key) {
-                static::$_instance->_attributes[$key] = $value;
-            }, array_values($attributes), array_keys($attributes));
-            static::$_instance->_imageIn = static::$_instance->_attributes['object'];
-        }
-        return static::$_instance;
-    }
-
-    /**
      * 解析图片属性
      *
      * @param string $image 图片地址
@@ -91,7 +64,7 @@ class Image
     private function __parseImage($image)
     {
         if (false === ($size = @getimagesize($image))) {
-            throw new \Exception('不是有效的图片：' . $image);
+            throw new Exception('不是有效的图片：' . $image);
         }
         // static::$_instance->_attributes['size'] = $size;
         $width = $size[0];
@@ -177,7 +150,7 @@ class Image
             $zoomWidth *= $this->_attributes['width'];
             $zoomHeight *= $this->_attributes['height'];
         } else {
-            $zoom = (int)$zoom;
+            $zoom = (int) $zoom;
             $zoomWidth = $zoom * $this->_attributes['width'];
             $zoomHeight = $zoom * $this->_attributes['height'];
         }
@@ -215,7 +188,7 @@ class Image
      *
      * @param string $text 文字水印内容
      * @param array $pos 水印位置，默认在左上角的坐标原点
-     * @param mixed $fontColor 颜色值，支持类型参见 Color::create
+     * @param mixed $fontColor 颜色值，支持类型参见 Color
      * @param int $fontSize 字体大小，默认 12
      * @param string $fontPath 字体路径，默认宋体
      *
@@ -231,7 +204,7 @@ class Image
         // $textHeight = $temp[3] - $temp[7];
         imagesettile($this->_imageOut, $this->_imageIn);
         imagefilledrectangle($this->_imageOut, 0, 0, $this->_attributes['width'], $this->_attributes['height'], IMG_COLOR_TILED);
-        list($red, $green, $blue) = Color::create($fontColor)->toRGB();
+        list($red, $green, $blue) = (new Color($fontColor))->toRGB()->get();
         $text2 = imagecolorallocate($this->_imageOut, $red, $green, $blue);
         $posX = min($pos[0], $this->_attributes['width'] - $textWidth);
         $posY = min($pos[1], $this->_attributes['height']);
@@ -368,5 +341,13 @@ class Image
         }
         imagepng($image);
         imagedestroy($image);
+    }
+
+    /**
+     * 释放输入输出图片
+     */
+    public function __destruct()
+    {
+        $this->destroy();
     }
 }
