@@ -424,4 +424,19 @@ class Strings
         return mb_substr($string, $start, $length);
     }
 
+    /**
+     * 字符串转数字
+     *
+     * - 正则为 `/^\d\.*\d*[e|E]/` 的字符串会……，这是 PHP 特性！如果你不喜欢 PHP，右上角
+     * - 返回类型根据实际情况定，写成 double 是因为文档生成没法用 number
+     *
+     * @param string $string
+     *
+     * @return "double|integer"
+     */
+    public static function toNumber($string)
+    {
+        return $string + 0;
+    }
+
 }
