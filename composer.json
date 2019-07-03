@@ -16,11 +16,7 @@
     ],
     "require": {
         "php": ">=5.4",
-        "guzzlehttp/guzzle": "^6.3",
-        "codeception/codeception": "3.0.x-dev"
-    },
-    "require-dev": {
-        "phpdocumentor/phpdocumentor": "2.*"
+        "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {
         "psr-4": {
