@@ -14,6 +14,7 @@ use icy2003\php\ihelpers\Base64;
 use icy2003\php\ihelpers\Charset;
 use icy2003\php\ihelpers\Crypto;
 use icy2003\php\ihelpers\Json;
+use icy2003\php\ihelpers\Request;
 use icy2003\php\ihelpers\Strings;
 
 /**
@@ -114,6 +115,43 @@ class Pay
     public function getRes()
     {
         return $this->_result;
+    }
+
+    /**
+     * 支付结果通知以及退款结果通知的数据处理
+     *
+     * @return array
+     */
+    public function getNotifyArray()
+    {
+        return (new Request())->post();
+    }
+
+    /**
+     * 返回通知成功时发送给支付宝的字符串
+     *
+     * @return string
+     */
+    public function getNotifyReturn()
+    {
+        return 'success';
+    }
+
+    /**
+     * self::getNotifyArray 和 self::getNotifyReturn 的结合：通知为交易成功时，$callback 为 true，则输出成功给微信
+     *
+     * @param callback $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
+     *
+     * @return void
+     */
+    public function notify($callback = null)
+    {
+        $array = $this->getNotifyArray();
+        if (!empty($array)) {
+            if (null === $callback || true === I::trigger($callback, [$array])) {
+                echo $this->getNotifyReturn();
+            }
+        }
     }
 
 }

@@ -450,6 +450,8 @@ class Strings
      * @param callback $callback 回调
      * @param string $string
      * @param string $delimiter 分隔符，默认英文逗号（,）
+	 * 
+	 * @return string
      */
     public static function map($callback, $string, $delimiter = ',')
     {

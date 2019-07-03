@@ -237,7 +237,7 @@ class Pay
     }
 
     /**
-     * self::getNotifyArray 和 self::getNotifyXml 的结合：通知为交易成功时，$callback 为 true，则输出成功给微信
+     * self::getNotifyArray 和 self::getNotifyReturn 的结合：通知为交易成功时，$callback 为 true，则输出成功给微信
      *
      * @param callback $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
      *
@@ -246,8 +246,10 @@ class Pay
     public function notify($callback = null)
     {
         $array = $this->getNotifyArray();
-        if (null === $callback || true === I::trigger($callback, [$array])) {
-            echo $this->getNotifyXml();
+        if (!empty($array)) {
+            if (null === $callback || true === I::trigger($callback, [$array])) {
+                echo $this->getNotifyReturn();
+            }
         }
     }
 
