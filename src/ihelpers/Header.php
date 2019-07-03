@@ -89,15 +89,35 @@ class Header
     }
 
     /**
+     * 内容类型为 JSON
+     *
+     * @return void
+     */
+    public static function json()
+    {
+        header('Content-type: application/json');
+    }
+
+    /**
+     * 内容类型为 XML
+     *
+     * @return void
+     */
+    public static function xml()
+    {
+        header('Content-type: text/xml');
+    }
+
+    /**
      * 设置可跨域的域名
      *
      * @param array|string $urls 跨域域名列表，格式例如：http://127.0.0.1:8080
      *
      * @return void
      */
-    public static function allowOrigin($urls = null)
+    public static function allowOrigin($urls = '*')
     {
-        if (null === $urls) {
+        if ('*' === $urls) {
             header('Access-Control-Allow-Origin:*');
         } else {
             $origin = I::get($_SERVER, 'HTTP_ORIGIN');
@@ -106,5 +126,38 @@ class Header
                 header('Access-Control-Allow-Origin:' . $origin);
             }
         }
+    }
+
+    /**
+     * 修改 X-Powered-By信息
+     *
+     * @param string $string
+     *
+     * @return void
+     */
+    public static function xPoweredBy($string = 'icy2003')
+    {
+        header('X-Powered-By: ' . $string);
+    }
+
+    /**
+     * 告诉浏览器文档内容没有发生改变
+     *
+     * @return void
+     */
+    public static function notModified()
+    {
+        header('HTTP/1.1 304 Not Modified');
+    }
+
+    /**
+     * 禁用缓存
+     *
+     * @return void
+     */
+    public static function noCache()
+    {
+        header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
     }
 }
