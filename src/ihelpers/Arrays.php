@@ -48,27 +48,43 @@ class Arrays
     }
 
     /**
-     * 选取二维（或者更高）数组中指定键的某几列
+     * 选取数组中指定键的某几列
      *
      * - 简单理解就是：从数据库里查出来几条数据，只拿其中的几个属性
+     * - 当 $dimension 为 2 时，理解为从几条数据里拿属性
+     * - 当 $dimension 为 1 时，理解为从一条数据里拿属性
      *
      * @param array $array
-     * @param array $keys 某几项字段，支持 I::get 的键格式
+     * @param array $keys 某几项字段，支持 I::get 的键格式，如果给 null，则返回原数组
+     * @param integer $dimension 维度，只能为 1 或 2，默认 2，表示处理二维数组
      *
      * @return array
      *
      * @test icy2003\php_tests\ihelpers\ArraysTest::testColumns
      */
-    public static function columns($array, $keys)
+    public static function columns($array, $keys = null, $dimension = 2)
     {
+        if (null === $keys) {
+            return $array;
+        }
         $result = [];
-        foreach ($array as $field => $row) {
-            foreach ($keys as $key) {
-                $result[$field][$key] = I::get($row, $key);
+        if (2 === $dimension) {
+            foreach ($array as $k => $row) {
+                foreach ($keys as $key) {
+                    $result[$k][$key] = I::get($row, $key);
+                }
+            }
+        } elseif (1 === $dimension) {
+            foreach ($array as $key => $value) {
+                if (in_array($key, $keys)) {
+                    $result[$key] = $value;
+                }
             }
         }
 
-        return array_filter($result);
+        return self::detectAll($result, function ($row) {
+            return null !== $row;
+        });
     }
 
     /**
@@ -115,9 +131,12 @@ class Arrays
      *
      * @return array
      */
-    public static function values($array, $keys)
+    public static function values($array, $keys = null)
     {
-        return array_intersect_key($array, array_flip($keys));
+        if (null === $keys) {
+            return array_values($array);
+        }
+        return array_values(array_intersect_key($array, array_flip($keys)));
     }
 
     /**
