@@ -71,20 +71,25 @@ class Arrays
         if (2 === $dimension) {
             foreach ($array as $k => $row) {
                 foreach ($keys as $key) {
-                    $result[$k][$key] = I::get($row, $key);
+                    if (array_key_exists($key, $row)) {
+                        $result[$k][$key] = I::get($row, $key);
+                    } else {
+                        $result[$k][$key] = null;
+                    }
                 }
             }
-        } elseif (1 === $dimension) {
-            foreach ($array as $key => $value) {
-                if (in_array($key, $keys)) {
-                    $result[$key] = $value;
+        }
+        if (1 === $dimension) {
+            foreach ($array as $k => $row) {
+                if (in_array($k, $keys, true)) {
+                    $result[$k] = $row;
+                } else {
+                    $result[$k] = null;
                 }
             }
         }
 
-        return self::detectAll($result, function ($row) {
-            return null !== $row;
-        });
+        return $result;
     }
 
     /**
