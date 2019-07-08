@@ -352,6 +352,6 @@ class I
                 throw new Exception('初始化 ' . $class . ' 失败', $e->getCode(), $e);
             }
         }
-        return null;
+        throw new Exception('必须带 class 以指定一个类');
     }
 }
