@@ -39,6 +39,11 @@ class Pay
     }
 
     /**
+     * 支付类型：APP
+     */
+    const TRADE_TYPE_APP = 'APP';
+
+    /**
      * 支付接口
      *
      * - APP支付：返回的字符串需给客户端拉起支付宝

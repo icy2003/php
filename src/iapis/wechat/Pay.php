@@ -81,6 +81,27 @@ class Pay
     }
 
     /**
+     * 支付类型：APP
+     */
+    const TRADE_TYPE_APP = 'APP';
+    /**
+     * 支付类型：JSAPI
+     */
+    const TRADE_TYPE_JSAPI = 'JSAPI';
+    /**
+     * 支付类型：Native
+     */
+    const TRADE_TYPE_NATIVE = 'NATIVE';
+    /**
+     * 支付类型：H5
+     */
+    const TRADE_TYPE_H5 = 'MWEB';
+    /**
+     * 支付类型：付款码
+     */
+    const TRADE_TYPE_MICROPAY = 'MICROPAY';
+
+    /**
      * 统一下单
      *
      * - 商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再在APP里面调起支付

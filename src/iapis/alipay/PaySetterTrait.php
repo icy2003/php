@@ -56,11 +56,6 @@ trait PaySetterTrait
     protected $_tradeType;
 
     /**
-     * 支付类型：APP
-     */
-    const TRADE_TYPE_APP = 'APP';
-
-    /**
      * 定义支付类型
      *
      * - APP 支付：@link https://docs.open.alipay.com/api_1/alipay.trade.app.pay
