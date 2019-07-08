@@ -249,6 +249,7 @@ class Pay
         if (!empty($array)) {
             if (null === $callback || true === I::trigger($callback, [$array])) {
                 echo $this->getNotifyReturn();
+                die;
             }
         }
     }

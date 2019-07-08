@@ -49,6 +49,33 @@ trait PaySetterTrait
     protected $_result = [];
 
     /**
+     * 支付类型
+     *
+     * @var string
+     */
+    protected $_tradeType;
+
+    /**
+     * 支付类型：APP
+     */
+    const TRADE_TYPE_APP = 'APP';
+
+    /**
+     * 定义支付类型
+     *
+     * - APP 支付：@link https://docs.open.alipay.com/api_1/alipay.trade.app.pay
+     *
+     * @param string $tradeType
+     *
+     * @return static
+     */
+    public function setTradeType($tradeType)
+    {
+        $this->_tradeType = $tradeType;
+        return $this;
+    }
+
+    /**
      * 仅支持JSON
      *
      * @param string $format
@@ -138,7 +165,8 @@ trait PaySetterTrait
      *
      * @return static
      */
-    public function setAppAuthToken($appAuthToken){
+    public function setAppAuthToken($appAuthToken)
+    {
         $this->_values['app_auth_token'] = $appAuthToken;
         return $this;
     }

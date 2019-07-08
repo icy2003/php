@@ -39,7 +39,7 @@ class Pay
     }
 
     /**
-     * app支付接口2.0
+     * 支付接口
      *
      * - APP支付：返回的字符串需给客户端拉起支付宝
      *
@@ -47,30 +47,37 @@ class Pay
      */
     public function pay()
     {
-        if (null === I::get($this->_values, 'biz_content.total_amount')) {
-            throw new Exception('缺少参数：biz_content.total_amount');
+        if (null === $this->_tradeType) {
+            throw new Exception('请使用 setTradeType 定义支付类型');
         }
-        if (null === I::get($this->_values, 'biz_content.subject')) {
-            throw new Exception('缺少参数：biz_content.subject');
+        // APP 支付
+        if (self::TRADE_TYPE_APP === $this->_tradeType) {
+            if (null === I::get($this->_values, 'biz_content.total_amount')) {
+                throw new Exception('请使用 setBizContentTotalAmount 设置 biz_content.total_amount');
+            }
+            if (null === I::get($this->_values, 'biz_content.subject')) {
+                throw new Exception('请使用 setBizContentSubject 设置：biz_content.subject');
+            }
+            if (null === I::get($this->_values, 'biz_content.out_trade_no')) {
+                throw new Exception('请使用 setBizContentOutTradeNo 设置：biz_content.out_trade_no');
+            }
+            $values = array_filter([
+                'app_id' => $this->_appId,
+                'method' => 'alipay.trade.app.pay',
+                'format' => I::get($this->_values, 'format'),
+                'return_url' => I::get($this->_values, 'return_url'),
+                'charset' => I::get($this->_values, 'charset', 'utf-8'),
+                'sign_type' => I::get($this->_values, 'sign_type', 'RSA2'),
+                'timestamp' => I::get($this->_values, 'timestamp', date('Y-m-d H:i:s')),
+                'version' => '1.0',
+                'notify_url' => I::get($this->_values, 'notify_url'),
+                'app_auth_token' => I::get($this->_values, 'app_auth_token'),
+                'biz_content' => Json::encode(I::get($this->_values, 'biz_content', [])),
+            ]);
+            $values['sign'] = $this->getSign($values);
+            $this->_result = http_build_query($values);
         }
-        if (null === I::get($this->_values, 'biz_content.out_trade_no')) {
-            throw new Exception('缺少参数：biz_content.out_trade_no');
-        }
-        $values = array_filter([
-            'app_id' => $this->_appId,
-            'method' => 'alipay.trade.app.pay',
-            'format' => I::get($this->_values, 'format'),
-            'return_url' => I::get($this->_values, 'return_url'),
-            'charset' => I::get($this->_values, 'charset', 'utf-8'),
-            'sign_type' => I::get($this->_values, 'sign_type', 'RSA2'),
-            'timestamp' => I::get($this->_values, 'timestamp', date('Y-m-d H:i:s')),
-            'version' => '1.0',
-            'notify_url' => I::get($this->_values, 'notify_url'),
-            'app_auth_token' => I::get($this->_values, 'app_auth_token'),
-            'biz_content' => Json::encode(I::get($this->_values, 'biz_content', [])),
-        ]);
-        $values['sign'] = $this->getSign($values);
-        $this->_result = http_build_query($values);
+
         return $this;
     }
 
@@ -108,7 +115,7 @@ class Pay
     }
 
     /**
-     * 返回刚刚调用过的微信接口的结果
+     * 返回刚刚调用过的支付宝接口的结果
      *
      * @return array
      */
@@ -119,6 +126,8 @@ class Pay
 
     /**
      * 支付结果通知以及退款结果通知的数据处理
+     *
+     * 请参考[交易状态问题解析](https://openclub.alipay.com/club/history/read/5407)
      *
      * @return array
      */
@@ -150,6 +159,7 @@ class Pay
         if (!empty($array)) {
             if (null === $callback || true === I::trigger($callback, [$array])) {
                 echo $this->getNotifyReturn();
+                die;
             }
         }
     }
