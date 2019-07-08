@@ -648,15 +648,33 @@ class Arrays
      * - count：在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
      *
      * @param array $array 数组
+     * @param callback|string $callback 回调，返回回调值为 true 的项，如果此参数是字符串，表示查询和此字符串严格相等的项
+     * @param boolean $isStrict 是否为严格模式，如果为 false，回调值为 true 值的也会返回，为字符串时不使用严格比较
      *
      * @return integer
      */
-    public static function count($array)
+    public static function count($array, $callback = null, $isStrict = true)
     {
+        $count = 0;
         if (is_array($array)) {
-            return count($array);
+            if (null === $callback) {
+                return count($array);
+            } elseif (is_string($callback) || is_callable($callback)) {
+                $function = $callback;
+                if (is_string($callback)) {
+                    $function = function ($row) use ($callback, $isStrict) {
+                        return true === $isStrict ? $row === $callback : $row == $callback;
+                    };
+                }
+                foreach ($array as $key => $row) {
+                    if (true === I::trigger($function, [$row, $key])) {
+                        $count++;
+                    }
+                }
+
+            }
         }
-        return 0;
+        return $count;
     }
 
     /**
