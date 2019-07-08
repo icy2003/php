@@ -10,6 +10,7 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
+use Exception;
 
 /**
  * 字符串类
@@ -521,5 +522,60 @@ class Strings
             return I::get($row, 0);
         }, $array);
         return true === $returnArray ? $result : implode('', $result);
+    }
+
+    /**
+     * 重复一个字符若干次
+     *
+     * @param string $char
+     * @param integer $num
+     * @param integer $maxLength 最大重复次数，默认不限制
+     *
+     * @return string
+     */
+    public static function repeat($char, $num, $maxLength = null)
+    {
+        $length = null === $maxLength ? $num : min($maxLength, $num);
+        return str_repeat($char, $length);
+    }
+
+    /**
+     * 隐藏部分文字
+     *
+     * - 只支持三种模式，例如：3?4、?3、3?，数字代表显示的字符数，默认模式为：3?4
+     * - 隐藏字符最大数为 4，例如对于字符串 abcdefghijklmnopqrstuvwxyz，隐藏后的结果为：abc****wxyz
+     *
+     * @param string $string
+     * @param string $hideChar 被替换的字符，默认为：*
+     * @param string $mode 替换模式，默认为：3?4，即保留前 3 字符，后 4 字符，隐藏中间
+     *
+     * @return string
+     */
+    public static function hide($string, $hideChar = '*', $mode = '3?4')
+    {
+        $length = self::length($string);
+        $modeArray = self::split($mode);
+        $modeCount = Arrays::count($modeArray);
+        if (1 !== Arrays::count($modeArray, '?')) {
+            throw new Exception("模式错误，只允许有且仅有一个 ? 符，例如：3?4");
+        }
+        if ($length <= array_sum($modeArray)) {
+            return $string;
+        }
+        if (3 === Arrays::count($modeArray)) {
+            if ('?' === $modeArray[1]) {
+                return self::sub($string, 0, $modeArray[0]) . self::repeat($hideChar, $length - $modeArray[0] - $modeArray[2], 4) . self::sub($string, $length - $modeArray[2], $modeArray[2]);
+            } else {
+                throw new Exception("模式错误，三段时，? 符必须在中间，例如：3?4");
+            }
+        } elseif (2 === $modeCount) {
+            if ('?' === $modeArray[0]) {
+                return self::repeat($hideChar, $length - $modeArray[1], 4) . self::sub($string, $length - $modeArray[1], $modeArray[1]);
+            } else {
+                return self::sub($string, 0, $modeArray[0]) . self::repeat($hideChar, $length - $modeArray[0], 4);
+            }
+        } else {
+            throw new Exception("支持模式有三种，例如：3?4、?3、3?");
+        }
     }
 }
