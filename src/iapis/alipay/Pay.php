@@ -160,10 +160,14 @@ class Pay
     /**
      * self::getNotifyArray 和 self::getNotifyReturn 的结合：通知为交易成功时，$callback 为 true，则输出成功给微信
      *
-     * - 回调参数：通知数组（$array）、是否支付成功($isPay)、是否退款成功（$isRefund）、是否全额退款（$isRefundFull）
-     * - $isRefund 的值：退款金额（refund_fee）永远和总金额（total_amount）对比，不考虑优惠，如需计算优惠，请直接使用 $array 原始数据自行计算
+     * - 回调参数：
+     *      1. 通知数组：$array 支付宝返回的原始数据
+     *      2. 是否支付成功：$isPay
+     *      3. 是否退款成功：$isRefund
+     *      4. 是否全额退款：$isRefundFull 退款金额（refund_fee）永远和总金额（total_amount）对比，不考虑优惠，如需计算优惠，请直接使用 $array 原始数据自行计算
+     * - 回调函数返回 true 时才会输出成功给支付宝
      *
-     * @param callback|array $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
+     * @param callback $callback 回调函数
      *
      * @return void
      */
