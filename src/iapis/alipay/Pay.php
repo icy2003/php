@@ -35,7 +35,13 @@ class Pay
     public function __construct($appId, $rsaPrivateKey)
     {
         $this->_appId = $appId;
+        if (null === $this->_appId) {
+            throw new Exception("缺少应用 ID");
+        }
         $this->_rsaPrivateKey = $rsaPrivateKey;
+        if (null === $this->_rsaPrivateKey) {
+            throw new Exception("缺少商户私钥");
+        }
     }
 
     /**
@@ -154,7 +160,10 @@ class Pay
     /**
      * self::getNotifyArray 和 self::getNotifyReturn 的结合：通知为交易成功时，$callback 为 true，则输出成功给微信
      *
-     * @param callback $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
+     * - 回调参数：通知数组（$array）、是否支付成功($isPay)、是否退款成功（$isRefund）、是否全额退款（$isRefundFull）
+     * - $isRefund 的值：退款金额（refund_fee）永远和总金额（total_amount）对比，不考虑优惠，如需计算优惠，请直接使用 $array 原始数据自行计算
+     *
+     * @param callback|array $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
      *
      * @return void
      */
@@ -162,7 +171,33 @@ class Pay
     {
         $array = $this->getNotifyArray();
         if (!empty($array)) {
-            if (null === $callback || true === I::trigger($callback, [$array])) {
+            $isPay = $isRefund = $isRefundFull = null;
+            $tradeStatus = I::get($array, 'trade_status');
+            $refundFee = I::get($array, 'refund_fee');
+            $totalAmount = I::get($array, 'total_amount');
+            if ($refundFee > 0) {
+                $isRefund = true;
+                if ('TRADE_CLOSED' === $tradeStatus && $refundFee === $totalAmount) {
+                    // 3、交易成功后，交易全额退款交易状态转为TRADE_CLOSED（交易关闭）
+                    // 7、如果一直部分退款退完所有交易金额则交易状态转为TRADE_CLOSED（交易关闭）
+                    $isRefundFull = true;
+                } elseif ('TRADE_SUCCESS' === $tradeStatus && $refundFee < $totalAmount) {
+                    // 6、交易成功后部分退款，交易状态仍为TRADE_SUCCESS（交易成功）
+                    $isRefundFull = false;
+                }
+            } elseif ($totalAmount > 0) {
+                if ('TRADE_CLOSED' === $tradeStatus) {
+                    // 2、交易创建成功后，用户未付款交易超时关闭交易状态转为TRADE_CLOSED（交易关闭）
+                    $isPay = false;
+                } elseif ('TRADE_SUCCESS' === $tradeStatus || 'TRADE_FINISHED' === $tradeStatus) {
+                    // 1、交易创建成功后，用户支付成功，交易状态转为TRADE_SUCCESS（交易成功）
+                    // 4、交易创建成功后，用户支付成功后，若用户商品不支持退款，交易状态直接转为TRADE_FINISHED（交易完成）
+                    // 5、交易成功后，默认退款时间三个月内没有退款，交易状态转为TRADE_FINISHED（交易完成）不可退款
+                    // 8、如果未退完所有交易金额，三个月后交易状态转为TRADE_FINISHED（交易完成）不可退款
+                    $isPay = true;
+                }
+            }
+            if (null === $callback || true === I::trigger($callback, [$array, $isPay, $isRefund, $isRefundFull])) {
                 echo $this->getNotifyReturn();
                 die;
             }

@@ -37,8 +37,17 @@ class Pay
     public function __construct($mchid, $appid, $apiKey)
     {
         $this->_mchId = $mchid;
+        if(null === $this->_mchId){
+            throw new Exception("缺少商户号");
+        }
         $this->_appId = $appid;
+        if(null === $this->_appId){
+            throw new Exception("缺少应用 ID");
+        }
         $this->_apiKey = $apiKey;
+        if(null === $this->_apiKey){
+            throw new Exception("缺少密钥");
+        }
     }
 
     /**
