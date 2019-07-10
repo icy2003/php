@@ -1,17 +1,25 @@
 language: php
 
-php:
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
-  - nightly
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+      env:
+        - CODECEPTION_TEST=1
+    - php: 7.1
+    - php: 7.2
+    - php: 7.3
+    - php: nightly
 
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet --no-interaction
+  - |
+    if [[$CODECEPTION_TEST == 1]]; then
+    composer require codeception/codeception@3.0.x-dev
+    fi
 
 notifications:
   email:
@@ -19,3 +27,9 @@ notifications:
     - 2317216477@qq.com
     on_success: never
     on_failure: always
+
+script:
+  - |
+    if [[$CODECEPTION_TEST == 1]]; then
+    ./vendor/bin/codecept run
+    fi
