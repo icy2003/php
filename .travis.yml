@@ -23,8 +23,8 @@ notifications:
   email:
     recipients:
     - 2317216477@qq.com
-    on_success: never
-    on_failure: always
+    on_success: always
+    on_failure: never
 
 script:
   - |
