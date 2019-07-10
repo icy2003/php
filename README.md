@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.com/icy2003/php.svg?branch=master)](https://travis-ci.com/icy2003/php)
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
+[![codebeat badge](https://codebeat.co/badges/5c8569ea-251e-4987-8f52-3c638d942aa5)](https://codebeat.co/projects/github-com-icy2003-php-master)
 
 **功能丰富**：涉及功能例如有：数组操作、字符串操作、文件操作、图片处理、微信支付宝支付等，如果说 PHP 作为工具是一把瑞士军刀，那 icy2003/php 会是 PHP 的瑞士军刀，从最开始我只是想获得随机字符串（`Strings::random`）开始，到此文档更新为止，icy2003/php 包含的方法已有 **700+** 个！尽管这只是 PHP 里的沧海一粟，但是足以应付 PHP 使用过程中大部分遇到的问题
 
