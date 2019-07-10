@@ -64,7 +64,7 @@ class I
                         return $defaultValue;
                     }
                 } elseif (is_object($mixed)) {
-                    $method = 'get' . ucfirst(Strings::underline2camel($key));
+                    $method = 'get' . ucfirst(Strings::toCamel($key));
                     if (method_exists($mixed, $method)) {
                         $mixed = $mixed->$method();
                     } elseif (property_exists($mixed, $key)) {
@@ -111,7 +111,7 @@ class I
             if (is_array($mixed)) {
                 $mixed[$key] = $value;
             } elseif (is_object($mixed)) {
-                $method = 'set' . ucfirst(Strings::underline2camel($key));
+                $method = 'set' . ucfirst(Strings::toCamel($key));
                 if (method_exists($mixed, $method)) {
                     $mixed->$method($value);
                 } elseif (property_exists($mixed, $key)) {

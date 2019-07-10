@@ -643,9 +643,10 @@ class Arrays
     }
 
     /**
-     * 计算数组中的单元数目，或对象中的属性个数
+     * 计算数组中的单元数目
      *
      * - count：在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
+     * - $callback 参数用于对符合条件的项做筛选
      *
      * @param array $array 数组
      * @param callback|string $callback 回调，返回回调值为 true 的项，如果此参数是字符串，表示查询和此字符串严格相等的项

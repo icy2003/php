@@ -9,29 +9,14 @@
 
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\I;
 use Exception;
+use icy2003\php\I;
 
 /**
  * 字符串类
  */
 class Strings
 {
-
-    /**
-     * 随机数种子（数字）
-     */
-    const STRINGS_RANDOM_NUMBER = '0123456789';
-
-    /**
-     * 随机数种子（小写字母）
-     */
-    const STRINGS_RANDOM_LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
-
-    /**
-     * 随机数种子（大写字母）
-     */
-    const STRINGS_RANDOM_UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
      * 返回字符串的字节长（一个中文等于 3 字节哦~）
@@ -55,6 +40,21 @@ class Strings
     {
         return mb_strlen($string, 'UTF-8');
     }
+
+    /**
+     * 随机数种子（数字）
+     */
+    const STRINGS_RANDOM_NUMBER = '0123456789';
+
+    /**
+     * 随机数种子（小写字母）
+     */
+    const STRINGS_RANDOM_LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+
+    /**
+     * 随机数种子（大写字母）
+     */
+    const STRINGS_RANDOM_UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
      * 生成随机字符串
@@ -90,13 +90,13 @@ class Strings
             return password_hash($password, PASSWORD_DEFAULT, ['cost' => $cost]);
         }
         if ($cost < 4 || $cost > 31) {
-            throw new \Exception('cost 必须大于等于 4，小于等于 31');
+            throw new Exception('cost 必须大于等于 4，小于等于 31');
         }
         $salt = sprintf('$2y$%02d$', $cost);
         $salt .= str_replace('+', '.', substr(base64_encode(static::random(20)), 0, 22));
         $hash = crypt($password, $salt);
         if (!is_string($hash) || strlen($hash) !== 60) {
-            throw new \Exception('未知错误');
+            throw new Exception('未知错误');
         }
         return $hash;
     }
@@ -154,7 +154,7 @@ class Strings
      *
      * @return string
      */
-    public static function camel2underline($string)
+    public static function toUnderline($string)
     {
         return strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $string));
     }
@@ -166,7 +166,7 @@ class Strings
      *
      * @return string
      */
-    public static function underline2camel($string)
+    public static function toCamel($string)
     {
         return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function ($matches) {
             return ucfirst($matches[1]);
@@ -180,7 +180,7 @@ class Strings
      *
      * @return string
      */
-    public static function formatAsTitle($string)
+    public static function toTitle($string)
     {
         return mb_convert_case($string, MB_CASE_TITLE, 'UTF-8');
     }
@@ -219,9 +219,9 @@ class Strings
      *
      * @return boolean
      */
-    public static function isContains($string, $search)
+    public static function isContains($string, $search, &$pos = null)
     {
-        return (string) $search !== "" && mb_strpos($string, $search) !== false;
+        return (string) $search !== "" && ($pos = mb_strpos($string, $search)) !== false;
     }
 
     /**
@@ -229,13 +229,14 @@ class Strings
      *
      * @param string $string
      * @param string $search
+     * @param integer $pos 如果找到子串，则引用出子串的起始位置
      *
      * @return string
      */
-    public static function partBefore($string, $search)
+    public static function partBefore($string, $search, &$pos = null)
     {
-        if (self::isContains($string, $search)) {
-            return mb_substr($string, 0, mb_strpos($string, $search));
+        if (self::isContains($string, $search, $pos)) {
+            return mb_substr($string, 0, $pos);
         }
         return "";
     }
@@ -245,13 +246,14 @@ class Strings
      *
      * @param string $string
      * @param string $search
+     * @param integer $pos 如果找到子串，则引用出子串的起始位置
      *
      * @return string
      */
-    public static function partAfter($string, $search)
+    public static function partAfter($string, $search, &$pos = null)
     {
-        if (self::isContains($string, $search)) {
-            return mb_substr($string, mb_strpos($string, $search) + 1, self::length($string) - 1);
+        if (self::isContains($string, $search, $pos)) {
+            return mb_substr($string, $pos + self::length($search), self::length($string) - 1);
         }
         return "";
     }
@@ -379,7 +381,7 @@ class Strings
                 $isEqual = true;
             }
             foreach ($array as $row) {
-                if (Strings::isContains($row, $char1) && Strings::isContains($row, $char2)) {
+                if (self::isContains($row, $char1) && self::isContains($row, $char2)) {
                     $isEqual = true;
                     break;
                 }
@@ -438,7 +440,7 @@ class Strings
      *
      * @param string $string
      *
-     * @return "double|integer"
+     * @return double
      */
     public static function toNumber($string)
     {
@@ -519,7 +521,7 @@ class Strings
     {
         $array = self::toPinyin($text, true);
         $result = array_map(function ($row) {
-            return I::get($row, 0);
+            return self::sub($row, 0, 1);
         }, $array);
         return true === $returnArray ? $result : implode('', $result);
     }
@@ -543,15 +545,14 @@ class Strings
      * 隐藏部分文字
      *
      * - 只支持三种模式，例如：3?4、?3、3?，数字代表显示的字符数，默认模式为：3?4
-     * - 隐藏字符最大数为 4，例如对于字符串 abcdefghijklmnopqrstuvwxyz，隐藏后的结果为：abc****wxyz
      *
      * @param string $string
-     * @param string $hideChar 被替换的字符，默认为：*
+     * @param string $hideChar 被替换的字符，默认为：****
      * @param string $mode 替换模式，默认为：3?4，即保留前 3 字符，后 4 字符，隐藏中间
      *
      * @return string
      */
-    public static function hide($string, $hideChar = '*', $mode = '3?4')
+    public static function hide($string, $hideChar = '****', $mode = '3?4')
     {
         $length = self::length($string);
         $modeArray = self::split($mode);
@@ -564,15 +565,15 @@ class Strings
         }
         if (3 === Arrays::count($modeArray)) {
             if ('?' === $modeArray[1]) {
-                return self::sub($string, 0, $modeArray[0]) . self::repeat($hideChar, $length - $modeArray[0] - $modeArray[2], 4) . self::sub($string, $length - $modeArray[2], $modeArray[2]);
+                return self::sub($string, 0, $modeArray[0]) . $hideChar . self::sub($string, $length - $modeArray[2], $modeArray[2]);
             } else {
                 throw new Exception("模式错误，三段时，? 符必须在中间，例如：3?4");
             }
         } elseif (2 === $modeCount) {
             if ('?' === $modeArray[0]) {
-                return self::repeat($hideChar, $length - $modeArray[1], 4) . self::sub($string, $length - $modeArray[1], $modeArray[1]);
+                return $hideChar . self::sub($string, $length - $modeArray[1], $modeArray[1]);
             } else {
-                return self::sub($string, 0, $modeArray[0]) . self::repeat($hideChar, $length - $modeArray[0], 4);
+                return self::sub($string, 0, $modeArray[0]) . $hideChar;
             }
         } else {
             throw new Exception("支持模式有三种，例如：3?4、?3、3?");
