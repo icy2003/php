@@ -7,14 +7,18 @@
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
 
 **功能丰富**：涉及功能例如有：数组操作、字符串操作、文件操作、图片处理、微信支付宝支付等，如果说 PHP 作为工具是一把瑞士军刀，那 icy2003/php 会是 PHP 的瑞士军刀，从最开始我只是想获得随机字符串（`Strings::random`）开始，到此文档更新为止，icy2003/php 包含的方法已有 **700+** 个！尽管这只是 PHP 里的沧海一粟，但是足以应付 PHP 使用过程中大部分遇到的问题
+
 **简洁明了**：方法的命名简洁明了，尽可能在有限的字符长度里完整表达一个方法的含义，但又不故意缩减字符。例如：`Xml::toArray` 表示 XML 转成数组，我没有把它命名为 Xml:convertToArray 或是 Xml::toArr，前者太啰嗦，后者过度省略
+
 **执行高效**：最直接的就是我不使用双引号和使用 `===`，所有的封装最开始都是一碗面条，直到抽象为最基础的小石头，在这个城堡的构建过程中，每个小石头都有它最精简的表达方式，必要时我还会反复测试效率甚至寻找其他解决方法
+
 **猜你所想**：总所周知，PHP 有<i style = "color:white">八</i>~~三~~大数据类型：数组、字符串、对象……是啊，尽管 PHP 建议你注意数据的类型（比如 PHP7 的类型约束），但相比那些强类型语言，PHP 太包容了！PHP 会猜测你使用的数据类型以及使用场景，自动转换
 icy2003/php 更加包容！例如： `Arrays::count`，这个函数用于获取数组元素个数，你可能会想，这有什么好扩展的？不就是 `count` 么？不，如果有个蠢蛋传了个字符串进去呢？是不是应该像强类型语言那样，傻傻地跟着报错？又或者说，你只是想知道，偶数的元素有几个，这时候 Arrays::count 第二参数接收一个回调，用于筛选你要的那种元素，而如果你只是想找到等于某个字符串的元素，那么第二参数可以改为接收字符串，省去了回调里写的那个比较，比较自然涉及到 `===` 还是 `==`，第三参数正是这个作用，到此 count 函数才算扩展完成。这只是一个例子，icy2003/php 里有很多类似的例子，只是为了让你更少地关注这些细节，把更多精力集中到实际业务里
 
 ## 文档
 
 **icy2003/php** 是基于 [phpdocumentor](https://www.phpdoc.org/) 标准格式写的注释，因此你可以轻易使用 phpdocumentor 生成一份完整详细的文档
+
 ```shell
 composer require phpdocumentor/phpdocumentor 2.*
 # windows
@@ -22,6 +26,7 @@ composer require phpdocumentor/phpdocumentor 2.*
 # linux
 ./vendor/bin/phpdoc -d ./src -t ./docs
 ```
+
 **icy2003/php** 对编辑器的提示支持也很好，在使用过程中就可以看到对应函数的说明
 
 
@@ -32,9 +37,7 @@ composer require phpdocumentor/phpdocumentor 2.*
 以及一个最常用的通用静态类：I.php，下面是它的部分方法简单介绍：
 
 - get：这个函数就是它名字本身的含义：“获取”，获取什么？很多，比如，无视数组层级获取值，获取字符串某个位置的字符等，详细使用可看注释，它几乎成为 icy2003/php 的核心函数了
-
 - displayErrors：显示 PHP 错误，同样是一个使用频率很高的操作
-
 - getAlias：熟悉 Yii2 的人应该很眼熟，它对 Yii2 的别名进行了改进（等你发现），当然你完全可以用 I::getAlias 代替 Yii2::getAlias
 
 ### ihelpers
@@ -61,6 +64,7 @@ composer require phpdocumentor/phpdocumentor 2.*
 ### iexts
 
 目前是 Yii2 和 phpoffice 的一些问题的修复
+
 顺便一提 phpoffice，作者不仅采用了我某个小功能的代码，作者还告诉我，他正在计划重构这货（phpoffice）。的确，现在的 phpoffice 有很多不尽如人意的问题，期待一下吧，你也许可以从这里找到一些好用的方法（至少是 phpoffice 没有提供或者有问题的）
 
 ### icomponents
@@ -81,7 +85,6 @@ composer require phpdocumentor/phpdocumentor 2.*
 ## 地址
 
 -  [github](https://github.com/icy2003/php)
-
 -  [packagist](https://packagist.org/packages/icy2003/php)
 
 ## 安装
