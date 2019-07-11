@@ -241,7 +241,7 @@ trait MathAndTrigonometry
      */
     public static function ceiling($number, $significance = 1)
     {
-        return (is_numeric($number) && is_numeric($significance)) ? (ceil($number / $significance) * $significance) : false;
+        return is_numeric($number) ? (ceil($number / $significance) * $significance) : false;
     }
 
     /**
@@ -596,11 +596,9 @@ trait MathAndTrigonometry
      *
      * @todo
      *
-     * @param array $array
-     *
      * @return array
      */
-    public static function minverse($array)
+    public static function minverse()
     {
         return [];
     }

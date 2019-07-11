@@ -30,7 +30,7 @@ class Request
      */
     private $__secureProtocolHeaders = [
         'x-forwarded-proto' => ['https'], // Common
-         'front-end-https' => ['on'], // Microsoft
+        'front-end-https' => ['on'], // Microsoft
     ];
 
     /**
@@ -210,6 +210,19 @@ class Request
     }
 
     /**
+     * 设置请求体
+     *
+     * @param string $rawBody
+     *
+     * @return static
+     */
+    public function setRawBody($rawBody)
+    {
+        $this->__rawBody = $rawBody;
+        return $this;
+    }
+
+    /**
      * 请求参数
      *
      * @var array
@@ -245,6 +258,19 @@ class Request
             }
         }
         return $this->__bodyParams;
+    }
+
+    /**
+     * 设置请求体参数
+     *
+     * @param array $bodyParams
+     *
+     * @return static
+     */
+    public function setBodyParams($bodyParams)
+    {
+        $this->__bodyParams = $bodyParams;
+        return $this;
     }
 
     /**
@@ -294,6 +320,19 @@ class Request
             return $_GET;
         }
         return $this->__queryParams;
+    }
+
+    /**
+     * 设置 GET 参数
+     *
+     * @param array $queryParams
+     *
+     * @return static
+     */
+    public function setQueryParams($queryParams)
+    {
+        $this->__queryParams = $queryParams;
+        return $this;
     }
 
     /**

@@ -46,7 +46,7 @@ trait PaySetterTrait
      *
      * @var array|string
      */
-    protected $_result = [];
+    protected $_result;
 
     /**
      * 支付类型

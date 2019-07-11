@@ -128,7 +128,7 @@ class Pay
     /**
      * 返回刚刚调用过的支付宝接口的结果
      *
-     * @return array
+     * @return mixed
      */
     public function getRes()
     {
