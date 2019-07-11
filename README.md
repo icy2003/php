@@ -5,7 +5,6 @@
 [![Build Status](https://travis-ci.com/icy2003/php.svg?branch=master)](https://travis-ci.com/icy2003/php)
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
-[![codebeat badge](https://codebeat.co/badges/5c8569ea-251e-4987-8f52-3c638d942aa5)](https://codebeat.co/projects/github-com-icy2003-php-master)
 
 **功能丰富**：涉及功能例如有：数组操作、字符串操作、文件操作、图片处理、微信支付宝支付等，如果说 PHP 作为工具是一把瑞士军刀，那 icy2003/php 会是 PHP 的瑞士军刀，从最开始我只是想获得随机字符串（`Strings::random`）开始，到此文档更新为止，icy2003/php 包含的方法已有 **700+** 个！尽管这只是 PHP 里的沧海一粟，但是足以应付 PHP 使用过程中大部分遇到的问题
 
@@ -13,7 +12,7 @@
 
 **执行高效**：最直接的就是我不使用双引号和使用 `===`，所有的封装最开始都是一碗面条，直到抽象为最基础的小石头，在这个城堡的构建过程中，每个小石头都有它最精简的表达方式，必要时我还会反复测试效率甚至寻找其他解决方法
 
-**猜你所想**：总所周知，PHP 有<i style = "color:white">八</i>~~三~~大数据类型：数组、字符串、对象……是啊，尽管 PHP 建议你注意数据的类型（比如 PHP7 的类型约束），但相比那些强类型语言，PHP 太包容了！PHP 会猜测你使用的数据类型以及使用场景，自动转换
+**猜你所想**：众所周知，PHP 有<i style = "color:white">八</i>~~三~~大数据类型：数组、字符串、对象……是啊，尽管 PHP 建议你注意数据的类型（比如 PHP7 的类型约束），但相比那些强类型语言，PHP 太包容了！PHP 会猜测你使用的数据类型以及使用场景，自动转换
 icy2003/php 更加包容！例如： `Arrays::count`，这个函数用于获取数组元素个数，你可能会想，这有什么好扩展的？不就是 `count` 么？不，如果有个蠢蛋传了个字符串进去呢？是不是应该像强类型语言那样，傻傻地跟着报错？又或者说，你只是想知道，偶数的元素有几个，这时候 Arrays::count 第二参数接收一个回调，用于筛选你要的那种元素，而如果你只是想找到等于某个字符串的元素，那么第二参数可以改为接收字符串，省去了回调里写的那个比较，比较自然涉及到 `===` 还是 `==`，第三参数正是这个作用，到此 count 函数才算扩展完成。这只是一个例子，icy2003/php 里有很多类似的例子，只是为了让你更少地关注这些细节，把更多精力集中到实际业务里
 
 ## 文档

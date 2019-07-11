@@ -269,7 +269,7 @@ class I
      * 设置别名
      *
      * @param string $alias 别名
-     * @param string $path 路径
+     * @param string|null $path 路径
      *
      * @return void
      */

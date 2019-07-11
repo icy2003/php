@@ -44,7 +44,7 @@ trait PaySetterTrait
      *
      * - 每执行一个接口都会修改此值
      *
-     * @var array
+     * @var array|string
      */
     protected $_result = [];
 
