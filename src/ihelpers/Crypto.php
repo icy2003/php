@@ -461,7 +461,7 @@ class Crypto
      * @param string $data 待签名数据
      * @param integer|string $signType 见[openssl_sign](https://www.php.net/manual/zh/function.openssl-sign.php)
      *
-     * @return static
+     * @return string
      */
     public function getSignature($data, $signType = OPENSSL_ALGO_SHA256)
     {

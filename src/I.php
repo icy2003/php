@@ -214,7 +214,7 @@ class I
      * @param string $alias 别名
      * @param bool $loadNew 是否加载新别名到 I 里，默认否
      *
-     * @return string
+     * @return string|boolean
      */
     public static function getAlias($alias, $loadNew = false)
     {
