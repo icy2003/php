@@ -238,7 +238,7 @@ class Crypto
      *
      * @param string $encrypted 被私钥加密后的密文
      *
-     * @return string
+     * @return string|boolean
      */
     public function getPublicDecrypt($encrypted)
     {
@@ -246,8 +246,11 @@ class Crypto
             throw new Exception("请使用 setPair 提供公钥");
         }
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
-        openssl_public_decrypt($encrypted, $decrypted, $this->_pemPublic);
-        return $decrypted;
+        if ($encrypted) {
+            openssl_public_decrypt($encrypted, $decrypted, $this->_pemPublic);
+            return $decrypted;
+        }
+        return false;
     }
 
     /**
@@ -273,7 +276,7 @@ class Crypto
      *
      * @param string $encrypted 被公钥加密后的密文
      *
-     * @return string
+     * @return string|boolean
      */
     public function getPrivateDecrypt($encrypted)
     {
@@ -281,8 +284,11 @@ class Crypto
             throw new Exception("请使用 setPair 提供私钥");
         }
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
-        openssl_private_decrypt($encrypted, $decrypted, $this->_pemPrivate);
-        return $decrypted;
+        if ($encrypted) {
+            openssl_private_decrypt($encrypted, $decrypted, $this->_pemPrivate);
+            return $decrypted;
+        }
+        return false;
     }
 
     /**

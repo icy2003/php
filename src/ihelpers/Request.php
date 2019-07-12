@@ -247,8 +247,7 @@ class Request
                     $contentType = substr($contentType, 0, $pos);
                 }
                 if ('application/json' == $contentType) {
-                    $params = Json::decode($this->getRawBody());
-                    $this->__bodyParams = null === $params ? [] : $params;
+                    $this->__bodyParams = Json::decode($this->getRawBody());
                 } elseif ('POST' === $this->getMethod()) {
                     $this->__bodyParams = $_POST;
                 } else {
@@ -365,14 +364,14 @@ class Request
     }
 
     /**
-     * 主机信息数组
+     * 主机
      *
-     * @var array
+     * @var string
      */
     private $__hostInfo;
 
     /**
-     * 获取主机信息
+     * 获取主机
      *
      * @return array
      */
@@ -388,7 +387,7 @@ class Request
             } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->__hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();
-                if (80 !== $port && !$secure || 443 !== $port && $secure) {
+                if ((80 !== $port && !$secure) || (443 !== $port && $secure)) {
                     $this->__hostInfo .= ':' . $port;
                 }
             }
@@ -498,17 +497,17 @@ class Request
      */
     public function getServerName()
     {
-        return I::get($_SERVER, 'SERVER_NAME');
+        return (string) I::get($_SERVER, 'SERVER_NAME');
     }
 
     /**
      * 获取服务器端口
      *
-     * @return int
+     * @return integer
      */
     public function getServerPort()
     {
-        return I::get($_SERVER, 'SERVER_PORT');
+        return (int) I::get($_SERVER, 'SERVER_PORT');
     }
 
     /**
@@ -563,7 +562,7 @@ class Request
      */
     public function getRemoteIP()
     {
-        return I::get($_SERVER, 'REMOTE_ADDR');
+        return (string) I::get($_SERVER, 'REMOTE_ADDR');
     }
 
     /**
@@ -573,7 +572,7 @@ class Request
      */
     public function getRemoteHost()
     {
-        return I::get($_SERVER, 'REMOTE_HOST');
+        return (string) I::get($_SERVER, 'REMOTE_HOST');
     }
 
     /**

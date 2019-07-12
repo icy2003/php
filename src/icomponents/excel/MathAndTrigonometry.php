@@ -356,7 +356,7 @@ trait MathAndTrigonometry
      * @param string $text 必需
      * @param integer $radix 必需。Radix 必须是整数
      *
-     * @return integer
+     * @return string
      */
     public static function decimal($text, $radix)
     {
@@ -406,13 +406,13 @@ trait MathAndTrigonometry
     /**
      * 返回数的阶乘
      *
-     * @param integer $number 必需。 要计算其阶乘的非负数。 如果 number 不是整数，将被截尾取整
+     * @param integer|double $number 必需。 要计算其阶乘的非负数。 如果 number 不是整数，将被截尾取整
      *
      * @return integer
      */
     public static function fact($number)
     {
-        $number = floor($number);
+        $number = (int) floor($number);
         if ($number == 0) {
             return 1;
         }
@@ -628,7 +628,7 @@ trait MathAndTrigonometry
      * @param array $array1
      * @param array $array2
      *
-     * @return array
+     * @return array|false
      */
     public static function mmult($array1, $array2)
     {
@@ -801,7 +801,7 @@ trait MathAndTrigonometry
      */
     public static function rand()
     {
-        return mt_rand(0, self::power(10, 10)) / self::power(10, 10);
+        return mt_rand(0, (int) self::power(10, 10)) / self::power(10, 10);
     }
 
     /**
@@ -809,8 +809,8 @@ trait MathAndTrigonometry
      *
      * @param integer $row 要返回的行数
      * @param integer $col 要返回的列数
-     * @param double $min 想返回的最小数值
-     * @param double $max 想返回的最大数值
+     * @param integer $min 想返回的最小数值
+     * @param integer $max 想返回的最大数值
      * @param boolean $isInt 返回整数或小数
      *
      * @return array
@@ -847,7 +847,7 @@ trait MathAndTrigonometry
      *
      * @param integer $number
      *
-     * @return string
+     * @return string|false
      */
     public static function roman($number)
     {

@@ -212,7 +212,7 @@ class Arrays
      * @param array $array
      * @param array $find 引用返回包含的值
      *
-     * @return array
+     * @return boolean
      */
     public static function valueExistsSome($values, $array, &$find = null)
     {
@@ -260,7 +260,7 @@ class Arrays
     public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
-            return array_combine($keys, $values);
+            return (array) array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {

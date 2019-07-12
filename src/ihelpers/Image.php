@@ -86,6 +86,8 @@ class Image
                 $object = imagecreatefrompng($image);
                 $method = 'imagepng';
                 break;
+            default:
+                throw new Exception("不支持的图片类型");
         }
         return [
             'width' => $width,
@@ -252,7 +254,7 @@ class Image
      */
     public function turnY()
     {
-        if($out =imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']) ){
+        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             $this->_imageOut = $out;
             for ($x = 0; $x < $this->_attributes['width']; $x++) {
                 imagecopy($this->_imageOut, $this->_imageIn, $this->_attributes['width'] - $x - 1, 0, $x, 0, 1, $this->_attributes['height']);
@@ -269,7 +271,7 @@ class Image
      */
     public function turnX()
     {
-        if($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])){
+        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             $this->_imageOut = $out;
             for ($y = 0; $y < $this->_attributes['height']; $y++) {
                 imagecopy($this->_imageOut, $this->_imageIn, 0, $this->_attributes['height'] - $y - 1, 0, $y, $this->_attributes['width'], 1);
@@ -331,6 +333,8 @@ class Image
      * @param int $margin 文字左边距
      * @param int $base 文字上边距
      * @param int $baseOffset 文字抖动偏差
+     *
+     * @return void
      */
     public static function captcha($code, $size = [80, 30], $fontSize = 14, $fontPath = 'simkai', $pixelNum = 2, $pixelColor = 5, $padding = 8, $margin = 7, $base = 20, $baseOffset = 4)
     {
@@ -340,22 +344,23 @@ class Image
         header("Cache-control: private");
         header('Content-Type: image/png');
         $codeLength = Strings::length($code);
-        $image = imagecreatetruecolor($size[0], $size[1]);
-        imagefilledrectangle($image, 0, 0, $size[0] - 1, $size[1] - 1, imagecolorallocate($image, mt_rand(235, 255), mt_rand(235, 255), mt_rand(235, 255)));
-        for ($i = 0; $i < $pixelColor; $i++) {
-            $noiseColor = imagecolorallocate($image, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
-            for ($j = 0; $j < $pixelNum; $j++) {
-                imagestring($image, 1, mt_rand(-10, $size[0]), mt_rand(-10, $size[1]), Strings::random(1), $noiseColor);
+        if ($image = imagecreatetruecolor($size[0], $size[1])) {
+            imagefilledrectangle($image, 0, 0, $size[0] - 1, $size[1] - 1, imagecolorallocate($image, mt_rand(235, 255), mt_rand(235, 255), mt_rand(235, 255)));
+            for ($i = 0; $i < $pixelColor; $i++) {
+                $noiseColor = imagecolorallocate($image, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
+                for ($j = 0; $j < $pixelNum; $j++) {
+                    imagestring($image, 1, mt_rand(-10, $size[0]), mt_rand(-10, $size[1]), Strings::random(1), $noiseColor);
+                }
             }
+            $codeArray = Strings::split($code);
+            for ($i = 0; $i < $codeLength; ++$i) {
+                $color = imagecolorallocate($image, mt_rand(0, 100), mt_rand(20, 120), mt_rand(50, 150));
+                imagettftext($image, $fontSize, mt_rand(-10, 10), $margin, mt_rand($base - $baseOffset, $base + $baseOffset), $color, $fontPath, $codeArray[$i]);
+                $margin += (imagefontwidth($fontSize) + $padding);
+            }
+            imagepng($image);
+            imagedestroy($image);
         }
-        $codeArray = Strings::split($code);
-        for ($i = 0; $i < $codeLength; ++$i) {
-            $color = imagecolorallocate($image, mt_rand(0, 100), mt_rand(20, 120), mt_rand(50, 150));
-            imagettftext($image, $fontSize, mt_rand(-10, 10), $margin, mt_rand($base - $baseOffset, $base + $baseOffset), $color, $fontPath, $codeArray[$i]);
-            $margin += (imagefontwidth($fontSize) + $padding);
-        }
-        imagepng($image);
-        imagedestroy($image);
     }
 
     /**

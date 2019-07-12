@@ -129,11 +129,13 @@ class FtpFile extends Base
             $string = stream_get_contents($string);
         }
         $this->createDir($this->getDirname($file));
-        $fp = fopen('data://text/plain,' . $string, 'r');
-        $isNewFile = @ftp_fput($this->_conn, $file, $fp, FTP_BINARY);
-        fclose($fp);
-        $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
-        return $isNewFile;
+        if ($fp = fopen('data://text/plain,' . $string, 'r')) {
+            $isNewFile = @ftp_fput($this->_conn, $file, $fp, FTP_BINARY);
+            fclose($fp);
+            $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
+            return $isNewFile;
+        }
+        return false;
     }
 
     /**
@@ -199,7 +201,7 @@ class FtpFile extends Base
                 @ftp_chmod($this->_conn, $mode, $subFile);
             }
         }
-        return (bool) @ftp_chmod($this->_conn, $mode, $file);
+        return (boolean) @ftp_chmod($this->_conn, $mode, $file);
     }
 
     /**
@@ -223,10 +225,12 @@ class FtpFile extends Base
      */
     protected function _copy($fromFile, $toFile)
     {
-        $fp = fopen("php://temp", 'r+');
-        ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
-        rewind($fp);
-        return @ftp_fput($this->_conn, $toFile, $fp, FTP_BINARY, 0);
+        if ($fp = fopen("php://temp", 'r+')) {
+            @ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
+            rewind($fp);
+            return @ftp_fput($this->_conn, $toFile, $fp, FTP_BINARY, 0);
+        }
+        return false;
     }
 
     /**
