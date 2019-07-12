@@ -10,7 +10,7 @@
 namespace icy2003\php\icomponents\cache;
 
 use icy2003\php\I;
-use icy2003\php\ihelpers\File;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 文件缓存
@@ -61,7 +61,8 @@ class FileCache extends Base
         } else {
             $this->_pathRoot = $pathRoot;
         }
-        File::fileExists($this->_pathRoot) || File::createDir($this->_pathRoot);
+        $local = new LocalFile();
+        $local->isFile($this->_pathRoot) || $local->createDir($this->_pathRoot);
     }
 
     /**
@@ -131,8 +132,9 @@ class FileCache extends Base
     protected function _setValue($fullKey, $value, $duration = 0)
     {
         $cacheFile = $this->_getCacheFile($fullKey);
-        $dirname = File::dirname($cacheFile);
-        File::createDir($dirname, $this->_dirMode);
+        $local = new LocalFile();
+        $dirname = $local->getDirname($cacheFile);
+        $local->createDir($dirname, $this->_dirMode);
         if (false !== file_put_contents($cacheFile, $value, LOCK_EX)) {
             null !== $this->_fileMode && @chmod($cacheFile, $this->_fileMode);
             0 >= $duration && $duration = 3600 * 24 * 365 * 10;
@@ -152,7 +154,7 @@ class FileCache extends Base
     protected function _getValue($fullKey)
     {
         $cacheFile = $this->_getCacheFile($fullKey);
-        if (File::fileExists($cacheFile)) {
+        if ((new LocalFile())->isFile($cacheFile)) {
             if (filemtime($cacheFile) > time()) {
                 return file_get_contents($cacheFile);
             }
@@ -171,7 +173,7 @@ class FileCache extends Base
     protected function _deleteValue($fullKey)
     {
         $cacheFile = $this->_getCacheFile($fullKey);
-        return File::deleteFile($cacheFile);
+        return (new LocalFile())->deleteFile($cacheFile);
     }
 
     /**
@@ -204,6 +206,6 @@ class FileCache extends Base
      */
     public function clear()
     {
-        return File::deleteDir($this->_pathRoot, false);
+        return (new LocalFile())->deleteDir($this->_pathRoot, false);
     }
 }

@@ -3,8 +3,8 @@
 namespace icy2003\php_tests\ihelpers;
 
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\ihelpers\Base64;
-use icy2003\php\ihelpers\File;
 
 class Base64Test extends \Codeception\Test\Unit
 {
@@ -30,6 +30,6 @@ class Base64Test extends \Codeception\Test\Unit
         $file = I::getAlias('@icy2003/php_tests/_data/php2.gif');
         Base64::toFile($this->__getString(), $file);
         parent::assertFileExists($file);
-        File::deleteFile($file);
+        (new LocalFile())->deleteFile($file);
     }
 }
