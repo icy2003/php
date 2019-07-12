@@ -16,6 +16,7 @@ use icy2003\php\ihelpers\Request;
 use icy2003\php\ihelpers\Strings;
 use icy2003\php\ihelpers\Url;
 use icy2003\php\ihelpers\Xml;
+use icy2003\php\ihelpers\Header;
 
 /**
  * Pay 支付
@@ -278,6 +279,7 @@ class Pay
         $array = $this->getNotifyArray();
         if (!empty($array)) {
             if (null === $callback || true === I::trigger($callback, [$array])) {
+                Header::xml();
                 echo $this->getNotifyReturn();
                 die;
             }
