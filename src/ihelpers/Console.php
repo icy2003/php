@@ -134,17 +134,17 @@ class Console
      *
      * @param string $string 输出文字
      *
-     * @return void
+     * @return integer|false
      */
     public static function stdout($string)
     {
-        fwrite(\STDOUT, $string);
+        return fwrite(\STDOUT, $string);
     }
 
     /**
      * 标准命令行输入
      *
-     * @return void
+     * @return string|false
      */
     public static function stdin()
     {
@@ -156,7 +156,7 @@ class Console
      *
      * @param string $string 错误文字
      *
-     * @return void
+     * @return integer|false
      */
     public static function stderr($string)
     {
@@ -168,15 +168,15 @@ class Console
      *
      * @param string $prompt 输入提示
      *
-     * @return void
+     * @return string|false
      */
     public static function input($prompt = null)
     {
         if (isset($prompt)) {
-            static::output($prompt);
+            self::output($prompt);
         }
 
-        return static::stdin();
+        return self::stdin();
     }
 
     /**
@@ -184,11 +184,11 @@ class Console
      *
      * @param string $string 提示文字
      *
-     * @return void
+     * @return integer|false
      */
     public static function output($string = null)
     {
-        return static::stdout($string . PHP_EOL);
+        return self::stdout($string . PHP_EOL);
     }
 
     /**
@@ -197,7 +197,7 @@ class Console
      * @param string $string ANSI 格式文本
      * @param array $format 格式代码数组
      *
-     * @return void
+     * @return string
      */
     public static function ansiFormat($string, $format = [])
     {

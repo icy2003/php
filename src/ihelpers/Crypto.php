@@ -257,7 +257,7 @@ class Crypto
      *
      * @param string $data
      *
-     * @return static
+     * @return string
      */
     public function getPrivateEncrypt($data)
     {
@@ -459,7 +459,7 @@ class Crypto
      * 获取用私钥生成的签名
      *
      * @param string $data 待签名数据
-     * @param integer|string $signType 见[openssl_sign](https://www.php.net/manual/zh/function.openssl-sign.php)
+     * @param integer $signType 见[openssl_sign](https://www.php.net/manual/zh/function.openssl-sign.php)
      *
      * @return string
      */
@@ -477,7 +477,7 @@ class Crypto
      *
      * @param string $data
      * @param string $signature
-     * @param integer|string $signType
+     * @param integer $signType
      *
      * @return boolean
      */
@@ -486,6 +486,6 @@ class Crypto
         if (null === $this->_pemPublic) {
             throw new Exception("请使用 setPair 提供公钥");
         }
-        return openssl_verify($data, $signature, $this->_pemPublic, $signType);
+        return (boolean) openssl_verify($data, $signature, $this->_pemPublic, $signType);
     }
 }

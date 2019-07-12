@@ -419,15 +419,13 @@ class Strings
     /**
      * 返回字符串的子串
      *
-     * - 默认获取单个字符
-     *
      * @param string $string
      * @param integer $start 起始位置
-     * @param integer $length 子串长度，默认为 1
+     * @param integer|null $length 子串长度，默认为 null，即返回剩下的部分
      *
      * @return string
      */
-    public static function sub($string, $start, $length = 1)
+    public static function sub($string, $start, $length = null)
     {
         return mb_substr($string, $start, $length);
     }

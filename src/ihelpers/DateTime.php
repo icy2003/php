@@ -23,8 +23,8 @@ class DateTime
     public static function today()
     {
         return [
-            mktime(0, 0, 0, date('m'), date('d'), date('Y')),
-            mktime(23, 59, 59, date('m'), date('d'), date('Y')),
+            mktime(0, 0, 0, (int) date('m'), (int) date('d'), (int) date('Y')),
+            mktime(23, 59, 59, (int) date('m'), (int) date('d'), (int) date('Y')),
         ];
     }
 
@@ -35,10 +35,10 @@ class DateTime
      */
     public static function yesterday()
     {
-        $yesterday = date('d') - 1;
+        $yesterday = (int) date('d') - 1;
         return [
-            mktime(0, 0, 0, date('m'), $yesterday, date('Y')),
-            mktime(23, 59, 59, date('m'), $yesterday, date('Y')),
+            mktime(0, 0, 0, (int) date('m'), $yesterday, (int) date('Y')),
+            mktime(23, 59, 59, (int) date('m'), $yesterday, (int) date('Y')),
         ];
     }
 
@@ -49,10 +49,10 @@ class DateTime
      */
     public static function tomorrow()
     {
-        $tomorrow = date('d') + 1;
+        $tomorrow = (int) date('d') + 1;
         return [
-            mktime(0, 0, 0, date('m'), $tomorrow, date('Y')),
-            mktime(23, 59, 59, date('m'), $tomorrow, date('Y')),
+            mktime(0, 0, 0, (int) date('m'), $tomorrow, (int) date('Y')),
+            mktime(23, 59, 59, (int) date('m'), $tomorrow, (int) date('Y')),
         ];
     }
 
@@ -106,8 +106,8 @@ class DateTime
     public static function month()
     {
         return [
-            mktime(0, 0, 0, date('m'), 1, date('Y')),
-            mktime(23, 59, 59, date('m'), date('t'), date('Y')),
+            mktime(0, 0, 0, (int) date('m'), 1, (int) date('Y')),
+            mktime(23, 59, 59, (int) date('m'), (int) date('t'), (int) date('Y')),
         ];
     }
 
@@ -118,8 +118,8 @@ class DateTime
      */
     public static function lastMonth()
     {
-        $begin = mktime(0, 0, 0, date('m') - 1, 1, date('Y'));
-        $end = mktime(23, 59, 59, date('m') - 1, date('t', $begin), date('Y'));
+        $begin = mktime(0, 0, 0, (int) date('m') - 1, 1, (int) date('Y'));
+        $end = mktime(23, 59, 59, (int) date('m') - 1, (int) date('t', $begin), (int) date('Y'));
 
         return [$begin, $end];
     }
@@ -131,8 +131,8 @@ class DateTime
      */
     public static function nextMonth()
     {
-        $begin = mktime(0, 0, 0, date('m') + 1, 1, date('Y'));
-        $end = mktime(23, 59, 59, date('m') + 1, date('t', $begin), date('Y'));
+        $begin = mktime(0, 0, 0, (int) date('m') + 1, 1, (int) date('Y'));
+        $end = mktime(23, 59, 59, (int) date('m') + 1, (int) date('t', $begin), (int) date('Y'));
 
         return [$begin, $end];
     }
@@ -145,8 +145,8 @@ class DateTime
     public static function year()
     {
         return [
-            mktime(0, 0, 0, 1, 1, date('Y')),
-            mktime(23, 59, 59, 12, 31, date('Y')),
+            mktime(0, 0, 0, 1, 1, (int) date('Y')),
+            mktime(23, 59, 59, 12, 31, (int) date('Y')),
         ];
     }
 
@@ -157,7 +157,7 @@ class DateTime
      */
     public static function lastYear()
     {
-        $year = date('Y') - 1;
+        $year = (int) date('Y') - 1;
         return [
             mktime(0, 0, 0, 1, 1, $year),
             mktime(23, 59, 59, 12, 31, $year),
@@ -171,7 +171,7 @@ class DateTime
      */
     public static function nextYear()
     {
-        $year = date('Y') + 1;
+        $year = (int) date('Y') + 1;
         return [
             mktime(0, 0, 0, 1, 1, $year),
             mktime(23, 59, 59, 12, 31, $year),

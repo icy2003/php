@@ -198,7 +198,7 @@ class Arrays
      * @param array $array
      * @param array $diff 引用返回不包含的值
      *
-     * @return array
+     * @return boolean
      */
     public static function valueExistsAll($values, $array, &$diff = null)
     {

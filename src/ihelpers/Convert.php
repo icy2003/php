@@ -118,7 +118,7 @@ class Convert
      * @param string $name 静态方法名
      * @param array $arguments 参数
      *
-     * @return string
+     * @return string|false
      */
     public static function __callStatic($name, $arguments)
     {

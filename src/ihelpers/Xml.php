@@ -44,10 +44,12 @@ class Xml
             return [];
         }
         $isDisabled = libxml_disable_entity_loader(true);
-        $xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $array = Json::decode(Json::encode($xml), true);
-        libxml_disable_entity_loader($isDisabled);
-        return $array;
+        if ($xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA)) {
+            $array = Json::decode(Json::encode($xml), true);
+            libxml_disable_entity_loader($isDisabled);
+            return $array;
+        }
+        return [];
     }
 
     /**

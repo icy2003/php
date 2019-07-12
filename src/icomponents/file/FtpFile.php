@@ -107,15 +107,15 @@ class FtpFile extends Base
      */
     public function getFileContent($file)
     {
-        $fp = fopen('php://temp', 'r+');
-        if (@ftp_fget($this->_conn, $fp, $file, FTP_BINARY, 0)) {
-            rewind($fp);
-            $content = stream_get_contents($fp);
-            fclose($fp);
-            return $content;
-        } else {
-            return false;
+        if ($fp = fopen('php://temp', 'r+')) {
+            if (@ftp_fget($this->_conn, $fp, $file, FTP_BINARY, 0)) {
+                rewind($fp);
+                $content = stream_get_contents($fp);
+                fclose($fp);
+                return $content;
+            }
         }
+        return false;
     }
 
     /**

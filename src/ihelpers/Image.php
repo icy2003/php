@@ -154,9 +154,11 @@ class Image
             $zoomWidth = $zoom * $this->_attributes['width'];
             $zoomHeight = $zoom * $this->_attributes['height'];
         }
-        $this->_imageOut = imagecreatetruecolor($zoomWidth, $zoomHeight);
-        $this->__setTransparency();
-        imagecopyresampled($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $zoomWidth, $zoomHeight, $this->_attributes['width'], $this->_attributes['height']);
+        if ($out = imagecreatetruecolor($zoomWidth, $zoomHeight)) {
+            $this->_imageOut = $out;
+            $this->__setTransparency();
+            imagecopyresampled($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $zoomWidth, $zoomHeight, $this->_attributes['width'], $this->_attributes['height']);
+        }
 
         return $this;
     }
@@ -176,9 +178,11 @@ class Image
         $height = min($this->_attributes['height'], $cut[1]);
         $x = min($this->_attributes['width'], $pos[0]);
         $y = min($this->_attributes['height'], $pos[1]);
-        $this->_imageOut = imagecreatetruecolor($width, $height);
-        $this->__setTransparency();
-        imagecopy($this->_imageOut, $this->_imageIn, 0, 0, $x, $y, $this->_attributes['width'], $this->_attributes['height']);
+        if ($out = imagecreatetruecolor($width, $height)) {
+            $this->_imageOut = $out;
+            $this->__setTransparency();
+            imagecopy($this->_imageOut, $this->_imageIn, 0, 0, $x, $y, $this->_attributes['width'], $this->_attributes['height']);
+        }
 
         return $this;
     }
@@ -196,19 +200,21 @@ class Image
      */
     public function markText($text, $pos = [0, 0], $fontColor = 'black', $fontSize = 12, $fontPath = 'simkai')
     {
-        $this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']);
-        $this->__setTransparency();
-        $text = Charset::toUtf($text);
-        $temp = imagettfbbox($fontSize, 0, $fontPath, $text);
-        $textWidth = $temp[2] - $temp[6];
-        // $textHeight = $temp[3] - $temp[7];
-        imagesettile($this->_imageOut, $this->_imageIn);
-        imagefilledrectangle($this->_imageOut, 0, 0, $this->_attributes['width'], $this->_attributes['height'], IMG_COLOR_TILED);
-        list($red, $green, $blue) = (new Color($fontColor))->toRGB()->get();
-        $text2 = imagecolorallocate($this->_imageOut, $red, $green, $blue);
-        $posX = min($pos[0], $this->_attributes['width'] - $textWidth);
-        $posY = min($pos[1], $this->_attributes['height']);
-        imagettftext($this->_imageOut, $fontSize, 0, $posX, $posY, $text2, $fontPath, $text);
+        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
+            $this->_imageOut = $out;
+            $this->__setTransparency();
+            $text = Charset::toUtf($text);
+            $temp = imagettfbbox($fontSize, 0, $fontPath, $text);
+            $textWidth = $temp[2] - $temp[6];
+            // $textHeight = $temp[3] - $temp[7];
+            imagesettile($this->_imageOut, $this->_imageIn);
+            imagefilledrectangle($this->_imageOut, 0, 0, $this->_attributes['width'], $this->_attributes['height'], IMG_COLOR_TILED);
+            list($red, $green, $blue) = (new Color($fontColor))->toRGB()->get();
+            $text2 = imagecolorallocate($this->_imageOut, $red, $green, $blue);
+            $posX = min($pos[0], $this->_attributes['width'] - $textWidth);
+            $posY = min($pos[1], $this->_attributes['height']);
+            imagettftext($this->_imageOut, $fontSize, 0, $posX, $posY, $text2, $fontPath, $text);
+        }
 
         return $this;
     }
@@ -224,15 +230,18 @@ class Image
      */
     public function markPicture($image, $pos = [0, 0], $size = null)
     {
-        $this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']);
-        $this->__setTransparency();
-        $markAttrs = $this->__parseImage($image);
-        null === $size && $size = [$markAttrs['width'], $markAttrs['height']];
-        imagecopy($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $this->_attributes['width'], $this->_attributes['height']);
-        $posX = min($pos[0], $this->_attributes['width'] - $size[0]);
-        $posY = min($pos[1], $this->_attributes['height'] - $size[1]);
-        imagecopyresized($this->_imageOut, $markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
-        imagedestroy($markAttrs['object']);
+        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
+            $this->_imageOut = $out;
+            $this->__setTransparency();
+            $markAttrs = $this->__parseImage($image);
+            null === $size && $size = [$markAttrs['width'], $markAttrs['height']];
+            imagecopy($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $this->_attributes['width'], $this->_attributes['height']);
+            $posX = min($pos[0], $this->_attributes['width'] - $size[0]);
+            $posY = min($pos[1], $this->_attributes['height'] - $size[1]);
+            imagecopyresized($this->_imageOut, $markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
+            imagedestroy($markAttrs['object']);
+        }
+
         return $this;
     }
 
@@ -243,10 +252,13 @@ class Image
      */
     public function turnY()
     {
-        $this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']);
-        for ($x = 0; $x < $this->_attributes['width']; $x++) {
-            imagecopy($this->_imageOut, $this->_imageIn, $this->_attributes['width'] - $x - 1, 0, $x, 0, 1, $this->_attributes['height']);
+        if($out =imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']) ){
+            $this->_imageOut = $out;
+            for ($x = 0; $x < $this->_attributes['width']; $x++) {
+                imagecopy($this->_imageOut, $this->_imageIn, $this->_attributes['width'] - $x - 1, 0, $x, 0, 1, $this->_attributes['height']);
+            }
         }
+
         return $this;
     }
 
@@ -257,10 +269,13 @@ class Image
      */
     public function turnX()
     {
-        $this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']);
-        for ($y = 0; $y < $this->_attributes['height']; $y++) {
-            imagecopy($this->_imageOut, $this->_imageIn, 0, $this->_attributes['height'] - $y - 1, 0, $y, $this->_attributes['width'], 1);
+        if($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])){
+            $this->_imageOut = $out;
+            for ($y = 0; $y < $this->_attributes['height']; $y++) {
+                imagecopy($this->_imageOut, $this->_imageIn, 0, $this->_attributes['height'] - $y - 1, 0, $y, $this->_attributes['width'], 1);
+            }
         }
+
         return $this;
     }
 

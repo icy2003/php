@@ -47,7 +47,7 @@ class Base64
      *
      * @param string $string base64 字符串
      *
-     * @return string
+     * @return string|boolean
      */
     public static function decode($string)
     {
@@ -59,7 +59,7 @@ class Base64
      *
      * @param string $file 文件路径
      *
-     * @return string
+     * @return string|boolean
      *
      * @test icy2003\php\tests\ihelpers\Base64Test::testFromFile
      */
