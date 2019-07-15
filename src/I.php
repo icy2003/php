@@ -257,12 +257,22 @@ class I
             $pos++;
         }
         // 对 Yii2 的支持
-        if (method_exists('\Yii', 'getAlias') && $result = /** @scrutinizer ignore-call */\Yii::getAlias($alias)) {
-            true === $loadNew && static::setAlias($alias, $result);
+        if ($result = self::trigger(['\Yii', 'getAlias'], [$alias])) {
+            true === $loadNew && self::setAlias($alias, $result);
             return $result;
         }
 
         return false;
+    }
+
+    /**
+     * 是否是 Yii2 项目
+     *
+     * @return boolean
+     */
+    public static function isYii2()
+    {
+        return method_exists('\Yii', 'getVersion');
     }
 
     /**
@@ -276,7 +286,7 @@ class I
     public static function setAlias($alias, $path)
     {
         // 对 Yii2 的支持
-        method_exists('\Yii', 'getAlias') && /** @scrutinizer ignore-call */\Yii::setAlias($alias, $path);
+        self::trigger(['\Yii', 'setAlias'], [$alias, $path]);
         if (strncmp($alias, '@', 1)) {
             $alias = '@' . $alias;
         }
