@@ -37,13 +37,11 @@ class Charset
      * 将任意编码的字符串转成 UTF-8.
      *
      * @param string $string
-     * @param string $charset 原编码，默认会自动判断
      *
      * @return string 转码后的字符串
      */
-    public static function toUtf($string, $charset = '')
+    public static function toUtf($string)
     {
-        $charset = $charset ?: self::detect($string);
         return self::convertTo($string, 'UTF-8');
     }
 
@@ -51,13 +49,11 @@ class Charset
      * 将任意编码的字符串转成中文编码.
      *
      * @param string $string
-     * @param string $charset 原编码，默认会自动判断
      *
      * @return string 转码后的字符串
      */
-    public static function toCn($string, $charset = '')
+    public static function toCn($string)
     {
-        $charset = $charset ?: self::detect($string);
         return self::convertTo($string, 'EUC-CN');
     }
 

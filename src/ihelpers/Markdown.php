@@ -195,9 +195,9 @@ class Markdown
      * @param array $styleArray 样式数组
      * @param bool $transpose 是否反转
      *
-     * @return void
+     * @return string
      */
-    public static function table($array, $styleArray = [], $transpose = false)
+    public static function table($array, /** @scrutinizer ignore-unused */$styleArray = [], /** @scrutinizer ignore-unused */$transpose = false)
     {
         if (empty($array)) {
             return '';

@@ -9,6 +9,7 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 文件类上传类
@@ -70,12 +71,13 @@ class Upload
     public static function download($fileName)
     {
         try {
-            if ($file = File::create($fileName)) {
+            $local = new LocalFile();
+            if ($local->isFile($fileName)) {
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Accept-Length:' . $file->splFileInfo()->getSize());
-                header('Content-Disposition: attachment; filename=' . Charset::toCn(File::basename($fileName)));
-                foreach ($file->data() as $data) {
+                header('Accept-Length:' . $local->getFilesize($fileName));
+                header('Content-Disposition: attachment; filename=' . Charset::toCn($local->getBasename($fileName)));
+                foreach ($local->dataGenerator($fileName) as $data) {
                     echo $data;
                 }
             }
@@ -189,10 +191,10 @@ class Upload
     {
         if (self::ERROR_SUCCESS === $_FILES[$this->__formName]['error']) {
             if (is_uploaded_file($file = $_FILES[$this->__formName]['tmp_name'])) {
-                $f = File::create()->loadFile($file);
+                $local = new LocalFile();
                 $fileName = $_FILES[$this->__formName]['name'];
-                $fileSize = $f->splFileInfo()->getSize();
-                $fileExt = $f->splFileInfo()->getExtension();
+                $fileSize = $local->getFilesize($file);
+                $fileExt = $local->splInfo($file)->getExtension();
                 if ($fileSize > $this->__sizeLimit) {
                     $this->__errorCode = self::ERROR_SIZE_LIMIT;
 
@@ -207,9 +209,9 @@ class Upload
                 $this->__attributes['sha1'] = sha1_file($file);
                 $this->__attributes['ext'] = $fileExt;
                 $this->__attributes['size'] = $fileSize;
-                $this->__attributes['filectime'] = $f->splFileInfo()->getCTime();
-                $this->__attributes['filemtime'] = $f->splFileInfo()->getMTime();
-                $this->__attributes['fileatime'] = $f->splFileInfo()->getATime();
+                $this->__attributes['filectime'] = $local->splInfo($file)->getCTime();
+                $this->__attributes['filemtime'] = $local->splInfo($file)->getMTime();
+                $this->__attributes['fileatime'] = $local->splInfo($file)->getATime();
                 $this->__attributes['originName'] = $fileName;
                 $this->__attributes['fileName'] = date('YmdHis') . Strings::random(10) . '.' . $fileExt;
                 $this->__errorCode = self::ERROR_SUCCESS;

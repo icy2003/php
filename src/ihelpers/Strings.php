@@ -216,6 +216,7 @@ class Strings
      *
      * @param string $string
      * @param string $search 待搜索子字符串
+     * @param integer $pos 如果找到子串，则引用出子串的起始位置
      *
      * @return boolean
      */

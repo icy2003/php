@@ -54,12 +54,7 @@ abstract class Base
     abstract public function getCommandResult($command);
 
     /**
-     * 返回路径中的文件名部分
-     *
-     * @param string $path 一个路径。无视 `/` 和 `\`
-     * @param string $suffix 如果文件名是以 suffix 结束的，那这一部分也会被去掉
-     *
-     * @return string
+     * @ignore
      */
     public function getBasename($path, $suffix = null)
     {
@@ -68,11 +63,7 @@ abstract class Base
     }
 
     /**
-     * 返回路径中的目录部分
-     *
-     * @param string $path 一个路径。无视 `/` 和 `\`
-     *
-     * @return string
+     * @ignore
      */
     public function getDirname($path)
     {
@@ -81,20 +72,12 @@ abstract class Base
     }
 
     /**
-     * 是否是一个文件
-     *
-     * @param string $file 文件的路径
-     *
-     * @return boolean
+     * @ignore
      */
     abstract public function isFile($file);
 
     /**
-     * 是否是一个目录
-     *
-     * @param string $dir 目录的路径
-     *
-     * @return boolean
+     * @ignore
      */
     abstract public function isDir($dir);
 
@@ -158,7 +141,7 @@ abstract class Base
      *
      * @param string $file 要读取的文件的名称
      *
-     * @return string
+     * @return string|false
      */
     abstract public function getFileContent($file);
 
