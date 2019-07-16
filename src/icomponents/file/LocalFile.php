@@ -498,6 +498,8 @@ class LocalFile extends Base implements FileInterface
             throw $e;
         } finally {
             I::trigger($callback, [$this->_attributes]);
+            // 必须要终止掉，防止发送其他数据导致错误
+            die;
         }
     }
 
