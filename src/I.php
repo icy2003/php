@@ -218,6 +218,9 @@ class I
      */
     public static function getAlias($alias, $loadNew = false)
     {
+        if (strncmp($alias, '@', 1)) {
+            return $alias;
+        }
         $localFile = new LocalFile();
         $aliases = [
             '@vendor' => __DIR__ . '/../../../../vendor',
@@ -229,9 +232,6 @@ class I
             if (false === array_key_exists($k, static::$aliases)) {
                 static::$aliases[$k] = $localFile->getRealpath($v);
             }
-        }
-        if (strncmp($alias, '@', 1)) {
-            return $alias;
         }
 
         $pos = 0;
