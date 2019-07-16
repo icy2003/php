@@ -12,13 +12,13 @@ build:
                     -
                         command: phpcs-run
                         use_website_config: true
-        tests:
-            override:
-                -
-                    command: vendor/bin/codecept --coverage-clover=my-coverage-file
-                    coverage:
-                        file: my-coverage-file
-                        format: php-clover
+    tests:
+        override:
+            -
+                command: vendor/bin/codecept --coverage-clover=my-coverage-file
+                coverage:
+                    file: my-coverage-file
+                    format: php-clover
 filter:
     excluded_paths:
         - 'tests/*'
