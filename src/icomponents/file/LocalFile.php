@@ -8,8 +8,11 @@
  */
 namespace icy2003\php\icomponents\file;
 
+use Exception;
 use icy2003\php\I;
 use icy2003\php\icomponents\file\FileInterface;
+use icy2003\php\ihelpers\Charset;
+use icy2003\php\ihelpers\Header;
 
 /**
  * 本地文件
@@ -48,10 +51,12 @@ class LocalFile extends Base implements FileInterface
         setlocale(LC_ALL, $locale);
         clearstatcache();
         $this->_functions['loader'] = function ($fileName) {
-            $hashName = $this->_getHashName($fileName);
+            $hashName = $this->__hash($fileName);
             $this->_attributes[$hashName] = I::get($this->_attributes, $hashName, [
                 'isCached' => false,
                 'isLocal' => true,
+                'file' => $this->__file($fileName),
+                // 以下属性需要重新设置
                 'isExists' => false,
                 'fileSize' => 0,
             ]);
@@ -76,8 +81,8 @@ class LocalFile extends Base implements FileInterface
                         }
                     }
                     curl_close($curl);
-                } elseif ((bool)ini_get('allow_url_fopen')) {
-                    $headArray = (array)get_headers($fileName, true);
+                } elseif ((bool) ini_get('allow_url_fopen')) {
+                    $headArray = (array) get_headers($fileName, 1);
                     if (preg_match('/200/', $headArray[0])) {
                         $this->_attributes[$hashName]['isExists'] = true;
                         $this->_attributes[$hashName]['fileSize'] = $headArray['Content-Length'];
@@ -88,7 +93,7 @@ class LocalFile extends Base implements FileInterface
                     $path = I::get($url, 'path', '/');
                     $port = I::get($url, 'port', 80);
                     $fp = fsockopen($host, $port);
-                    if ((bool)$fp) {
+                    if (is_resource($fp)) {
                         $header = [
                             'GET ' . $path . ' HTTP/1.0',
                             'HOST: ' . $host . ':' . $port,
@@ -109,8 +114,10 @@ class LocalFile extends Base implements FileInterface
                 }
             } else {
                 $this->_attributes[$hashName]['isLocal'] = true;
-                $this->_attributes[$hashName]['spl'] = new \SplFileObject($fileName);
-                $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($fileName);
+                $this->_attributes[$hashName]['isExists'] = file_exists($this->_attributes[$hashName]['file']);
+                $this->_attributes[$hashName]['fileSize'] = filesize($this->_attributes[$hashName]['file']);
+                $this->_attributes[$hashName]['spl'] = new \SplFileObject($this->_attributes[$hashName]['file']);
+                $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($this->_attributes[$hashName]['file']);
             }
         };
     }
@@ -122,9 +129,21 @@ class LocalFile extends Base implements FileInterface
      *
      * @return string
      */
-    protected function _getHashName($fileName)
+    private function __hash($fileName)
     {
         return md5($fileName);
+    }
+
+    /**
+     * 返回路径别名
+     *
+     * @param string $file
+     *
+     * @return string
+     */
+    private function __file($file)
+    {
+        return (string) I::getAlias($file);
     }
 
     /**
@@ -135,10 +154,10 @@ class LocalFile extends Base implements FileInterface
      *
      * @return mixed
      */
-    protected function _getFileAttribute($fileName, $name)
+    public function attribute($fileName, $name)
     {
         I::trigger($this->_functions['loader'], [$fileName]);
-        return $this->_attributes[$this->_getHashName($fileName)][$name];
+        return I::get($this->_attributes, $this->__hash($fileName) . '.' . $name);
     }
 
     /**
@@ -150,8 +169,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function spl($fileName)
     {
-        I::trigger($this->_functions['loader'], [$fileName]);
-        return $this->_getFileAttribute($fileName, 'spl');
+        return $this->attribute($fileName, 'spl');
     }
 
     /**
@@ -163,8 +181,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function splInfo($fileName)
     {
-        I::trigger($this->_functions['loader'], [$fileName]);
-        return $this->_getFileAttribute($fileName, 'splInfo');
+        return $this->attribute($fileName, 'splInfo');
     }
 
     /**
@@ -236,9 +253,9 @@ class LocalFile extends Base implements FileInterface
     /**
      * @ignore
      */
-    public function getATime($filename)
+    public function getATime($fileName)
     {
-        return fileatime($filename);
+        return fileatime($this->__file($fileName));
     }
 
     /**
@@ -246,39 +263,39 @@ class LocalFile extends Base implements FileInterface
      */
     public function getBasename($path, $suffix = null)
     {
-        return parent::getBasename($path, $suffix);
+        return parent::getBasename($this->__file($path), $suffix);
     }
 
     /**
      * @ignore
      */
-    public function getCTime($filename)
+    public function getCTime($fileName)
     {
-        return filectime($filename);
+        return filectime($this->__file($fileName));
     }
 
     /**
      * @ignore
      */
-    public function getExtension($filename)
+    public function getExtension($fileName)
     {
-        return pathinfo($filename, PATHINFO_EXTENSION);
+        return pathinfo($this->__file($fileName), PATHINFO_EXTENSION);
     }
 
     /**
      * @ignore
      */
-    public function getFilename($filename)
+    public function getFilename($fileName)
     {
-        return pathinfo($filename, PATHINFO_FILENAME);
+        return pathinfo($this->__file($fileName), PATHINFO_FILENAME);
     }
 
     /**
      * @ignore
      */
-    public function getMtime($filename)
+    public function getMtime($fileName)
     {
-        return filemtime($filename);
+        return filemtime($this->__file($fileName));
     }
 
     /**
@@ -286,7 +303,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getDirname($path)
     {
-        return parent::getDirname($path);
+        return parent::getDirname($this->__file($path));
     }
 
     /**
@@ -294,19 +311,15 @@ class LocalFile extends Base implements FileInterface
      */
     public function getPerms($path)
     {
-        return fileperms($path);
+        return fileperms($this->__file($path));
     }
 
     /**
      * @ignore
      */
-    public function getFilesize($file)
+    public function getFilesize($fileName)
     {
-        I::trigger($this->_functions['loader'], [$file]);
-        if (false === $this->_getFileAttribute($file, 'isLocal')) {
-            return $this->_getFileAttribute($file, 'fileSize');
-        }
-        return filesize($file);
+        return $this->attribute($fileName, 'fileSize');
     }
 
     /**
@@ -314,7 +327,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getType($path)
     {
-        return filetype($path);
+        return filetype($this->__file($path));
     }
 
     /**
@@ -322,7 +335,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isDir($dir)
     {
-        return is_dir($dir);
+        return is_dir($this->__file($dir));
     }
 
     /**
@@ -338,19 +351,15 @@ class LocalFile extends Base implements FileInterface
      */
     public function isFile($file)
     {
-        I::trigger($this->_functions['loader'], [$file]);
-        if (false === $this->_getFileAttribute($file, 'isLocal')) {
-            return $this->_getFileAttribute($file, 'isExists');
-        }
-        return file_exists($file);
+        return $this->attribute($file, 'isExists');
     }
 
     /**
      * @ignore
      */
-    public function isLink($filename)
+    public function isLink($link)
     {
-        return is_link($filename);
+        return is_link($this->__file($link));
     }
 
     /**
@@ -358,7 +367,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isReadable($path)
     {
-        return is_readable($path);
+        return is_readable($this->__file($path));
     }
 
     /**
@@ -366,7 +375,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isWritable($path)
     {
-        return is_writable($path);
+        return is_writable($this->__file($path));
     }
 
     /**
@@ -382,7 +391,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getRealpath($path)
     {
-        return realpath($path);
+        return realpath($this->__file($path));
     }
 
     /**
@@ -391,7 +400,7 @@ class LocalFile extends Base implements FileInterface
     public function getLists($dir = null, $flags = FileConstants::COMPLETE_PATH)
     {
         null === $dir && $dir = $this->getRealpath('./');
-        $dir = rtrim($dir, '/') . '/';
+        $dir = $this->__file(rtrim($dir, '/') . '/');
         $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS);
         if (I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
@@ -415,7 +424,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFileContent($file)
     {
-        return file_get_contents($file);
+        return file_get_contents($this->__file($file));
     }
 
     /**
@@ -423,6 +432,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function putFileContent($file, $string, $mode = 0777)
     {
+        $file = $this->__file($file);
         $this->createDir($this->getDirname($file), $mode);
         $isCreated = false !== file_put_contents($file, $string);
         $this->chmod($file, $mode, FileConstants::RECURSIVE_DISABLED);
@@ -434,6 +444,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function deleteFile($file)
     {
+        $file = $this->__file($file);
         if ($this->isFile($file)) {
             return unlink($file);
         }
@@ -457,10 +468,38 @@ class LocalFile extends Base implements FileInterface
     }
 
     /**
+     * 客户端向服务端发起下载请求
+     *
+     * @param string $fileName
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function download($fileName)
+    {
+        $fileName = $this->__file($fileName);
+        try {
+            if ($this->isFile($fileName)) {
+                header('Content-type:application/octet-stream');
+                header('Accept-Ranges:bytes');
+                header('Accept-Length:' . $this->getFilesize($fileName));
+                header('Content-Disposition: attachment; filename=' . Charset::toCn($this->getBasename($fileName)));
+                foreach ($this->dataGenerator($fileName) as $data) {
+                    echo $data;
+                }
+            }
+        } catch (Exception $e) {
+            Header::notFound();
+            throw $e;
+        }
+    }
+
+    /**
      * @ignore
      */
     public function chown($file, $user, $flags = FileConstants::RECURSIVE_DISABLED)
     {
+        $file = $this->__file($file);
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
@@ -475,6 +514,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function chgrp($file, $group, $flags = FileConstants::RECURSIVE_DISABLED)
     {
+        $file = $this->__file($file);
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
@@ -489,6 +529,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function chmod($file, $mode = 0777, $flags = FileConstants::RECURSIVE_DISABLED)
     {
+        $file = $this->__file($file);
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
@@ -503,6 +544,8 @@ class LocalFile extends Base implements FileInterface
      */
     public function symlink($from, $to)
     {
+        $from = $this->__file($from);
+        $to = $this->__file($to);
         return symlink($from, $to);
     }
 
@@ -511,11 +554,12 @@ class LocalFile extends Base implements FileInterface
      */
     public function close($fileName = null)
     {
+        $fileName = $this->__file($fileName);
         if (is_string($fileName)) {
-            $fileName = [$this->_getHashName($fileName)];
+            $fileName = [$this->__hash($fileName)];
         } elseif (is_array($fileName)) {
             foreach ($fileName as $k => $name) {
-                $fileName[$k] = $this->_getHashName($name);
+                $fileName[$k] = $this->__hash($name);
             }
         }
         foreach ($this->_attributes as $hashName => /** @scrutinizer ignore-unused */$attribute) {
@@ -531,6 +575,8 @@ class LocalFile extends Base implements FileInterface
      */
     protected function _copy($fromFile, $toFile)
     {
+        $fromFile = $this->__file($fromFile);
+        $toFile = $this->__file($toFile);
         return copy($fromFile, $toFile);
     }
 
@@ -539,6 +585,8 @@ class LocalFile extends Base implements FileInterface
      */
     protected function _move($fromFile, $toFile)
     {
+        $fromFile = $this->__file($fromFile);
+        $toFile = $this->__file($toFile);
         return rename($fromFile, $toFile);
     }
 
@@ -547,6 +595,7 @@ class LocalFile extends Base implements FileInterface
      */
     protected function _mkdir($dir, $mode = 0777)
     {
+        $dir = $this->__file($dir);
         return mkdir($dir, $mode);
     }
 
@@ -555,6 +604,7 @@ class LocalFile extends Base implements FileInterface
      */
     protected function _rmdir($dir)
     {
+        $dir = $this->__file($dir);
         return rmdir($dir);
     }
 

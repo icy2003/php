@@ -16,11 +16,11 @@ interface FileInterface
     /**
      * 取得文件的上次访问时间
      *
-     * @param string $filename 文件的路径
+     * @param string $fileName 文件的路径
      *
      * @return integer
      */
-    public function getATime($filename);
+    public function getATime($fileName);
 
     /**
      * 返回路径中的文件名部分
@@ -35,38 +35,38 @@ interface FileInterface
     /**
      * 取得文件的 inode 修改时间
      *
-     * @param string $filename 文件的路径
+     * @param string $fileName 文件的路径
      *
      * @return integer
      */
-    public function getCTime($filename);
+    public function getCTime($fileName);
 
     /**
      * 获取文件后缀
      *
-     * @param string $filename 文件的路径
+     * @param string $fileName 文件的路径
      *
      * @return string
      */
-    public function getExtension($filename);
+    public function getExtension($fileName);
 
     /**
      * 返回文件名（不带后缀）
      *
-     * @param string $filename 文件的路径
+     * @param string $fileName 文件的路径
      *
      * @return string
      */
-    public function getFilename($filename);
+    public function getFilename($fileName);
 
     /**
      * 取得文件修改时间
      *
-     * @param string $filename 文件的路径
+     * @param string $fileName 文件的路径
      *
      * @return integer
      */
-    public function getMtime($filename);
+    public function getMtime($fileName);
 
     /**
      * 返回路径中的目录部分
@@ -136,11 +136,11 @@ interface FileInterface
     /**
      * 是否是一个链接
      *
-     * @param string $filename
+     * @param string $link
      *
      * @return boolean
      */
-    public function isLink($filename);
+    public function isLink($link);
 
     /**
      * 目录或文件是否可读
