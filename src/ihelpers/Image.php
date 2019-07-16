@@ -305,6 +305,7 @@ class Image
     {
         header('Content-type:' . $this->_attributes['mime']);
         $method = $this->_attributes['method'];
+        null === $this->_imageOut && $this->_imageOut = $this->_imageIn;
         $method($this->_imageOut);
     }
 
@@ -315,8 +316,8 @@ class Image
      */
     public function destroy()
     {
-        imagedestroy($this->_imageIn);
-        imagedestroy($this->_imageOut);
+        is_resource($this->_imageIn) && imagedestroy($this->_imageIn);
+        is_resource($this->_imageOut) && imagedestroy($this->_imageOut);
     }
 
     /**
