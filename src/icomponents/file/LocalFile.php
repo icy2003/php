@@ -471,11 +471,12 @@ class LocalFile extends Base implements FileInterface
      * 客户端向服务端发起下载请求
      *
      * @param string $fileName
+     * @param callback $callback 下载完成后的回调，参数列表：文件属性数组
      *
      * @return void
      * @throws Exception
      */
-    public function download($fileName)
+    public function download($fileName, $callback = null)
     {
         $fileName = $this->__file($fileName);
         try {
@@ -491,6 +492,8 @@ class LocalFile extends Base implements FileInterface
         } catch (Exception $e) {
             Header::notFound();
             throw $e;
+        } finally {
+            I::trigger($callback, [$this->_attributes]);
         }
     }
 
