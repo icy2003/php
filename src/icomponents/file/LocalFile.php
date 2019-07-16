@@ -554,7 +554,6 @@ class LocalFile extends Base implements FileInterface
      */
     public function close($fileName = null)
     {
-        $fileName = $this->__file($fileName);
         if (is_string($fileName)) {
             $fileName = [$this->__hash($fileName)];
         } elseif (is_array($fileName)) {
