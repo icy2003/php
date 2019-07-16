@@ -7,7 +7,6 @@ matrix:
     - php: 7.0
       env:
         - CODECEPTION_TEST=1
-        - CODECOV_TOKEN="78e2d1a5-a521-4cb7-8fbc-57cf8dc20266"
     - php: 7.1
     - php: 7.2
     - php: 7.3
