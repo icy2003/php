@@ -63,6 +63,7 @@ class Image
      */
     private function __parseImage($image)
     {
+        $image = I::getAlias($image);
         if (false === ($size = @getimagesize($image))) {
             throw new Exception('不是有效的图片：' . $image);
         }

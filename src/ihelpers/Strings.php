@@ -137,8 +137,8 @@ class Strings
 
         $test .= '\0';
         $hash .= '\0';
-        $expectedLength = static::byteLength($test);
-        $actualLength = static::byteLength($hash);
+        $expectedLength = self::byteLength($test);
+        $actualLength = self::byteLength($hash);
         $diff = $expectedLength - $actualLength;
         for ($i = 0; $i < $actualLength; $i++) {
             $diff |= (ord($hash[$i]) ^ ord($test[$i % $expectedLength]));

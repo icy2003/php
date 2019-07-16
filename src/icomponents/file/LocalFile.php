@@ -470,7 +470,7 @@ class LocalFile extends Base implements FileInterface
     /**
      * 客户端向服务端发起下载请求
      *
-     * @param string $fileName
+     * @param string|array $fileName 如果是数组，第一个元素是原名，第二个元素为下载名，原名需要指定路径，下载名不需要
      * @param callback $callback 下载完成后的回调，参数列表：文件属性数组
      *
      * @return void
@@ -478,14 +478,18 @@ class LocalFile extends Base implements FileInterface
      */
     public function download($fileName, $callback = null)
     {
-        $fileName = $this->__file($fileName);
+        if (is_string($fileName)) {
+            $fileName = [$fileName, Charset::toCn($this->getBasename($fileName))];
+        }
+        list($originName, $downloadName) = $fileName;
+        $originName = $this->__file($originName);
         try {
-            if ($this->isFile($fileName)) {
+            if ($this->isFile($originName)) {
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Accept-Length:' . $this->getFilesize($fileName));
-                header('Content-Disposition: attachment; filename=' . Charset::toCn($this->getBasename($fileName)));
-                foreach ($this->dataGenerator($fileName) as $data) {
+                header('Accept-Length:' . $this->getFilesize($originName));
+                header('Content-Disposition: attachment; filename=' . $downloadName);
+                foreach ($this->dataGenerator($originName) as $data) {
                     echo $data;
                 }
             }
