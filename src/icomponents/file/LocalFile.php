@@ -76,8 +76,8 @@ class LocalFile extends Base implements FileInterface
                         }
                     }
                     curl_close($curl);
-                } elseif (ini_get('allow_url_fopen')) {
-                    $headArray = get_headers($fileName, true);
+                } elseif ((bool)ini_get('allow_url_fopen')) {
+                    $headArray = (array)get_headers($fileName, true);
                     if (preg_match('/200/', $headArray[0])) {
                         $this->_attributes[$hashName]['isExists'] = true;
                         $this->_attributes[$hashName]['fileSize'] = $headArray['Content-Length'];
@@ -88,7 +88,7 @@ class LocalFile extends Base implements FileInterface
                     $path = I::get($url, 'path', '/');
                     $port = I::get($url, 'port', 80);
                     $fp = fsockopen($host, $port);
-                    if ($fp) {
+                    if ((bool)$fp) {
                         $header = [
                             'GET ' . $path . ' HTTP/1.0',
                             'HOST: ' . $host . ':' . $port,
@@ -133,7 +133,7 @@ class LocalFile extends Base implements FileInterface
      * @param string $fileName
      * @param string $name
      *
-     * @return array
+     * @return mixed
      */
     protected function _getFileAttribute($fileName, $name)
     {
@@ -339,8 +339,8 @@ class LocalFile extends Base implements FileInterface
     public function isFile($file)
     {
         I::trigger($this->_functions['loader'], [$file]);
-        if (false === $this->_getNetFileAttribute($file, 'isLocal')) {
-            return $this->_getNetFileAttribute($file, 'isExists');
+        if (false === $this->_getFileAttribute($file, 'isLocal')) {
+            return $this->_getFileAttribute($file, 'isExists');
         }
         return file_exists($file);
     }
