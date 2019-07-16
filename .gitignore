@@ -28,6 +28,9 @@ Thumbs.db
 # composer 本身不需要
 composer.phar
 
+# ocular.phar
+ocular.phar
+
 # composer.lock 也不需要因为 composer 在安装时会自动生成该文件
 /composer.lock
 
