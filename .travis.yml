@@ -38,7 +38,7 @@ install:
   - travis_retry composer self-update
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
-  - composer require phpunit/phpunit@4.8.34
+  - composer require phpunit/phpunit 4.8.36
 script:
   - if [ $TASK_TESTS_PHP == 1 ]; then ./vendor/bin/phpunit --verbose $PHPUNIT_FLAGS --exclude-group $PHPUNIT_EXCLUDE_GROUP; fi
 after_success:
