@@ -14,7 +14,7 @@ matrix:
 
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet
-  - if [[$CODECEPTION_TEST == 1]]; then composer require codeception/codeception@3.0.x-dev fi
+  - if [[$CODECEPTION_TEST == 1]]; then composer require codeception/codeception@3.0.x-dev; fi
 
 notifications:
   email:
