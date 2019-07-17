@@ -38,8 +38,8 @@ install:
   - travis_retry composer self-update
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
-  - if [[$TASK_TESTS_PHP == 1]]; then composer require phpunit/phpunit@4.8.34; fi
+  - composer require phpunit/phpunit@4.8.34
 script:
-  - if [ $TASK_TESTS_PHP == 1 ]; then vendor/bin/phpunit --verbose $PHPUNIT_FLAGS --exclude-group $PHPUNIT_EXCLUDE_GROUP; fi
+  - if [ $TASK_TESTS_PHP == 1 ]; then ./vendor/bin/phpunit --verbose $PHPUNIT_FLAGS --exclude-group $PHPUNIT_EXCLUDE_GROUP; fi
 after_success:
   - if [ $TASK_TESTS_COVERAGE == 1 ]; then travis_retry wget https://scrutinizer-ci.com/ocular.phar; php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
