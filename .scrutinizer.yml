@@ -9,9 +9,6 @@ build:
             tests:
                 override:
                     - php-scrutinizer-run
-                    -
-                        command: phpcs-run
-                        use_website_config: true
     tests: true
 filter:
     excluded_paths:
@@ -28,3 +25,6 @@ coding_style:
                 concatenation: true
             other:
                 after_type_cast: false
+tools:
+    external_code_coverage:
+        timeout: 3600

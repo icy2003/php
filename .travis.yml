@@ -1,5 +1,5 @@
 language: php
-
+dist: trusty
 matrix:
   fast_finish: true
   include:
@@ -18,6 +18,17 @@ install:
     if [[$CODECEPTION_TEST == 1]]; then
     composer require codeception/codeception@3.0.x-dev
     fi
+before_script:
+    - travis_retry composer self-update
+    - travis_retry composer install --no-interaction --prefer-source --dev
+
+script:
+  - |
+    if [[$CODECEPTION_TEST == 1]]; then
+    ./vendor/bin/codecept run
+    fi
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
 
 notifications:
   email:
@@ -25,16 +36,3 @@ notifications:
     - 2317216477@qq.com
     on_success: always
     on_failure: never
-
-before_script:
-    - travis_retry composer self-update
-    - travis_retry composer install --no-interaction --prefer-source --dev
-
-script:
-  - vendor/bin/phpunit --coverage-clover=coverage.xml
-  - |
-    if [[$CODECEPTION_TEST == 1]]; then
-    ./vendor/bin/codecept run
-    fi
-after_success:
-    - bash <(curl -s https://codecov.io/bash)
