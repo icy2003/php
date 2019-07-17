@@ -33,13 +33,13 @@ matrix:
 before_script:
   - php --version
   - composer --version
-  - if [ $TASK_TESTS_COVERAGE == 1 ]; then PHPUNIT_FLAGS="--coverage-clover=coverage.clover"; fi
+  - if [ $TASK_TESTS_COVERAGE == 1 ]; then PHPUNIT_FLAGS="--coverage-clover coverage.clover"; fi
 install:
   - travis_retry composer self-update
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
   - composer require phpunit/phpunit 4.8.36
 script:
-  - if [ $TASK_TESTS_PHP == 1 ]; then vendor/bin/phpunit --verbose $PHPUNIT_FLAGS --exclude-group $PHPUNIT_EXCLUDE_GROUP; fi
+  - if [ $TASK_TESTS_COVERAGE == 1 ]; then php vendor/bin/phpunit $PHPUNIT_FLAGS --exclude-group $PHPUNIT_EXCLUDE_GROUP; fi
 after_success:
   - if [ $TASK_TESTS_COVERAGE == 1 ]; then travis_retry wget https://scrutinizer-ci.com/ocular.phar; php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
