@@ -1,17 +1,22 @@
-language: php
 dist: trusty
 matrix:
   fast_finish: true
   include:
     - php: 5.6
+    - php: 7.0
+      env:
+        - CODECEPTION_TEST=1
     - php: 7.1
+    - php: 7.2
+    - php: 7.3
     - php: nightly
 
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet
-  - composer require codeception/codeception 3.0.x-dev
+  - if [$CODECEPTION_TEST == 1]; then composer require codeception/codeception 3.0.x-dev; fi
 script:
-  - ./vendor/bin/codecept run
+  - if [$CODECEPTION_TEST == 1]; then ./vendor/bin/codecept run; fi
+
 notifications:
   email:
     recipients:
