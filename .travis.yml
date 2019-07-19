@@ -21,7 +21,13 @@ install:
 script:
   - |
     if [[$CODECEPTION_TEST == 1]]; then
-    ./vendor/bin/codecept run
+    ./vendor/bin/codecept run --coverage-text --coverage-phpunit coverage.clover
+    fi
+after_scripts:
+  - |
+    if [[$CODECEPTION_TEST == 1]]; then
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
     fi
 
 notifications:
