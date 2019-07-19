@@ -6,7 +6,6 @@
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/icy2003/php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/)
-[![codecov](https://codecov.io/gh/icy2003/php/branch/master/graph/badge.svg)](https://codecov.io/gh/icy2003/php)
 
 **功能丰富**
 

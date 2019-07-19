@@ -446,6 +446,7 @@ class LocalFile extends Base implements FileInterface
     {
         $file = $this->__file($file);
         if ($this->isFile($file)) {
+            $this->close($file);
             return unlink($file);
         }
         return true;
@@ -478,6 +479,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function download($fileName, $callback = null)
     {
+        set_time_limit(0);
         if (is_string($fileName)) {
             $fileName = [$fileName, Charset::toCn($this->getBasename($fileName))];
         }
@@ -487,7 +489,7 @@ class LocalFile extends Base implements FileInterface
             if ($this->isFile($originName)) {
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Accept-Length:' . $this->getFilesize($originName));
+                header('Content-Length:' . $this->getFilesize($originName));
                 header('Content-Disposition: attachment; filename=' . $downloadName);
                 foreach ($this->dataGenerator($originName) as $data) {
                     echo $data;

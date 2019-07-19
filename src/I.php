@@ -58,7 +58,7 @@ class I
             $keyArray = explode('.', $keyString);
             foreach ($keyArray as $key) {
                 if (is_array($mixed)) {
-                    if (array_key_exists($key, $mixed)) {
+                    if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
                         $mixed = $mixed[$key];
                     } else {
                         return $defaultValue;
@@ -67,7 +67,7 @@ class I
                     $method = 'get' . ucfirst(Strings::toCamel($key));
                     if (method_exists($mixed, $method)) {
                         $mixed = $mixed->$method();
-                    } elseif (property_exists($mixed, $key)) {
+                    } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
                         $mixed = $mixed->$key;
                     } else {
                         return $defaultValue;

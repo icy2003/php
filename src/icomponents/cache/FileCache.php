@@ -57,7 +57,7 @@ class FileCache extends Base
     public function __construct($pathRoot = null)
     {
         if (null === $pathRoot) {
-            $this->_pathRoot = I::getAlias('@icy2003/php_runtime/cache');
+            $this->_pathRoot = (string) I::getAlias('@icy2003/php_runtime/cache');
         } else {
             $this->_pathRoot = $pathRoot;
         }
@@ -72,7 +72,7 @@ class FileCache extends Base
      * @param mixed $value 缓存值
      * @param int $duration 有效期，默认 0，表示永久
      *
-     * @return void
+     * @return boolean
      */
     public function set($key, $value, $duration = 0)
     {
@@ -100,7 +100,7 @@ class FileCache extends Base
      *
      * @param string $key 缓存键
      *
-     * @return void
+     * @return boolean
      */
     public function delete($key)
     {

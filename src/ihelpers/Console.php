@@ -201,11 +201,9 @@ class Console
      */
     public static function ansiFormat($string, $format = [])
     {
-        $code = trim(implode(';', $format));
-        if (!empty($code)) {
-            $code = '\033[' . $code . 'm';
-        }
-        return '\033[0m' . $code . $string . '\033[0m';
+        $code = implode(';', $format);
+
+        return "\033[0m" . ($code !== '' ? "\033[" . $code . 'm' : '') . $string . "\033[0m";
     }
 
     /**
