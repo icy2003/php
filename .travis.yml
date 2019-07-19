@@ -9,6 +9,8 @@ matrix:
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet
   - composer require codeception/codeception 3.0.x-dev
+before_scirpts:
+  - mkdir ./tests/{acceptance,functional}
 script:
   - ./vendor/bin/codecept run --coverage-text --coverage-phpunit coverage.clover
 after_scripts:
