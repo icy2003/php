@@ -12,8 +12,7 @@ build:
         coverage:
             tests:
                 override:
-                    - command: ./vendor/bin/codecept run --coverage-xml --coverage-phpunit coverage.clover
-                      coverage:
+                    coverage:
                         file: ./tests/_output/coverage.xml
                         format: clover
 filter:

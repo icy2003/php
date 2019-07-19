@@ -9,6 +9,11 @@ matrix:
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet
   - composer require codeception/codeception 3.0.x-dev
+script:
+  - ./vendor/bin/codecept run --coverage-xml --coverage-phpunit coverage.clover
+after_scripts:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
 
 notifications:
   email:
