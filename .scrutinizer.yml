@@ -26,5 +26,7 @@ coding_style:
             other:
                 after_type_cast: false
 tools:
+    php_code_coverage:
+        enabled: true
     external_code_coverage:
         timeout: 3600
