@@ -9,7 +9,12 @@ build:
             tests:
                 override:
                     - php-scrutinizer-run
-    tests: true
+        coverage:
+            tests:
+                override:
+                    coverage:
+                        file: ./tests/_output/coverage.xml
+                        format: clover
 filter:
     excluded_paths:
         - 'tests/*'
