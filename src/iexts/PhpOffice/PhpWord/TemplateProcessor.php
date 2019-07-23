@@ -177,7 +177,7 @@ class TemplateProcessor extends T
      * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
      * @param array $styleArray 对应所有单元格的样式二维数组
      *
-     * @return void
+     * @return boolean
      */
     public function setTableFromPart($documentPartXML, $var, $array, $mergeArray = [], $styleArray = [])
     {
@@ -261,6 +261,9 @@ class TemplateProcessor extends T
             $objWriter = IOFactory::createWriter($phpWord);
             $xml = $objWriter->getWriterPart('Document')->write();
             $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -274,11 +277,11 @@ class TemplateProcessor extends T
      * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
      * @param array $styleArray 对应所有单元格的样式二维数组
      *
-     * @return void
+     * @return boolean
      */
     public function setTable($var, $array, $mergeArray = [], $styleArray = [])
     {
-        $this->setTableFromPart($this->tempDocumentMainPart, $var, $array, $mergeArray, $styleArray);
+        return $this->setTableFromPart($this->tempDocumentMainPart, $var, $array, $mergeArray, $styleArray);
     }
 
     /**
@@ -289,7 +292,7 @@ class TemplateProcessor extends T
      * @param array $array 一维数组
      * @param int $depth 列表层级，从 0 开始。默认 0
      *
-     * @return void
+     * @return boolean
      */
     public function setListFromPart($documentPartXML, $var, $array, $depth = 0)
     {
@@ -302,6 +305,9 @@ class TemplateProcessor extends T
             $objWriter = IOFactory::createWriter($phpWord);
             $xml = $objWriter->getWriterPart('Document')->write();
             $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -314,11 +320,11 @@ class TemplateProcessor extends T
      *
      * @todo 给列表加样式
      *
-     * @return void
+     * @return boolean
      */
     public function setList($var, $array, $depth = 0)
     {
-        $this->setListFromPart($this->tempDocumentMainPart, $var, $array, $depth);
+       return $this->setListFromPart($this->tempDocumentMainPart, $var, $array, $depth);
     }
 
     /**
@@ -326,7 +332,7 @@ class TemplateProcessor extends T
      *
      * @param boolean $isUpdate
      *
-     * @return void
+     * @return boolean
      */
     public function setIsUpdateFields($isUpdate = true)
     {
@@ -338,6 +344,9 @@ class TemplateProcessor extends T
             } else {
                 $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val="' . $string . '"/></w:settings>', $this->_tempDocumentSettingPart);
             }
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -375,7 +384,7 @@ class TemplateProcessor extends T
      * @param string $replace 替换的值
      * @param int $limit 替换次数，默认-1，表示替换全部
      *
-     * @return void
+     * @return boolean
      */
     public function setValueFromPart($documentPartXML, $search, $replace, $limit = parent::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
@@ -383,6 +392,9 @@ class TemplateProcessor extends T
             $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit);
             $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, $limit);
             $this->setValue($search, $replace, $limit);
+            return true;
+        }else{
+            return false;
         }
     }
 
