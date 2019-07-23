@@ -14,7 +14,8 @@ use icy2003\php\I;
 /**
  * Arrays 扩展函数
  */
-trait ArraysTrait{
+trait ArraysTrait
+{
 
     /**
      * 获取指定某些键的项的值
@@ -308,5 +309,39 @@ trait ArraysTrait{
             }
         }
         return false;
+    }
+
+    /**
+     * 递增数组的一个值并返回
+     *
+     * - 如果该值不存在，则默认为 0
+     *
+     * @param array $array 引用返回数组
+     * @param string $key
+     * @param integer $step 步长，默认 1
+     *
+     * @return double|integer
+     */
+    public function increment(&$array, $key, $step = 1)
+    {
+        $array[$key] = I::get($array, $key, 0) + $step;
+        return $array[$key];
+    }
+
+    /**
+     * 递减数组的一个值并返回
+     *
+     * - 如果该值不存在，则默认为 0
+     *
+     * @param array $array 引用返回数组
+     * @param string $key
+     * @param integer $step 步长，默认 1
+     *
+     * @return double|integer
+     */
+    public function decrement($array, $key, $step = 1)
+    {
+        $array[$key] = I::get($array, $key, 0) - $step;
+        return $array[$key];
     }
 }
