@@ -8,6 +8,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\icomponents\file\LocalFile;
+
 /**
  * Base64 相关
  */
@@ -66,7 +68,8 @@ class Base64
     public static function fromFile($file)
     {
         $base64 = false;
-        file_exists($file) && $base64 = base64_encode(file_get_contents($file));
+        $local = new LocalFile();
+        $local->isFile($file) && $base64 = base64_encode($local->getFileContent($file));
         return $base64;
     }
 
