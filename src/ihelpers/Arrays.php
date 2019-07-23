@@ -129,7 +129,7 @@ class Arrays
     }
 
     /**
-     * 获取指定某些键的项
+     * 获取指定某些键的项的值
      *
      * @param array $array
      * @param array $keys
@@ -138,10 +138,23 @@ class Arrays
      */
     public static function values($array, $keys = null)
     {
+        return array_values(self::some($array, $keys));
+    }
+
+    /**
+     * 获取指定某些键的项
+     *
+     * @param array $array
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function some($array, $keys = null)
+    {
         if (null === $keys) {
-            return array_values($array);
+            return $array;
         }
-        return array_values(array_intersect_key($array, array_flip($keys)));
+        return array_intersect_key($array, array_flip($keys));
     }
 
     /**
