@@ -6,6 +6,10 @@ use icy2003\php\ihelpers\Arrays;
 
 class ArraysTest extends \Codeception\Test\Unit
 {
+    /**
+     * @var \UnitTester
+     */
+    protected $tester;
 
     public function testIndexBy()
     {
