@@ -201,7 +201,7 @@ class LocalFile extends Base implements FileInterface
     {
         try {
             $spl = $this->spl($fileName);
-            while ($line = $spl->fgets()) {
+            while (false === $spl->eof() && $line = $spl->fgets()) {
                 yield $line;
             }
         } finally {
