@@ -480,4 +480,28 @@ class Arrays
         return $count;
     }
 
+    /**
+     * 返回指定长度的数组，不足的值设置为 null
+     *
+     * @param array $array
+     * @param integer $count 指定长度
+     * @param callback $callback 回调参数：数组的值、数组的键
+     *
+     * @return array
+     */
+    public static function lists($array, $count = null, $callback = null)
+    {
+        null === $count && $count = self::count($array);
+        $arrayCount = self::count($array);
+        if ($arrayCount >= $count) {
+            $return = $array;
+        } else {
+            $return = self::merge($array, self::fill(0, $count - $arrayCount, null));
+        }
+        if (null !== $callback) {
+            $return = array_map($callback, array_values($return), array_keys($return));
+        }
+        return $return;
+    }
+
 }
