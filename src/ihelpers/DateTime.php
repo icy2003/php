@@ -36,7 +36,7 @@ class DateTime
      *
      * @return array
      */
-    public function rangeDay($offset = 0)
+    public function dayRange($offset = 0)
     {
         $day = (int) (date('d') + $offset);
         return [
@@ -54,7 +54,7 @@ class DateTime
      *
      * @return array
      */
-    public function ramgeWeek($offset = 0)
+    public function weekRange($offset = 0)
     {
         $timestamp = time();
         $offset = (int) $offset;
@@ -71,7 +71,7 @@ class DateTime
      *
      * @return array
      */
-    public function rangeMonth($offset = 0)
+    public function monthRange($offset = 0)
     {
         $month = (int) (date('m') + $offset);
         $begin = mktime(0, 0, 0, $month, 1, (int) date('Y'));
@@ -87,7 +87,7 @@ class DateTime
      *
      * @return array
      */
-    public function rangeYear($offset = 0)
+    public function yearRange($offset = 0)
     {
         $year = (int) (date('Y') + $offset);
         return [
