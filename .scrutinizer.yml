@@ -11,21 +11,13 @@ build:
                     - php-scrutinizer-run
 filter:
     excluded_paths:
-        - 'tests/*'
-        - 'src/iexts/*'
+        - "tests/*"
+        - "src/iexts/*"
     dependency_paths:
         - "vendor/"
-checks:
-    php: true
-coding_style:
-    php:
-        spaces:
-            around_operators:
-                concatenation: true
-            other:
-                after_type_cast: false
 tools:
-    php_code_coverage:
-        enabled: true
+    php_mess_detector: true
+    php_code_sniffer: true
+    php_pdepend: true
     external_code_coverage:
         timeout: 3600
