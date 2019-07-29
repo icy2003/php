@@ -16,6 +16,8 @@ use LogicException;
  * 数组类
  *
  * 常见数组格式的拼装和处理
+ *
+ * @test icy2003\php_tests\ihelpers\ArraysTest
  */
 class Arrays
 {
@@ -31,7 +33,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testIndexBy
+     * @tested
      */
     public static function indexBy($array, $index, $isMerge = false)
     {
@@ -63,7 +65,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testColumns
+     * @tested
      */
     public static function columns($array, $keys = null, $dimension = 2)
     {
@@ -110,7 +112,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testColumn
+     * @tested
      */
     public static function column($array, $column, $index = null)
     {
@@ -146,6 +148,8 @@ class Arrays
      * @param array $values
      *
      * @return array
+     *
+     * @tested
      */
     public static function combine($keys, $values)
     {
@@ -172,7 +176,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testMerge
+     * @tested
      */
     public static function merge($a, $b)
     {
@@ -210,7 +214,7 @@ class Arrays
      * @return \Generator
      * @throws \LogicException
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testRangeGenerator
+     * @tested
      */
     public static function rangeGenerator($start, $end, $step = 1)
     {
@@ -241,7 +245,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetectFirst
+     * @tested
      */
     public static function detectFirst($array, $callback)
     {
@@ -262,7 +266,7 @@ class Arrays
      *
      * @return array
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testDetectAll
+     * @tested
      */
     public static function detectAll($array, $callback, $filter = null)
     {
@@ -288,7 +292,7 @@ class Arrays
      *
      * @return string
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testKeyLast
+     * @tested
      */
     public static function keyLast($array)
     {
@@ -311,7 +315,7 @@ class Arrays
      *
      * @return string
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testKeyFirst
+     * @tested
      */
     public static function keyFirst($array)
     {
@@ -332,7 +336,7 @@ class Arrays
      *
      * @return int
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testDimension
+     * @tested
      */
     public static function dimension($array)
     {
@@ -358,7 +362,7 @@ class Arrays
      *
      * @return boolean
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testIsAssoc
+     * @tested
      */
     public static function isAssoc($array)
     {
@@ -378,7 +382,7 @@ class Arrays
      *
      * @return boolean
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testIsIndexed
+     * @tested
      */
     public static function isIndexed($array)
     {
@@ -399,7 +403,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testFirst
+     * @tested
      */
     public static function first($array, $pos = 1)
     {
@@ -426,7 +430,7 @@ class Arrays
      *
      * @return mixed
      *
-     * @test icy2003\php_tests\ihelpers\ArraysTest::testLast
+     * @tested
      */
     public static function last($array, $pos = 1)
     {
@@ -451,10 +455,12 @@ class Arrays
      * - $callback 参数用于对符合条件的项做筛选
      *
      * @param array $array 数组
-     * @param callback|string $callback 回调，返回回调值为 true 的项，如果此参数是字符串，表示查询和此字符串严格相等的项
+     * @param callback|mixed $callback 回调，返回回调值为 true 的项，如果此参数是非回调类型，表示查询和此值严格相等的项
      * @param boolean $isStrict 是否为严格模式，如果为 false，回调值为 true 值的也会返回，为字符串时不使用严格比较
      *
      * @return integer
+     *
+     * @tested
      */
     public static function count($array, $callback = null, $isStrict = true)
     {
@@ -462,9 +468,9 @@ class Arrays
         if (is_array($array)) {
             if (null === $callback) {
                 return count($array);
-            } elseif (is_string($callback) || is_callable($callback)) {
+            } else {
                 $function = $callback;
-                if (is_string($callback)) {
+                if (false === is_callable($callback)) {
                     $function = function ($row) use ($callback, $isStrict) {
                         return true === $isStrict ? $row === $callback : $row == $callback;
                     };
@@ -488,6 +494,8 @@ class Arrays
      * @param callback $callback 回调参数：数组的值、数组的键
      *
      * @return array
+     *
+     * @tested
      */
     public static function lists($array, $count = null, $callback = null)
     {
@@ -499,7 +507,9 @@ class Arrays
             $return = self::merge($array, self::fill(0, $count - $arrayCount, null));
         }
         if (null !== $callback) {
-            $return = array_map($callback, array_values($return), array_keys($return));
+            foreach ($return as $key => $value) {
+                $return[$key] = I::trigger($callback, [$value, $key]);
+            }
         }
         return $return;
     }
