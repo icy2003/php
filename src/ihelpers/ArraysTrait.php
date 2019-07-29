@@ -21,9 +21,11 @@ trait ArraysTrait
      * 获取指定某些键的项的值
      *
      * @param array $array
-     * @param array $keys
+     * @param array|string $keys 数组或逗号字符串
      *
      * @return array
+     *
+     * @tested
      */
     public static function values($array, $keys = null)
     {
@@ -34,15 +36,18 @@ trait ArraysTrait
      * 获取指定某些键的项
      *
      * @param array $array
-     * @param array $keys
+     * @param array|string $keys 数组或都好字符串
      *
      * @return array
+     *
+     * @tested
      */
     public static function some($array, $keys = null)
     {
         if (null === $keys) {
             return $array;
         }
+        $keys = Strings::toArray($keys);
         return array_intersect_key($array, array_flip($keys));
     }
 
@@ -50,12 +55,15 @@ trait ArraysTrait
      * 获取指定除了某些键的项
      *
      * @param array $array
-     * @param array $keys
+     * @param array|string $keys
      *
      * @return array
+     *
+     * @tested
      */
-    public static function valuesExcepted($array, $keys)
+    public static function exceptedKeys($array, $keys)
     {
+        $keys = Strings::toArray($keys);
         return array_diff_key($array, array_flip($keys));
     }
 
