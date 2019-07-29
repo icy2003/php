@@ -59,6 +59,8 @@ class LocalFile extends Base implements FileInterface
                 // 以下属性需要重新设置
                 'isExists' => false,
                 'fileSize' => 0,
+                'spl' => null,
+                'splInfo' => null,
             ]);
             // 如果已经被缓存了，直接返回
             if (true === $this->_attributes[$hashName]['isCached']) {
@@ -114,10 +116,11 @@ class LocalFile extends Base implements FileInterface
                 }
             } else {
                 $this->_attributes[$hashName]['isLocal'] = true;
-                $this->_attributes[$hashName]['isExists'] = file_exists($this->_attributes[$hashName]['file']);
-                $this->_attributes[$hashName]['fileSize'] = filesize($this->_attributes[$hashName]['file']);
-                $this->_attributes[$hashName]['spl'] = new \SplFileObject($this->_attributes[$hashName]['file']);
-                $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($this->_attributes[$hashName]['file']);
+                if ($this->_attributes[$hashName]['isExists'] = file_exists($this->_attributes[$hashName]['file'])) {
+                    $this->_attributes[$hashName]['fileSize'] = filesize($this->_attributes[$hashName]['file']);
+                    $this->_attributes[$hashName]['spl'] = new \SplFileObject($this->_attributes[$hashName]['file']);
+                    $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($this->_attributes[$hashName]['file']);
+                }
             }
         };
     }
@@ -198,7 +201,7 @@ class LocalFile extends Base implements FileInterface
     {
         try {
             $spl = $this->spl($fileName);
-            while ($line = $spl->fgets()) {
+            while (false === $spl->eof() && $line = $spl->fgets()) {
                 yield $line;
             }
         } finally {

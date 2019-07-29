@@ -11,13 +11,13 @@ namespace icy2003\php\iexts\PhpOffice\PhpWord;
 
 use icy2003\php\I;
 use icy2003\php\ihelpers\Html;
+use icy2003\php\ihelpers\Regular;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\TemplateProcessor as T;
-use icy2003\php\ihelpers\Regular;
 
 /**
  * TemplateProcessor 扩展
@@ -176,10 +176,11 @@ class TemplateProcessor extends T
      * @param array $array 只支持行列号的二维数组
      * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
      * @param array $styleArray 对应所有单元格的样式二维数组
+     * @param integer $count 引用返回被替换的次数
      *
-     * @return void
+     * @return boolean
      */
-    public function setTableFromPart($documentPartXML, $var, $array, $mergeArray = [], $styleArray = [])
+    public function setTableFromPart($documentPartXML, $var, $array, $mergeArray = [], $styleArray = [], &$count = null)
     {
         if ($this->tagPos($var, $documentPartXML)) {
             $phpWord = new PhpWord();
@@ -260,7 +261,10 @@ class TemplateProcessor extends T
             }
             $objWriter = IOFactory::createWriter($phpWord);
             $xml = $objWriter->getWriterPart('Document')->write();
-            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
+            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML, $count);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -273,12 +277,13 @@ class TemplateProcessor extends T
      * @param array $array 只支持行列号的二维数组
      * @param array $mergeArray 合并单元格的数组，例如：['A1:B1', 'C1:C2']
      * @param array $styleArray 对应所有单元格的样式二维数组
+     * @param integer $count 引用返回被替换的次数
      *
-     * @return void
+     * @return boolean
      */
-    public function setTable($var, $array, $mergeArray = [], $styleArray = [])
+    public function setTable($var, $array, $mergeArray = [], $styleArray = [], &$count = null)
     {
-        $this->setTableFromPart($this->tempDocumentMainPart, $var, $array, $mergeArray, $styleArray);
+        return $this->setTableFromPart($this->tempDocumentMainPart, $var, $array, $mergeArray, $styleArray, $count);
     }
 
     /**
@@ -287,11 +292,12 @@ class TemplateProcessor extends T
      * @param string $documentPartXML 某段 XML 字串
      * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
      * @param array $array 一维数组
-     * @param int $depth 列表层级，从 0 开始。默认 0
+     * @param integer $depth 列表层级，从 0 开始。默认 0
+     * @param integer $count 引用返回被替换的次数
      *
-     * @return void
+     * @return boolean
      */
-    public function setListFromPart($documentPartXML, $var, $array, $depth = 0)
+    public function setListFromPart($documentPartXML, $var, $array, $depth = 0, &$count = null)
     {
         if ($this->tagPos($var, $documentPartXML)) {
             $phpWord = new PhpWord();
@@ -301,7 +307,10 @@ class TemplateProcessor extends T
             }
             $objWriter = IOFactory::createWriter($phpWord);
             $xml = $objWriter->getWriterPart('Document')->write();
-            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML);
+            $this->replaceBlock($var, $this->__getBodyBlock($xml), $documentPartXML, $count);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -310,15 +319,16 @@ class TemplateProcessor extends T
      *
      * @param string $var 变量名，如 `list`，在 word 里应该写：${list}${/list}
      * @param array $array 一维数组
-     * @param int $depth 列表层级，从 0 开始。默认 0
+     * @param integer $depth 列表层级，从 0 开始。默认 0
+     * @param integer $count 引用返回被替换的次数
      *
      * @todo 给列表加样式
      *
-     * @return void
+     * @return boolean
      */
-    public function setList($var, $array, $depth = 0)
+    public function setList($var, $array, $depth = 0, &$count = null)
     {
-        $this->setListFromPart($this->tempDocumentMainPart, $var, $array, $depth);
+        return $this->setListFromPart($this->tempDocumentMainPart, $var, $array, $depth, $count);
     }
 
     /**
@@ -326,7 +336,7 @@ class TemplateProcessor extends T
      *
      * @param boolean $isUpdate
      *
-     * @return void
+     * @return boolean
      */
     public function setIsUpdateFields($isUpdate = true)
     {
@@ -338,6 +348,9 @@ class TemplateProcessor extends T
             } else {
                 $this->_tempDocumentSettingPart = str_replace('</w:settings>', '<w:updateFields w:val="' . $string . '"/></w:settings>', $this->_tempDocumentSettingPart);
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -348,10 +361,11 @@ class TemplateProcessor extends T
      * @param string $blockname 变量名
      * @param string $replacement 替换字符串
      * @param string $documentPartXML xml 字符串，默认整个文档的
+     * @param integer $count 引用返回被替换的次数
      *
      * @return void
      */
-    public function replaceBlock($blockname, $replacement, $documentPartXML = null)
+    public function replaceBlock($blockname, $replacement, $documentPartXML = null, &$count = null)
     {
         null === $documentPartXML && $documentPartXML = $this->tempDocumentMainPart;
         // PHP7.0~7.2 会有 bug 导致匹配不到结果，例子参见 samples/php7preg_bug.php
@@ -362,7 +376,7 @@ class TemplateProcessor extends T
             $matches
         );
         if (isset($matches[1])) {
-            $part = $this->setValueForPart($matches[1] . $matches[3] . $matches[4], $replacement, $documentPartXML, parent::MAXIMUM_REPLACEMENTS_DEFAULT);
+            $part = $this->setValueForPart($matches[1] . $matches[3] . $matches[4], $replacement, $documentPartXML, parent::MAXIMUM_REPLACEMENTS_DEFAULT, $count);
             $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, parent::MAXIMUM_REPLACEMENTS_DEFAULT);
         }
     }
@@ -373,17 +387,45 @@ class TemplateProcessor extends T
      * @param string $documentPartXML 某段 XML 字串
      * @param string $search 待搜索的变量名
      * @param string $replace 替换的值
-     * @param int $limit 替换次数，默认-1，表示替换全部
+     * @param integer $limit 替换次数，默认-1，表示替换全部
+     * @param integer $count 引用返回被替换的次数
      *
-     * @return void
+     * @return boolean
      */
-    public function setValueFromPart($documentPartXML, $search, $replace, $limit = parent::MAXIMUM_REPLACEMENTS_DEFAULT)
+    public function setValueFromPart($documentPartXML, $search, $replace, $limit = parent::MAXIMUM_REPLACEMENTS_DEFAULT, &$count = null)
     {
         if ($this->tagPos($search, $documentPartXML)) {
-            $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit);
+            $part = $this->setValueForPart(static::ensureMacroCompleted($search), static::ensureUtf8Encoded($replace), $documentPartXML, $limit, $count);
             $this->tempDocumentMainPart = $this->setValueForPart($documentPartXML, $part, $this->tempDocumentMainPart, $limit);
             $this->setValue($search, $replace, $limit);
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    /**
+     * @see parent::setValueForPart
+     *
+     * - 引用返回替换次数
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $documentPartXML
+     * @param integer $limit
+     * @param integer $count
+     *
+     * @return string
+     */
+    protected function setValueForPart($search, $replace, $documentPartXML, $limit, &$count = null)
+    {
+        // Note: we can't use the same function for both cases here, because of performance considerations.
+        if (self::MAXIMUM_REPLACEMENTS_DEFAULT === $limit) {
+            return str_replace($search, $replace, $documentPartXML, $count);
+        }
+        $regExpEscaper = new RegExp();
+
+        return preg_replace($regExpEscaper->escape($search), $replace, $documentPartXML, $limit, $count);
     }
 
 }

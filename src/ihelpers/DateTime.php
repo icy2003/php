@@ -9,6 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\I;
+
 /**
  * 日期类
  */
@@ -16,148 +18,78 @@ class DateTime
 {
 
     /**
-     * 返回今天开始和结束的时间戳
+     * 构造函数
+     *
+     * @param string $timezone 时区设置，默认上海
+     */
+    public function __construct($timezone = 'Asia/Shanghai')
+    {
+        date_default_timezone_set($timezone);
+    }
+
+    /**
+     * 距离今天偏移量天数的开始和结束时间戳
+     *
+     * - 0：今天，1：明天，-1：昨天，以此类推
+     *
+     * @param integer $offset 天数偏移量，默认 0，即今天
      *
      * @return array
      */
-    public static function today()
+    public function rangeDay($offset = 0)
     {
+        $day = (int) (date('d') + $offset);
         return [
-            mktime(0, 0, 0, (int) date('m'), (int) date('d'), (int) date('Y')),
-            mktime(23, 59, 59, (int) date('m'), (int) date('d'), (int) date('Y')),
+            mktime(0, 0, 0, (int) date('m'), $day, (int) date('Y')),
+            mktime(23, 59, 59, (int) date('m'), $day, (int) date('Y')),
         ];
     }
 
     /**
-     * 返回昨天开始和结束的时间戳
+     * 距离本周偏移量周数的开始和结束的时间戳
+     *
+     * - 星期天是第一天，星期六是最后一天！！
+     *
+     * @param integer $offset
      *
      * @return array
      */
-    public static function yesterday()
-    {
-        $yesterday = (int) date('d') - 1;
-        return [
-            mktime(0, 0, 0, (int) date('m'), $yesterday, (int) date('Y')),
-            mktime(23, 59, 59, (int) date('m'), $yesterday, (int) date('Y')),
-        ];
-    }
-
-    /**
-     * 返回明天开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function tomorrow()
-    {
-        $tomorrow = (int) date('d') + 1;
-        return [
-            mktime(0, 0, 0, (int) date('m'), $tomorrow, (int) date('Y')),
-            mktime(23, 59, 59, (int) date('m'), $tomorrow, (int) date('Y')),
-        ];
-    }
-
-    /**
-     * 返回本周开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function week()
+    public function ramgeWeek($offset = 0)
     {
         $timestamp = time();
+        $offset = (int) $offset;
         return [
-            strtotime(date('Y-m-d', strtotime('+0 week Monday', $timestamp))),
-            strtotime(date('Y-m-d', strtotime('+0 week Sunday', $timestamp))) + 24 * 3600 - 1,
+            strtotime(date('Y-m-d', strtotime('Sunday ' . ($offset - 1) . ' week', $timestamp))),
+            strtotime(date('Y-m-d', strtotime('Saturday ' . $offset . ' week', $timestamp))) + 24 * 3600 - 1,
         ];
     }
 
     /**
-     * 返回上周开始和结束的时间戳
+     * 距离本月偏移量月份数的开始和结束的时间戳
+     *
+     * @param integer $offset
      *
      * @return array
      */
-    public static function lastWeek()
+    public function rangeMonth($offset = 0)
     {
-        $timestamp = time();
-        return [
-            strtotime(date('Y-m-d', strtotime('last week Monday', $timestamp))),
-            strtotime(date('Y-m-d', strtotime('last week Sunday', $timestamp))) + 24 * 3600 - 1,
-        ];
-    }
-
-    /**
-     * 返回下周开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function nextWeek()
-    {
-        $timestamp = time();
-        return [
-            strtotime(date('Y-m-d', strtotime('next week Monday', $timestamp))),
-            strtotime(date('Y-m-d', strtotime('next week Sunday', $timestamp))) + 24 * 3600 - 1,
-        ];
-    }
-
-    /**
-     * 返回本月开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function month()
-    {
-        return [
-            mktime(0, 0, 0, (int) date('m'), 1, (int) date('Y')),
-            mktime(23, 59, 59, (int) date('m'), (int) date('t'), (int) date('Y')),
-        ];
-    }
-
-    /**
-     * 返回上个月开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function lastMonth()
-    {
-        $begin = mktime(0, 0, 0, (int) date('m') - 1, 1, (int) date('Y'));
-        $end = mktime(23, 59, 59, (int) date('m') - 1, (int) date('t', $begin), (int) date('Y'));
+        $month = (int) (date('m') + $offset);
+        $begin = mktime(0, 0, 0, $month, 1, (int) date('Y'));
+        $end = mktime(23, 59, 59, $month, (int) date('t', $begin), (int) date('Y'));
 
         return [$begin, $end];
     }
 
     /**
-     * 返回下个月开始和结束的时间戳
+     * 距离今年偏移量年份数的开始和结束的时间戳
+     *
+     * @param integer $offset
      *
      * @return array
      */
-    public static function nextMonth()
+    public function rangeYear($offset = 0)
     {
-        $begin = mktime(0, 0, 0, (int) date('m') + 1, 1, (int) date('Y'));
-        $end = mktime(23, 59, 59, (int) date('m') + 1, (int) date('t', $begin), (int) date('Y'));
-
-        return [$begin, $end];
-    }
-
-    /**
-     * 返回今年开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function year()
-    {
-        return [
-            mktime(0, 0, 0, 1, 1, (int) date('Y')),
-            mktime(23, 59, 59, 12, 31, (int) date('Y')),
-        ];
-    }
-
-    /**
-     * 返回去年开始和结束的时间戳
-     *
-     * @return array
-     */
-    public static function lastYear()
-    {
-        $year = (int) date('Y') - 1;
+        $year = (int) (date('Y') + $offset);
         return [
             mktime(0, 0, 0, 1, 1, $year),
             mktime(23, 59, 59, 12, 31, $year),
@@ -165,62 +97,116 @@ class DateTime
     }
 
     /**
-     * 返回明年开始和结束的时间戳
+     * 距离某时间偏移量天数的时间戳
      *
-     * @return array
+     * @param integer $offset
+     * @param integer|null $time 不给则取当前时间
+     *
+     * @return integer
      */
-    public static function nextYear()
+    public function day($offset = 0, $time = null)
     {
-        $year = (int) date('Y') + 1;
-        return [
-            mktime(0, 0, 0, 1, 1, $year),
-            mktime(23, 59, 59, 12, 31, $year),
-        ];
+        $timestamp = null === $time ? time() : $time;
+        $offset = (int) $offset;
+        return $timestamp + 3600 * 24 * $offset;
     }
 
     /**
-     * 天数转换成秒数
+     * 距离某时间偏移量星期数的时间戳
      *
-     * @param int $day
-     * @return int
+     * @param integer $offset
+     * @param integer|null $time 不给则取当前时间
+     *
+     * @return integer
      */
-    public static function dayToSecond($day = 1)
+    public function week($offset = 0, $time = null)
     {
-        return $day * 86400;
+        $timestamp = null === $time ? time() : $time;
+        $offset = (int) $offset;
+        return $timestamp + 3600 * 24 * 7 * $offset;
     }
 
     /**
-     * 周数转换成秒数
+     * 距离某时间偏移量月份数的时间戳
      *
-     * @param int $week
-     * @return int
+     * @param integer $offset
+     * @param integer|null $time 不给则取当前时间
+     *
+     * @return integer
      */
-    public static function weekToSecond($week = 1)
+    public function month($offset = 0, $time = null)
     {
-        return self::daysToSecond() * 7 * $week;
+        $timestamp = null === $time ? time() : $time;
+        $offset = (int) $offset;
+        return $timestamp + 3600 * 24 * date('t', $timestamp) * $offset;
     }
 
     /**
-     * 返回几天前的时间戳
+     * 距离某时间偏移量年份数的时间戳
      *
-     * @param int $day
-     * @return int
+     * @param integer $offset
+     * @param integer|null $time 不给则取当前时间
+     *
+     * @return integer
      */
-    public static function daysAgo($day = 1)
+    public function year($offset = 0, $time = null)
     {
-        $nowTime = time();
-        return $nowTime - self::daysToSecond($day);
+        $timestamp = null === $time ? time() : $time;
+        $offset = (int) $offset;
+        return $timestamp + 3600 * 24 * (date('z', mktime(0, 0, 0, 12, 31, date('Y', $timestamp))) + 1) * $offset;
     }
 
     /**
-     * 返回几天后的时间戳
+     * 返回星期几的英文名
      *
-     * @param int $day
-     * @return int
+     * @param integer|null $time
+     *
+     * @return string
      */
-    public static function daysAfter($day = 1)
+    public function weekName($time = null)
     {
-        $nowTime = time();
-        return $nowTime + self::daysToSecond($day);
+        $timestamp = null === $time ? time() : $time;
+        return date('l', $timestamp);
+    }
+
+    /**
+     * 返回月份名
+     *
+     * @param integer|null $time
+     *
+     * @return string
+     */
+    public function monthName($time = null)
+    {
+        $timestamp = null === $time ? time() : $time;
+        return date('F', $timestamp);
+    }
+
+    /**
+     * 是否是闰年
+     *
+     * @param integer|null $time
+     *
+     * @return boolean
+     */
+    public function isLeapYear($time = null)
+    {
+        $timestamp = null === $time ? time() : $time;
+        return (bool) date('L', $timestamp);
+    }
+
+    /**
+     * 返回该年的第几天
+     *
+     * - 1 月 1 日为第一天
+     *
+     * @param integer|null $time
+     *
+     * @return integer
+     */
+    public function yearPosition($time = null)
+    {
+        $timestamp = null === $time ? time() : $time;
+        return (int) date('z', $timestamp) + 1;
     }
 }
