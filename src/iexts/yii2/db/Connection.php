@@ -54,6 +54,8 @@ class Connection extends C
 
     /**
      * 初始化
+     *
+     * @return void
      */
     protected function initConnection()
     {
