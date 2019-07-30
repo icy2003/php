@@ -364,4 +364,35 @@ class I
         }
         throw new Exception('必须带 class 以指定一个类');
     }
+
+    /**
+     * 静态配置
+     *
+     * @var array
+     */
+    public static $ini = [
+        'USE_CUSTOM' => false,
+    ];
+
+    /**
+     * 读取或设置一个全局配置
+     *
+     * - 该配置是利用静态类进行存储的
+     * - 如果给定 $value，则为设置，不给则为获取
+     * - 可选默认配置有：
+     *      1. USE_CUSTOM：默认 false，即尝试使用 php 原生函数的实现，如果此参数为 true，则使用 icy2003/php 的实现
+     *
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return void|mixed
+     */
+    public static function ini($key, $value = null)
+    {
+        if (null !== $value) {
+            self::$ini[$key] = $value;
+        } else {
+            return self::get(self::$ini, $key);
+        }
+    }
 }
