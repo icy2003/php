@@ -11,4 +11,5 @@ coverage:
         - src/*
     exclude:
         - src/iexts/*
+        - src/iapis/*
     show_uncovered: false
