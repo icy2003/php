@@ -51,4 +51,23 @@ class Connection extends C
             return parent::createPdoInstance();
         }
     }
+
+    /**
+     * 初始化
+     *
+     * @return void
+     */
+    protected function initConnection()
+    {
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        if ($this->emulatePrepare !== null && constant('PDO::ATTR_EMULATE_PREPARES')) {
+            if ($this->driverName !== 'sqlsrv') {
+                $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->emulatePrepare);
+            }
+        }
+        if ($this->charset !== null && in_array($this->getDriverName(), ['pgsql', 'mysql', 'mysqli', 'cubrid', 'imysql'], true)) {
+            $this->pdo->exec('SET NAMES ' . $this->pdo->quote($this->charset));
+        }
+        $this->trigger(self::EVENT_AFTER_OPEN);
+    }
 }

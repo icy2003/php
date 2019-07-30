@@ -8,7 +8,7 @@ actor_suffix: Tester
 coverage:
     enabled: true
     include:
-        - src/*
+        - src/*.php
     exclude:
         - src/iexts/*
         - src/iapis/*

@@ -333,7 +333,6 @@ class Color
     public function toRGB()
     {
         $type = $this->_type;
-        $this->_type = self::TYPE_RGB;
         if (self::TYPE_RGB === $type) {
             $this->_color = array_map(function ($i) {
                 return (0.5 + $i) | 0;
@@ -343,12 +342,14 @@ class Color
             $green = ($this->_color & 0x00FF00) >> 8;
             $blue = ($this->_color & 0x0000FF);
             $this->_color = [$red, $green, $blue];
+            $this->_type = self::TYPE_RGB;
             $this->toRGB();
         } elseif (self::TYPE_CMYK === $type) {
             $cyan = $this->_color[0] * (1 - $this->_color[3]) + $this->_color[3];
             $magenta = $this->_color[1] * (1 - $this->_color[3]) + $this->_color[3];
             $yellow = $this->_color[2] * (1 - $this->_color[3]) + $this->_color[3];
             $this->_color = [(1 - $cyan) * 255, (1 - $magenta) * 255, (1 - $yellow) * 255];
+            $this->_type = self::TYPE_RGB;
             $this->toRGB();
         }
 
@@ -363,11 +364,12 @@ class Color
     public function toHex()
     {
         $type = $this->_type;
-        $this->_type = self::TYPE_HEX;
         if (self::TYPE_HEX === $type) {
             // 什么也不做
+            $this->_type = self::TYPE_HEX;
         } elseif (self::TYPE_RGB === $type) {
             $this->_color = strtoupper(dechex($this->_color[0] << 16 | $this->_color[1] << 8 | $this->_color[2]));
+            $this->_type = self::TYPE_HEX;
             $this->toHex();
         } elseif (self::TYPE_CMYK === $type) {
             $this->toRGB()->toHex();
@@ -384,11 +386,11 @@ class Color
     public function toCMYK()
     {
         $type = $this->_type;
-        $this->_type = self::TYPE_CMYK;
         if (self::TYPE_CMYK === $type) {
             $this->_color = array_map(function ($i) {
                 return sprintf('%01.4f', $i);
             }, $this->_color);
+            $this->_type = self::TYPE_CMYK;
         } elseif (self::TYPE_RGB === $type) {
             $cyan = 1 - ($this->_color[0] / 255);
             $magenta = 1 - ($this->_color[1] / 255);
@@ -415,6 +417,7 @@ class Color
 
             $key = $var_K;
             $this->_color = [$cyan, $magenta, $yellow, $key];
+            $this->_type = self::TYPE_CMYK;
             $this->toCMYK();
         } elseif (self::TYPE_HEX === $type) {
             $this->toRGB()->toCMYK();
