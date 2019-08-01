@@ -72,6 +72,10 @@ class Ini
                 }
                 list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {return trim($row);});
                 $array[$name] = $value;
+                // 如果值被 [] 包括，则以英文逗号为分割，将值变成数组
+                if (Strings::isStartsWith($value, '[') && Strings::isEndsWith($value, ']')) {
+                    $array[$name] = explode(',', Strings::sub($value, 1, -1));
+                }
             }
         } elseif (self::TYPE_JSON === $this->_type) {
             $content = $local->getFileContent($this->_file);
