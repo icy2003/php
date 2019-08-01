@@ -17,11 +17,11 @@ use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
 
 /**
- * OCR
+ * 图像识别
  *
  * @link https://ai.baidu.com/docs#/OCR-API/top
  */
-class Ocr extends Base
+class OCR extends Base
 {
 
     /**
@@ -41,6 +41,25 @@ class Ocr extends Base
     ];
 
     /**
+     * 设置选项
+     *
+     * @param array $options
+     * - image：图片 base64
+     * - language_type：识别语言类型，默认为CHN_ENG。可选值包括：CHN_ENG：中英文混合；ENG：英文；POR：葡萄牙语；FRE：法语；GER：德语；ITA：意大利语；SPA：西班牙语；RUS：俄语；JAP：日语；KOR：韩语
+     * - detect_direction：是否检测图像朝向，默认不检测，即：false。朝向是指输入图像是正常方向、逆时针旋转90/180/270度。可选值包括：true，检测朝向；false，不检测朝向
+     * - detect_language：是否检测语言，默认不检测。当前支持（中文、英语、日语、韩语）
+     * - probability：是否返回识别结果中每一行的置信度
+     * - recognize_granularity：是否定位单字符位置，big：不定位单字符位置，默认值；small：定位单字符位置
+     * - vertexes_location：是否返回文字外接多边形顶点位置，不支持单字位置。默认为false
+     *
+     * @return static
+     */
+    public function setOptions($options)
+    {
+        return parent::setOptions($options);
+    }
+
+    /**
      * 加载一个图片
      *
      * - base64：图像数据，大小不超过4M，最短边至少15px，最长边最大4096px,支持jjpg/jpeg/png/bmp格式
@@ -57,28 +76,8 @@ class Ocr extends Base
         } elseif ((new LocalFile())->isFile($image)) {
             $this->_options['image'] = Base64::fromFile($image);
         } else {
-            throw new Exception("错误的图片类型");
+            throw new Exception('错误的图片类型');
         }
-        return $this;
-    }
-
-    /**
-     * 设置选项
-     *
-     * @param array $options
-     * - image：图片 base64
-     * - language_type：识别语言类型，默认为CHN_ENG。可选值包括：CHN_ENG：中英文混合；ENG：英文；POR：葡萄牙语；FRE：法语；GER：德语；ITA：意大利语；SPA：西班牙语；RUS：俄语；JAP：日语；KOR：韩语
-     * - detect_direction：是否检测图像朝向，默认不检测，即：false。朝向是指输入图像是正常方向、逆时针旋转90/180/270度。可选值包括：true，检测朝向；false，不检测朝向
-     * - detect_language：是否检测语言，默认不检测。当前支持（中文、英语、日语、韩语）
-     * - probability：是否返回识别结果中每一行的置信度
-     * - recognize_granularity：是否定位单字符位置，big：不定位单字符位置，默认值；small：定位单字符位置
-     * - vertexes_location：是否返回文字外接多边形顶点位置，不支持单字位置。默认为false
-     *
-     * @return static
-     */
-    public function setOptions($options)
-    {
-        $this->_options = Arrays::merge($this->_options, $options);
         return $this;
     }
 
