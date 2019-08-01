@@ -66,6 +66,10 @@ class Ini
         $array = [];
         if (self::TYPE_INI === $this->_type) {
             foreach ($local->linesGenerator($this->_file, true) as $line) {
+                // 如果 # 开头认为这是注释
+                if (Strings::isStartsWith(trim($line), '#')) {
+                    continue;
+                }
                 list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {return trim($row);});
                 $array[$name] = $value;
             }
