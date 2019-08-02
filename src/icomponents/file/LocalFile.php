@@ -159,7 +159,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function attribute($fileName, $name)
     {
-        I::trigger($this->_functions['loader'], [$fileName]);
+        I::call($this->_functions['loader'], [$fileName]);
         return I::get($this->_attributes, $this->__hash($fileName) . '.' . $name);
     }
 
@@ -502,7 +502,7 @@ class LocalFile extends Base implements FileInterface
             Header::notFound();
             throw $e;
         } finally {
-            I::trigger($callback, [$this->_attributes]);
+            I::call($callback, [$this->_attributes]);
             // 必须要终止掉，防止发送其他数据导致错误
             die;
         }

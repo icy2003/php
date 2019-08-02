@@ -30,19 +30,19 @@ class I
      *          2. 如果 $array['a'] 是对象，则先检查 getB 方法，然后检查 b 属性
      *          3. 如果 $array['a']['b'] 是对象，则检查 getCdEf 方法，然后检查 cd_ef 属性
      *      - 当 $mixed 为**布尔值**（即表达式）时，等价于三元操作符，例如 I::get(1 > 2, '真', '假')
-     *      - 当 $mixed 为**字符串或数字**时，等价于 Strings::sub，截取字符串
+     *      - 当 $mixed 为**字符串**时，等价于 Strings::sub，截取字符串
      *      - 当 $mixed 为 **null** 时，含义可被描述为：在使用 I::get($array, 'a.b', 1)，$array 意外的是 null，返回 1 是理所当然的
      *      - 当 $mixed 为**回调函数**，$mixed 的执行结果将作为 I::get 的返回值
      * @param mixed $keyString 取决于 $mixed 的类型：
      *      - 当 $mixed 为**数组或对象**时，$keyString 表示：点（.）分割代表层级的字符串，下划线用于对象中转化成驼峰方法，支持数组和对象嵌套
      *      - 当 $mixed 为**布尔值**（即表达式）时，$keyString 表示：$mixed 为 true 时返回的值
-     *      - 当 $mixed 为**字符串或数字**时，$keyString 强制转为整型，表示：截取 $mixed 时，子串的起始位置
+     *      - 当 $mixed 为**字符串**时，$keyString 强制转为整型，表示：截取 $mixed 时，子串的起始位置
      *      - 当 $mixed 为 **null** 时，此参数无效
      *      - 当 $mixed 为**回调函数**，如果 $mixed 的返回值代表 true（如：1），则执行此回调
      * @param mixed $defaultValue 取决于 $mixed 的类型：
      *      - 当 $mixed 为**数组或对象**时，$defaultValue 表示：拿不到值时会直接返回该默认值
      *      - 当 $mixed 为**布尔值**（即表达式）时，$defaultValue 表示：$mixed 为 false 时返回的值
-     *      - 当 $mixed 为**字符串或数字**时，$defaultValue 表示：截取 $mixed 时，子串的长度，null 时表示长度为 1
+     *      - 当 $mixed 为**字符串**时，$defaultValue 表示：截取 $mixed 时，子串的长度，null 时表示长度为 1
      *      - 当 $mixed 为 **null** 时，返回 $defaultValue
      *      - 当 $mixed 为**回调函数**，如果 $mixed 的返回值代表 false（如：0），则执行此回调
      *
@@ -50,11 +50,17 @@ class I
      */
     public static function get($mixed, $keyString, $defaultValue = null)
     {
-        if (true === $mixed) {
-            return $keyString;
-        } elseif (false === $mixed) {
-            return $defaultValue;
-        } elseif (is_array($mixed) || is_object($mixed)) {
+        if (is_bool($mixed)) { // 布尔类型
+            return true === $mixed ? $keyString : $defaultValue;
+        } elseif (is_callable($mixed)) { // 回调
+            $result = self::call($mixed);
+            if ($result) {
+                self::call($keyString);
+            } else {
+                self::call($defaultValue);
+            }
+            return $result;
+        } elseif (is_array($mixed) || is_object($mixed)) { // 数组和对象
             $keyArray = explode('.', $keyString);
             foreach ($keyArray as $key) {
                 if (is_array($mixed)) {
@@ -73,24 +79,18 @@ class I
                         return $defaultValue;
                     }
                 } else {
-                    return $defaultValue;
+                    return self::get($mixed, $key, $defaultValue);
                 }
             }
             return $mixed;
-        } elseif (is_string($mixed) || is_numeric($mixed)) {
+        } elseif (is_string($mixed) || is_numeric($mixed)) { // 字符串或数字
             $pos = (int) $keyString;
             $length = null === $defaultValue ? 1 : (int) $defaultValue;
             return Strings::sub($mixed, $pos, $length);
-        } elseif (null === $mixed) {
+        } elseif (null === $mixed) { // null
             return $defaultValue;
-        } elseif (is_callable($mixed)) {
-            $result = self::trigger($mixed);
-            if ($result) {
-                self::trigger($keyString);
-            } else {
-                self::trigger($defaultValue);
-            }
-            return $result;
+        } else { // 资源
+            return $defaultValue;
         }
     }
 
@@ -132,7 +132,7 @@ class I
      * @param array $params 回调参数
      * @return mixed
      */
-    public static function trigger($callback, $params = [])
+    public static function call($callback, $params = [])
     {
         $result = false;
         is_callable($callback) && $result = call_user_func_array($callback, $params);
@@ -179,13 +179,7 @@ class I
      */
     public static function phpini($key, $default = null)
     {
-        if (false !== ($ini = ini_get($key))) {
-            return $ini;
-        }
-        if (false !== ($ini = get_cfg_var($key))) {
-            return $ini;
-        }
-        return $default;
+        return false !== ($ini = ini_get($key)) ? $ini : (false !== ($ini = get_cfg_var($key)) ? $ini : $default);
     }
 
     /**
@@ -257,7 +251,7 @@ class I
             $pos++;
         }
         // 对 Yii2 的支持
-        if ($result = self::trigger(['\Yii', 'getAlias'], [$alias])) {
+        if ($result = self::call(['\Yii', 'getAlias'], [$alias])) {
             true === $loadNew && self::setAlias($alias, $result);
             return $result;
         }
@@ -286,7 +280,7 @@ class I
     public static function setAlias($alias, $path)
     {
         // 对 Yii2 的支持
-        self::trigger(['\Yii', 'setAlias'], [$alias, $path]);
+        self::call(['\Yii', 'setAlias'], [$alias, $path]);
         if (strncmp($alias, '@', 1)) {
             $alias = '@' . $alias;
         }
@@ -372,6 +366,7 @@ class I
      */
     public static $ini = [
         'USE_CUSTOM' => false,
+        'EXT_LOADED' => true,
     ];
 
     /**
@@ -381,6 +376,7 @@ class I
      * - 如果给定 $value，则为设置，不给则为获取
      * - 可选默认配置有：
      *      1. USE_CUSTOM：默认 false，即尝试使用 php 原生函数的实现，如果此参数为 true，则使用 icy2003/php 的实现
+     *      2. EXT_LOADED：默认 true，即尝试检测是否有扩展，如果为 false，直接认为没有该扩展
      *
      * @param string $key
      * @param mixed $value
@@ -394,5 +390,20 @@ class I
         } else {
             return self::get(self::$ini, $key);
         }
+    }
+
+    /**
+     * 是否有加载 PHP 扩展
+     *
+     * @param string $extName
+     *
+     * @return boolean
+     */
+    public static function isExt($extName)
+    {
+        if (false === extension_loaded($extName) || false === self::ini('EXT_LOADED')) {
+            return false;
+        }
+        return true;
     }
 }
