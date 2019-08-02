@@ -10,6 +10,7 @@ namespace icy2003\php\ihelpers;
 
 use Exception;
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 加解密
@@ -33,7 +34,7 @@ class Crypto
      */
     public function __construct()
     {
-        if (false === extension_loaded('openssl')) {
+        if (false === I::isExt('openssl')) {
             throw new Exception("请安装 php_openssl 扩展");
         }
         $this->_config = [
@@ -54,7 +55,7 @@ class Crypto
     public function setDigestAlg($method)
     {
         $methods = openssl_get_md_methods();
-        if (!in_array($method, $methods)) {
+        if (!Arrays::in($method, $methods, false, true)) {
             throw new Exception("不合法的摘要算法");
         }
         $this->_config['digest_alg'] = $method;
@@ -92,7 +93,7 @@ class Crypto
         $types = [
             OPENSSL_KEYTYPE_DSA, OPENSSL_KEYTYPE_DH, OPENSSL_KEYTYPE_RSA, OPENSSL_KEYTYPE_EC,
         ];
-        if (!in_array($privateKeyType, $types)) {
+        if (!Arrays::in($privateKeyType, $types, false, true)) {
             throw new Exception("不合法的密钥扩展名");
         }
         $this->_config['private_key_type'] = $privateKeyType;
@@ -109,10 +110,10 @@ class Crypto
     public function setConfig($config = null)
     {
         null === $config && $config = I::get($this->_config, 'config');
-        if (false === file_exists($configPath = I::getAlias($config))) {
+        if (false === (new LocalFile())->isFile($configPath = $config)) {
             throw new Exception("openssl.cnf 文件不存在");
         }
-        $this->_config['config'] = $configPath;
+        $this->_config['config'] = I::getAlias($configPath);
         return $this;
     }
 
