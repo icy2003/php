@@ -310,7 +310,7 @@ class Strings
         $arr = [];
         $parts = explode($delimiter, $string);
         foreach ($parts as $part) {
-            $arr[] = I::trigger($callback, [$part]);
+            $arr[] = I::call($callback, [$part]);
         }
         return implode($delimiter, $arr);
     }
@@ -529,7 +529,13 @@ class Strings
                 $result[] = $res;
             }
         }
-        return true === $returnArray ? $result : implode('', $result);
+        if (true === $returnArray) {
+            return $result;
+        } elseif (false === $returnArray) {
+            return implode('', $result);
+        } else {
+            return implode((string) $returnArray, $result);
+        }
     }
 
     /**

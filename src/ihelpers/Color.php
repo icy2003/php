@@ -306,7 +306,7 @@ class Color
             } else {
                 // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
                 $hex = I::get(static::$_names, $color, $color);
-                if ($hex > 0xFFFFFF || $hex < 0) {
+                if ($hex > 0xFFFFFF || $hex < 0 || hexdec($hex) === 0 && $hex !== '000000' && $hex !== '#000000') {
                     throw new Exception('错误的颜色值：' . $color);
                 }
                 // 如果是字符形式的十六进制数，则先转成十进制再作后续运算

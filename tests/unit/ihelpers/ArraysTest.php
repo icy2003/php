@@ -588,4 +588,10 @@ class ArraysTest extends \Codeception\Test\Unit
         ]);
     }
 
+    public function testIn(){
+        $this->tester->assertTrue(Arrays::in('1', [1]));
+        $this->tester->assertFalse(Arrays::in('1', [1], true));
+        $this->tester->assertTrue(Arrays::in('a', ['A'], false, true));
+    }
+
 }

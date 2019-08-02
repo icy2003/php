@@ -201,7 +201,7 @@ class Pay
                     $isPay = true;
                 }
             }
-            if (null === $callback || true === I::trigger($callback, [$array, $isPay, $isRefund, $isRefundFull])) {
+            if (null === $callback || true === I::call($callback, [$array, $isPay, $isRefund, $isRefundFull])) {
                 echo $this->getNotifyReturn();
                 die;
             }

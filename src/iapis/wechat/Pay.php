@@ -278,7 +278,7 @@ class Pay
     {
         $array = $this->getNotifyArray();
         if (!empty($array)) {
-            if (null === $callback || true === I::trigger($callback, [$array])) {
+            if (null === $callback || true === I::call($callback, [$array])) {
                 Header::xml();
                 echo $this->getNotifyReturn();
                 die;

@@ -40,6 +40,5 @@ class CharsetTest extends \Codeception\Test\Unit
     public function testConvertTo()
     {
         $this->tester->assertEquals(Charset::convertTo('中', 'EUC-CN'), $this->_getTxt());
-        $this->tester->assertEquals(Charset::convertTo('é', 'ASCII'), '\'e');
     }
 }
