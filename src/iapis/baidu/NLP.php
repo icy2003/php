@@ -54,28 +54,6 @@ class NLP extends Base
     }
 
     /**
-     * 加载一段文字
-     *
-     * - $text 为字符串：设置 text
-     * - $text 为数组：设置 word_1 和 word_2
-     *
-     * @param string|array $text
-     *
-     * @return static
-     */
-    public function text($text)
-    {
-        if (is_string($text)) {
-            $this->_options['text'] = $text;
-        } elseif (is_array($text)) {
-            $this->_options['word_1'] = I::get($text, 0);
-            $this->_options['word_2'] = I::get($text, 1);
-        }
-
-        return $this;
-    }
-
-    /**
      * 词法分析（通用版）
      *
      * - 向用户提供分词、词性标注、专名识别三大功能

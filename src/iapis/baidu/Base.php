@@ -13,6 +13,8 @@ use GuzzleHttp\Exception\ClientException;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
+use icy2003\php\ihelpers\Base64;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 百度 API 基类
@@ -222,7 +224,7 @@ class Base
      */
     public function toArray()
     {
-        return I::trigger($this->_toArrayCall, [$this->getResult()]);
+        return I::call($this->_toArrayCall, [$this->getResult()]);
     }
 
     /**
@@ -253,5 +255,51 @@ class Base
     public function __toString()
     {
         return Json::encode($this->_result);
+    }
+
+    /**
+     * 加载一个图片
+     *
+     * 可支持格式：
+     * - base64：图像数据，大小不超过4M，最短边至少15px，最长边最大4096px,支持jjpg/jpeg/png/bmp格式
+     * - 文件 URL：图片完整URL，URL长度不超过1024字节，对应的 base64 数据限制如上，不支持https的图片链接
+     *
+     * @param string $image
+     *
+     * @return static
+     */
+    public function image($image)
+    {
+        if (Base64::isBase64($image)) {
+            $this->_options['image'] = $image;
+        } elseif ((new LocalFile())->isFile($image)) {
+            $this->_options['image'] = Base64::fromFile($image);
+        } else {
+            throw new Exception('错误的图片类型');
+        }
+        return $this;
+    }
+
+    /**
+     * 加载一段文字
+     *
+     * 可支持的格式：
+     * - $text 为字符串：设置 text
+     * - $text 为数组：设置 word_1 和 word_2
+     *
+     * @param string|array $text
+     *
+     * @return static
+     */
+    public function text($text)
+    {
+        if (is_string($text)) {
+            $this->_options['text'] = $text;
+        } elseif (is_array($text)) {
+            $this->_options['word_1'] = I::get($text, 0);
+            $this->_options['word_2'] = I::get($text, 1);
+        }
+
+        return $this;
     }
 }

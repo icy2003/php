@@ -8,11 +8,8 @@
  */
 namespace icy2003\php\iapis\baidu;
 
-use Exception;
 use icy2003\php\I;
-use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\ihelpers\Arrays;
-use icy2003\php\ihelpers\Base64;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
 
@@ -57,28 +54,6 @@ class OCR extends Base
     public function setOptions($options)
     {
         return parent::setOptions($options);
-    }
-
-    /**
-     * 加载一个图片
-     *
-     * - base64：图像数据，大小不超过4M，最短边至少15px，最长边最大4096px,支持jjpg/jpeg/png/bmp格式
-     * - 文件 URL：图片完整URL，URL长度不超过1024字节，对应的 base64 数据限制如上，不支持https的图片链接
-     *
-     * @param string $image
-     *
-     * @return static
-     */
-    public function image($image)
-    {
-        if (Base64::isBase64($image)) {
-            $this->_options['image'] = $image;
-        } elseif ((new LocalFile())->isFile($image)) {
-            $this->_options['image'] = Base64::fromFile($image);
-        } else {
-            throw new Exception('错误的图片类型');
-        }
-        return $this;
     }
 
     /**
