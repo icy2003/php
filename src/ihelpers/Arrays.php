@@ -249,7 +249,7 @@ class Arrays
     public static function detectFirst($array, $callback)
     {
         foreach ($array as $key => $item) {
-            if (true === I::trigger($callback, [$item, $key])) {
+            if (true === I::call($callback, [$item, $key])) {
                 return $item;
             }
         }
@@ -271,9 +271,9 @@ class Arrays
     {
         $all = [];
         foreach ($array as $key => $item) {
-            if (true === I::trigger($callback, [$item, $key])) {
+            if (true === I::call($callback, [$item, $key])) {
                 if (null !== $filter) {
-                    $all[$key] = I::trigger($filter, [$item, $key]);
+                    $all[$key] = I::call($filter, [$item, $key]);
                 } else {
                     $all[$key] = $item;
                 }
@@ -477,7 +477,7 @@ class Arrays
                     };
                 }
                 foreach ($array as $key => $row) {
-                    if (true === I::trigger($function, [$row, $key])) {
+                    if (true === I::call($function, [$row, $key])) {
                         $count++;
                     }
                 }
@@ -509,7 +509,7 @@ class Arrays
         }
         if (null !== $callback) {
             foreach ($return as $key => $value) {
-                $return[$key] = I::trigger($callback, [$value, $key]);
+                $return[$key] = I::call($callback, [$value, $key]);
             }
         }
         return $return;
@@ -825,7 +825,7 @@ class Arrays
             return array_search($search, $array, $isStrict);
         }
         foreach ($array as $key => $row) {
-            $result = I::trigger($search, [$row]);
+            $result = I::call($search, [$row]);
             if (true === $isStrict && true === $result || false === $isStrict && true == $result) {
                 return $key;
             }
@@ -869,6 +869,30 @@ class Arrays
     {
         $array[$key] = I::get($array, $key, 0) - $step;
         return $array[$key];
+    }
+
+    /**
+     * in_array 的扩展
+     *
+     * @param mixed $value
+     * @param array $array
+     * @param boolean $isStrict 是否严格匹配，默认 false，即不严格
+     * @param boolean $ignoreCase 是否忽略大小写，默认 false，不忽略
+     *
+     * @return boolean
+     */
+    public static function in($value, $array, $isStrict = false, $ignoreCase = false)
+    {
+        if (false === is_array($array)) {
+            return false;
+        }
+        if (false === $ignoreCase) {
+            return in_array($value, $array, $isStrict);
+        } else {
+            $value = Json::decode(strtolower(Json::encode($value)));
+            $array = Json::decode(strtolower(Json::encode($array)));
+            return in_array($value, $array, $isStrict);
+        }
     }
 
 }
