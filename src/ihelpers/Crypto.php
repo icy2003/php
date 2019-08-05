@@ -8,7 +8,6 @@
  */
 namespace icy2003\php\ihelpers;
 
-use Exception;
 use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\icomponents\file\LocalFile;
@@ -165,6 +164,9 @@ class Crypto
      */
     public function getPair($toCompact = false)
     {
+        if (null === $this->_pemPublic && null === $this->_pemPrivate) {
+            $this->generatePair();
+        }
         if (false === $toCompact) {
             return [$this->_pemPublic, $this->_pemPrivate];
         } else {
@@ -218,7 +220,9 @@ class Crypto
      */
     public function getPublicEncrypt($data)
     {
-        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
+        if (null === $this->_pemPublic) {
+            $this->generatePair();
+        }
         openssl_public_encrypt($data, $encrypted, $this->_pemPublic);
         return Base64::encode($encrypted);
     }
@@ -232,7 +236,7 @@ class Crypto
      */
     public function getPublicDecrypt($encrypted)
     {
-        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥');
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
         if ($encrypted) {
             openssl_public_decrypt($encrypted, $decrypted, $this->_pemPublic);
@@ -252,7 +256,9 @@ class Crypto
      */
     public function getPrivateEncrypt($data)
     {
-        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
+        if (null === $this->_pemPrivate) {
+            $this->generatePair();
+        }
         openssl_private_encrypt($data, $encrypted, $this->_pemPrivate);
         return Base64::encode($encrypted);
     }
@@ -266,7 +272,7 @@ class Crypto
      */
     public function getPrivateDecrypt($encrypted)
     {
-        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供私钥');
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
         if ($encrypted) {
             openssl_private_decrypt($encrypted, $decrypted, $this->_pemPrivate);
@@ -455,7 +461,9 @@ class Crypto
      */
     public function getSignature($data, $signType = OPENSSL_ALGO_SHA256)
     {
-        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
+        if (null === $this->_pemPrivate) {
+            $this->generatePair();
+        }
         openssl_sign($data, $signature, $this->_pemPrivate, $signType);
         return $signature;
     }
@@ -471,7 +479,7 @@ class Crypto
      */
     public function isVerify($data, $signature, $signType = OPENSSL_ALGO_SHA256)
     {
-        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥');
         return (boolean) openssl_verify($data, $signature, $this->_pemPublic, $signType);
     }
 }
