@@ -19,7 +19,7 @@ class Json
     /**
      * Json 编码
      *
-     * @param array $value 数组
+     * @param mixed $value 数组
      * @param int $options Json 选项，默认 JSON_UNESCAPED_UNICODE，其他选项说明：
      * ```
      * JSON_HEX_QUOT：所有的 " 转换成 \u0022。PHP>=5.3.0
@@ -67,7 +67,7 @@ class Json
         if (!is_string($json)) {
             return false;
         }
-        $array = static::decode($json);
+        $array = self::decode($json);
         if (is_array($array)) {
             return true;
         }
@@ -86,9 +86,9 @@ class Json
     {
         header('Content-Type:application/json; charset=utf-8');
         if (is_array($json)) {
-            $json = static::encode($json);
+            $json = self::encode($json);
         }
-        if (false === static::isJson($json)) {
+        if (false === self::isJson($json)) {
             $json = '[]';
         }
         echo $json;die;
@@ -105,7 +105,7 @@ class Json
      */
     public static function get($json, $key, $defaultValue = null)
     {
-        $array = static::decode($json);
+        $array = self::decode($json);
         return I::get($array, $key, $defaultValue);
     }
 }

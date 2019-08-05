@@ -9,6 +9,7 @@
 namespace icy2003\php\ihelpers;
 
 use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\icomponents\file\LocalFile;
 
@@ -34,9 +35,7 @@ class Crypto
      */
     public function __construct()
     {
-        if (false === I::isExt('openssl')) {
-            throw new Exception("请安装 php_openssl 扩展");
-        }
+        C::assertExtension('openssl', '请安装 php_openssl 扩展');
         $this->_config = [
             'digest_alg' => 'SHA256',
             'private_key_bits' => 2048,
@@ -55,9 +54,7 @@ class Crypto
     public function setDigestAlg($method)
     {
         $methods = openssl_get_md_methods();
-        if (!Arrays::in($method, $methods, false, true)) {
-            throw new Exception("不合法的摘要算法");
-        }
+        C::assertTrue(Arrays::in($method, $methods, false, true), '不合法的摘要算法');
         $this->_config['digest_alg'] = $method;
         return $this;
     }
@@ -93,9 +90,7 @@ class Crypto
         $types = [
             OPENSSL_KEYTYPE_DSA, OPENSSL_KEYTYPE_DH, OPENSSL_KEYTYPE_RSA, OPENSSL_KEYTYPE_EC,
         ];
-        if (!Arrays::in($privateKeyType, $types, false, true)) {
-            throw new Exception("不合法的密钥扩展名");
-        }
+        C::assertTrue(Arrays::in($privateKeyType, $types, false, true), '不合法的密钥扩展名');
         $this->_config['private_key_type'] = $privateKeyType;
         return $this;
     }
@@ -110,9 +105,7 @@ class Crypto
     public function setConfig($config = null)
     {
         null === $config && $config = I::get($this->_config, 'config');
-        if (false === (new LocalFile())->isFile($configPath = $config)) {
-            throw new Exception("openssl.cnf 文件不存在");
-        }
+        C::assertTrue((new LocalFile())->isFile($configPath = $config), 'openssl.cnf 文件不存在');
         $this->_config['config'] = I::getAlias($configPath);
         return $this;
     }
@@ -193,9 +186,7 @@ class Crypto
      */
     public function setPair($pair)
     {
-        if (2 !== Arrays::count($pair)) {
-            throw new Exception("请给只包含两个元素的一维数组，第一个为公钥，第二个为私钥。如果不想给，请填 false");
-        }
+        C::assertTrue(2 === Arrays::count($pair), '请给只包含两个元素的一维数组，第一个为公钥，第二个为私钥。如果不想给，请填 false');
         if (false !== $pair[0]) {
             $this->_pemPublic = $pair[0];
             if (false === Strings::isContains($this->_pemPublic, "\n")) {
@@ -227,9 +218,7 @@ class Crypto
      */
     public function getPublicEncrypt($data)
     {
-        if (null === $this->_pemPublic) {
-            throw new Exception("请使用 setPair 提供公钥");
-        }
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
         openssl_public_encrypt($data, $encrypted, $this->_pemPublic);
         return Base64::encode($encrypted);
     }
@@ -243,9 +232,7 @@ class Crypto
      */
     public function getPublicDecrypt($encrypted)
     {
-        if (null === $this->_pemPublic) {
-            throw new Exception("请使用 setPair 提供公钥");
-        }
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
         if ($encrypted) {
             openssl_public_decrypt($encrypted, $decrypted, $this->_pemPublic);
@@ -265,9 +252,7 @@ class Crypto
      */
     public function getPrivateEncrypt($data)
     {
-        if (null === $this->_pemPrivate) {
-            throw new Exception("请使用 setPair 提供私钥");
-        }
+        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
         openssl_private_encrypt($data, $encrypted, $this->_pemPrivate);
         return Base64::encode($encrypted);
     }
@@ -281,9 +266,7 @@ class Crypto
      */
     public function getPrivateDecrypt($encrypted)
     {
-        if (null === $this->_pemPrivate) {
-            throw new Exception("请使用 setPair 提供私钥");
-        }
+        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
         $encrypted = Base64::isBase64($encrypted) ? Base64::decode($encrypted) : $encrypted;
         if ($encrypted) {
             openssl_private_decrypt($encrypted, $decrypted, $this->_pemPrivate);
@@ -472,9 +455,7 @@ class Crypto
      */
     public function getSignature($data, $signType = OPENSSL_ALGO_SHA256)
     {
-        if (null === $this->_pemPrivate) {
-            throw new Exception("请使用 setPair 提供私钥");
-        }
+        C::assertNotTrue(null === $this->_pemPrivate, '请使用 setPair 提供私钥' );
         openssl_sign($data, $signature, $this->_pemPrivate, $signType);
         return $signature;
     }
@@ -490,9 +471,7 @@ class Crypto
      */
     public function isVerify($data, $signature, $signType = OPENSSL_ALGO_SHA256)
     {
-        if (null === $this->_pemPublic) {
-            throw new Exception("请使用 setPair 提供公钥");
-        }
+        C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥' );
         return (boolean) openssl_verify($data, $signature, $this->_pemPublic, $signType);
     }
 }

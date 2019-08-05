@@ -197,13 +197,13 @@ class ArraysTest extends \Codeception\Test\Unit
         try {
             foreach (Arrays::rangeGenerator(1, 5, -1) as $value) {
             }
-        } catch (\LogicException $e) {
+        } catch (\Exception $e) {
             $this->tester->assertTrue(true);
         }
         try {
             foreach (Arrays::rangeGenerator(5, 1, 1) as $value) {
             }
-        } catch (\LogicException $e) {
+        } catch (\Exception $e) {
             $this->tester->assertTrue(true);
         }
     }
@@ -592,6 +592,7 @@ class ArraysTest extends \Codeception\Test\Unit
         $this->tester->assertTrue(Arrays::in('1', [1]));
         $this->tester->assertFalse(Arrays::in('1', [1], true));
         $this->tester->assertTrue(Arrays::in('a', ['A'], false, true));
+        $this->tester->assertFalse(Arrays::in(1, ''));
     }
 
 }

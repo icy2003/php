@@ -11,6 +11,7 @@ namespace icy2003\php\ihelpers;
 
 use Exception;
 use icy2003\php\I;
+use icy2003\php\C;
 
 /**
  * 颜色处理
@@ -305,9 +306,9 @@ class Color
                 }
             } else {
                 // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
-                $hex = I::get(static::$_names, $color, $color);
-                if ($hex > 0xFFFFFF || $hex < 0 || hexdec($hex) === 0 && $hex !== '000000' && $hex !== '#000000') {
-                    throw new Exception('错误的颜色值：' . $color);
+                $hex = I::get(self::$_names, $color, $color);
+                if ($hex) {
+                    C::assertNotTrue($hex > 0xFFFFFF || $hex < 0 || hexdec($hex) === 0 && $hex !== '000000' && $hex !== '#000000' , '错误的颜色值：' . $color);
                 }
                 // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
                 if (is_string($hex)) {
@@ -316,9 +317,7 @@ class Color
                 $this->_type = self::TYPE_HEX;
                 $this->_color = $hex;
             }
-            if ('unknow' === $this->_type) {
-                throw new Exception('错误的颜色类型');
-            }
+            C::assertNotTrue('unknow' === $this->_type, '错误的颜色类型');
         } else {
             $this->_color = $color;
             $this->_type = $type;

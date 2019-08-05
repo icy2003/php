@@ -8,6 +8,7 @@
  */
 namespace icy2003\php\icomponents\file;
 
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
 
@@ -40,28 +41,18 @@ class SftpFile extends Base
      */
     public function __construct($config)
     {
-        if (!function_exists('ssh2_connect')) {
-            throw new \Exception("请开启 ssh2 扩展");
-        }
-        if (!Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff)) {
-            throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
-        }
+        C::assertFunction('ssh2_connect', '请开启 ssh2 扩展');
+        C::assertTrue(Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff), '缺少 ' . implode(',', $diff) . ' 参数');
         $this->_conn = ssh2_connect(
             I::get($config, 'host'),
             I::get($config, 'port', 22),
             I::get($config, 'methods', []),
             I::get($config, 'callback', [])
         );
-        if (false === $this->_conn) {
-            throw new \Exception("连接失败");
-        }
-        if (false === ssh2_auth_password($this->_conn, I::get($config, 'username'), I::get($config, 'password'))) {
-            throw new \Exception("账号密码错误");
-        }
+        C::assertNotFalse($this->_conn, '连接失败');
+        C::assertNotFalse(ssh2_auth_password($this->_conn, I::get($config, 'username'), I::get($config, 'password')), '账号密码错误');
         $this->_sftp = ssh2_sftp($this->_conn);
-        if (false === $this->_sftp) {
-            throw new \Exception("初始化 sftp 失败");
-        }
+        C::assertNotFalse($this->_sftp, '初始化 sftp 失败');
     }
 
     /**
