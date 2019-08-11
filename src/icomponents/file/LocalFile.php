@@ -92,8 +92,8 @@ class LocalFile extends Base implements FileInterface
                 } else {
                     $url = parse_url($fileName);
                     $host = $url['host'];
-                    $path = I::get($url, 'path', '/');
-                    $port = I::get($url, 'port', 80);
+                    $path = (string) I::get($url, 'path', '/');
+                    $port = (int) I::get($url, 'port', 80);
                     $fp = fsockopen($host, $port);
                     if (is_resource($fp)) {
                         $header = [
@@ -172,7 +172,11 @@ class LocalFile extends Base implements FileInterface
      */
     public function spl($fileName)
     {
-        return $this->attribute($fileName, 'spl');
+        $spl = $this->attribute($fileName, 'spl');
+        if ($spl instanceof \SplFileObject) {
+            return $spl;
+        }
+        throw new Exception('非本地文件，不支持 spl 属性');
     }
 
     /**
@@ -184,7 +188,11 @@ class LocalFile extends Base implements FileInterface
      */
     public function splInfo($fileName)
     {
-        return $this->attribute($fileName, 'splInfo');
+        $splInfo = $this->attribute($fileName, 'splInfo');
+        if ($splInfo instanceof \SplFileInfo) {
+            return $splInfo;
+        }
+        throw new Exception('非本地文件，不支持 splInfo 属性');
     }
 
     /**
@@ -322,7 +330,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFilesize($fileName)
     {
-        return $this->attribute($fileName, 'fileSize');
+        return (int) $this->attribute($fileName, 'fileSize');
     }
 
     /**
@@ -354,7 +362,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isFile($file)
     {
-        return $this->attribute($file, 'isExists');
+        return (bool) $this->attribute($file, 'isExists');
     }
 
     /**

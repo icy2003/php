@@ -10,6 +10,8 @@
 namespace icy2003\php\ihelpers;
 
 use icy2003\php\I;
+use icy2003\php\C;
+use Exception;
 
 /**
  * 字符串类
@@ -345,15 +347,11 @@ class Strings
         if (function_exists('password_hash')) {
             return password_hash($password, PASSWORD_DEFAULT, ['cost' => $cost]);
         }
-        if ($cost < 4 || $cost > 31) {
-            throw new Exception('cost 必须大于等于 4，小于等于 31');
-        }
+        C::assertNotTrue($cost < 4 || $cost > 31, 'cost 必须大于等于 4，小于等于 31');
         $salt = sprintf('$2y$%02d$', $cost);
         $salt .= str_replace('+', '.', substr(base64_encode(self::random(20)), 0, 22));
         $hash = crypt($password, $salt);
-        if (!is_string($hash) || strlen($hash) !== 60) {
-            throw new Exception('未知错误');
-        }
+        C::assertNotTrue(!is_string($hash) || strlen($hash) !== 60 , '未知错误');
         return $hash;
     }
 
@@ -467,6 +465,9 @@ class Strings
      */
     public static function looksLike($string1, $string2, $array = ['0oO', 'yv', 'ij', '1lI'])
     {
+        if(self::length($string1) !== self::length($string2)){
+            return false;
+        }
         $array1 = self::split($string1);
         $array2 = self::split($string2);
         foreach ($array1 as $index => $char1) {
@@ -552,7 +553,13 @@ class Strings
         $result = array_map(function ($row) {
             return self::sub($row, 0, 1);
         }, $array);
-        return true === $returnArray ? $result : implode('', $result);
+        if (true === $returnArray) {
+            return $result;
+        } elseif (false === $returnArray) {
+            return implode('', $result);
+        } else {
+            return implode((string) $returnArray, $result);
+        }
     }
 
     /**
@@ -571,18 +578,13 @@ class Strings
         $length = self::length($string);
         $modeArray = self::split($mode);
         $modeCount = Arrays::count($modeArray);
-        if (1 !== Arrays::count($modeArray, '?')) {
-            throw new Exception("模式错误，只允许有且仅有一个 ? 符，例如：3?4");
-        }
+        C::assertFalse(1 !== Arrays::count($modeArray, '?'), '模式错误，只允许有且仅有一个 ? 符，例如：3?4');
         if ($length <= array_sum($modeArray)) {
             return $string;
         }
         if (3 === Arrays::count($modeArray)) {
-            if ('?' === $modeArray[1]) {
-                return self::sub($string, 0, $modeArray[0]) . $hideChar . self::sub($string, $length - $modeArray[2], $modeArray[2]);
-            } else {
-                throw new Exception("模式错误，三段时，? 符必须在中间，例如：3?4");
-            }
+            C::assertTrue('?' === $modeArray[1] , '模式错误，三段时，? 符必须在中间，例如：3?4');
+            return self::sub($string, 0, $modeArray[0]) . $hideChar . self::sub($string, $length - $modeArray[2], $modeArray[2]);
         } elseif (2 === $modeCount) {
             if ('?' === $modeArray[0]) {
                 return $hideChar . self::sub($string, $length - $modeArray[1], $modeArray[1]);

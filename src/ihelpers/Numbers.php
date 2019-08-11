@@ -70,6 +70,8 @@ class Numbers
     /**
      * 转成字节数
      *
+     * - 支持数字和单位之间有空格
+     *
      * @param string $size 例如：10m、10M、10Tb、10kB 等
      *
      * @return integer
@@ -90,11 +92,13 @@ class Numbers
             return $matches[1] * pow(1024, $sizeMap[strtolower($matches[2])]);
         };
 
-        return preg_replace_callback('/(\d*)([a-z]?)b?/i', $callback, $size, 1);
+        return preg_replace_callback('/(\d*)\s*([a-z]?)b?/i', $callback, $size, 1);
     }
 
     /**
      * 字节数尽可能转成 k、m、g 等形式
+     *
+     * - 支持小单位转大单位
      *
      * @param integer $bytes
      *
@@ -102,6 +106,7 @@ class Numbers
      */
     public static function fromBytes($bytes)
     {
+        $bytes = self::toBytes($bytes);
         $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
         return @round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), 2) . ' ' . $unit[$i];
     }

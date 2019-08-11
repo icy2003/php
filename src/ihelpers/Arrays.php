@@ -9,8 +9,8 @@
 
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\C;
 use icy2003\php\I;
-use LogicException;
 
 /**
  * 数组类
@@ -211,23 +211,18 @@ class Arrays
      * @param integer $step 步长
      *
      * @return \Generator
-     * @throws \LogicException
      *
      * @tested
      */
     public static function rangeGenerator($start, $end, $step = 1)
     {
         if ($start < $end) {
-            if ($step <= 0) {
-                throw new LogicException('步长必须大于 0');
-            }
+            C::assertTrue($step > 0, '步长必须大于 0');
             for ($i = $start; $i <= $end; $i += $step) {
                 yield $i;
             }
         } elseif ($start > $end) {
-            if ($step >= 0) {
-                throw new LogicException('步长必须小于 0');
-            }
+            C::assertTrue($step < 0, '步长必须小于 0');
             for ($i = $start; $i >= $end; $i += $step) {
                 yield $i;
             }
