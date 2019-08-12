@@ -9,16 +9,21 @@
 namespace icy2003\php\icomponents\file;
 
 use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\icomponents\file\FileInterface;
+use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Charset;
 use icy2003\php\ihelpers\Header;
+use icy2003\php\ihelpers\Request;
+use icy2003\php\ihelpers\Strings;
 
 /**
  * 本地文件
  *
  * - 支持本地文件操作
  * - 支持网络文件：文件是否存在、文件大小
+ * - 下载文件请使用 download() 而不是 downloadFile()
  */
 class LocalFile extends Base implements FileInterface
 {
@@ -485,16 +490,46 @@ class LocalFile extends Base implements FileInterface
     }
 
     /**
+     * download() 配置名：ip
+     */
+    const C_DOWNLOAD_IP = 'ip';
+    /**
+     * download() 配置名：speed
+     */
+    const C_DOWNLOAD_SPEED = 'speed';
+    /**
+     * download() 配置名：xSendFile
+     */
+    const C_DOWNLOAD_X_SEND_FILE = 'xSendFile';
+    /**
+     * download() 配置名：xSendFileRoot
+     */
+    const C_DOWNLOAD_X_SEND_FILE_ROOT = 'xSendFileRoot';
+
+    /**
      * 客户端向服务端发起下载请求
      *
      * @param string|array $fileName 如果是数组，第一个元素是原名，第二个元素为下载名，原名需要指定路径，下载名不需要
+     * @param null|array $config 配置项
+     *      - ip：限特定 IP 访问，数组或逗号字符串，默认为 *，即对所有 IP 不限制
+     *      - speed：限速，默认不限速，单位 kb/s
+     *      - xSendFile：是否使用 X-Sendfile 进行下载，默认 false，即不使用。X-Sendfile 缓解了 PHP 的压力，但同时 PHP 将失去对资源的控制权，因为 PHP 并不知道资源发完了没
+     *      - xSendFileRoot：文件根路径，默认为 /protected/。此时 Nginx 可作如下配置，更多 @link https://www.nginx.com/resources/wiki/start/topics/examples/xsendfile/
+     *      ```nginx.conf
+     *      location /protected/ {
+     *          internal; # 表示这个路径只能在 Nginx 内部访问，不能用浏览器直接访问防止未授权的下载
+     *          alias   /usr/share/nginx/html/protected/; # 别名
+     *          # root    /usr/share/nginx/html; # 根目录
+     *      }
+     *      ```
      * @param callback $callback 下载完成后的回调，参数列表：文件属性数组
      *
      * @return void
      * @throws Exception
      */
-    public function download($fileName, $callback = null)
+    public function download($fileName, $config = null, $callback = null)
     {
+        Header::xPoweredBy();
         set_time_limit(0);
         if (is_string($fileName)) {
             $fileName = [$fileName, Charset::toCn($this->getBasename($fileName))];
@@ -502,18 +537,38 @@ class LocalFile extends Base implements FileInterface
         list($originName, $downloadName) = $fileName;
         $originName = $this->__file($originName);
         try {
+            $ip = I::get($config, self::C_DOWNLOAD_IP, '*');
+            if ('*' !== $ip) {
+                C::assertTrue(Arrays::in((new Request())->getUserIP(), Strings::toArray($ip)), 'http/1.1 403.6 此 IP 禁止访问');
+            }
             if ($this->isFile($originName)) {
+                $fileSize = $this->getFilesize($originName);
                 header('Content-type:application/octet-stream');
                 header('Accept-Ranges:bytes');
-                header('Content-Length:' . $this->getFilesize($originName));
+                header('Content-Length:' . $fileSize);
                 header('Content-Disposition: attachment; filename=' . $downloadName);
-                foreach ($this->dataGenerator($originName, true) as $data) {
-                    echo $data;
+                $speed = I::get($config, self::C_DOWNLOAD_SPEED, 0);
+                $xSendFile = I::get($config, self::C_DOWNLOAD_X_SEND_FILE, false);
+                $xSendFileRoot = I::get($config, self::C_DOWNLOAD_X_SEND_FILE_ROOT, '/protected/');
+                if (true === $xSendFile) {
+                    $path = rtrim($xSendFileRoot, '/') . '/' . $this->getBasename($originName);
+                    header('X-Accel-Redirect: ' . $path); // Nginx、Cherokee 实现了该头
+                    header('X-Sendfile: ' . $path); // Apache、Lighttpd v1.5、Cherokee 实现了该头
+                    header('X-LIGHTTPD-send-file: ', $path); // Lighttpd v1.4 实现了该头
+                    if ($speed) {
+                        header('X-Accel-Limit-Rate: ' . $speed); // 单位 kb/s
+                    }
+                } else {
+                    flush();
+                    foreach ($this->dataGenerator($originName, true, ($speed ? $speed : 1024) * 1024) as $data) {
+                        echo $data;
+                        flush();
+                        $speed > 0 && sleep(1);
+                    }
                 }
             }
         } catch (Exception $e) {
-            Header::notFound();
-            throw $e;
+            header($e->getMessage());
         } finally {
             I::call($callback, [$this->_attributes]);
             // 必须要终止掉，防止发送其他数据导致错误
