@@ -9,8 +9,6 @@
 
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\I;
-
 /**
  * 日期类
  */
@@ -33,15 +31,19 @@ class DateTime
      * - 0：今天，1：明天，-1：昨天，以此类推
      *
      * @param integer $offset 天数偏移量，默认 0，即今天
+     * @param integer|null $time 设定该时间戳为今天
      *
      * @return array
      */
-    public function dayRange($offset = 0)
+    public function dayRange($offset = 0, $time = null)
     {
-        $day = (int) (date('d') + $offset);
+        null === $time && $time = time();
+        $y = (int) (date('Y', $time));
+        $m = (int) (date('m', $time));
+        $d = (int) (date('d', $time) + $offset);
         return [
-            mktime(0, 0, 0, (int) date('m'), $day, (int) date('Y')),
-            mktime(23, 59, 59, (int) date('m'), $day, (int) date('Y')),
+            mktime(0, 0, 0, $m, $d, $y),
+            mktime(23, 59, 59, $m, $d, $y),
         ];
     }
 
@@ -51,16 +53,17 @@ class DateTime
      * - 星期天是第一天，星期六是最后一天！！
      *
      * @param integer $offset
+     * @param integer|null $time 设定该时间戳为本周
      *
      * @return array
      */
-    public function weekRange($offset = 0)
+    public function weekRange($offset = 0, $time = null)
     {
-        $timestamp = time();
+        null === $time && $time = time();
         $offset = (int) $offset;
         return [
-            strtotime(date('Y-m-d', strtotime('Sunday ' . ($offset - 1) . ' week', $timestamp))),
-            strtotime(date('Y-m-d', strtotime('Saturday ' . $offset . ' week', $timestamp))) + 24 * 3600 - 1,
+            strtotime(date('Y-m-d', strtotime('Sunday ' . ($offset - 1) . ' week', $time))),
+            strtotime(date('Y-m-d', strtotime('Saturday ' . $offset . ' week', $time))) + 24 * 3600 - 1,
         ];
     }
 
@@ -68,14 +71,17 @@ class DateTime
      * 距离本月偏移量月份数的开始和结束的时间戳
      *
      * @param integer $offset
+     * @param integer|null $time 设定该时间戳为本月
      *
      * @return array
      */
-    public function monthRange($offset = 0)
+    public function monthRange($offset = 0, $time = null)
     {
-        $month = (int) (date('m') + $offset);
-        $begin = mktime(0, 0, 0, $month, 1, (int) date('Y'));
-        $end = mktime(23, 59, 59, $month, (int) date('t', $begin), (int) date('Y'));
+        null === $time && $time = time();
+        $y = (int) (date('Y', $time));
+        $m = (int) (date('m', $time) + $offset);
+        $begin = mktime(0, 0, 0, $m, 1, $y);
+        $end = mktime(23, 59, 59, $m, (int) date('t', $begin), $y);
 
         return [$begin, $end];
     }
@@ -84,12 +90,14 @@ class DateTime
      * 距离今年偏移量年份数的开始和结束的时间戳
      *
      * @param integer $offset
+     * @param integer|null $time 设定该时间戳为本年
      *
      * @return array
      */
-    public function yearRange($offset = 0)
+    public function yearRange($offset = 0, $time = null)
     {
-        $year = (int) (date('Y') + $offset);
+        null === $time && $time = time();
+        $year = (int) (date('Y', $time) + $offset);
         return [
             mktime(0, 0, 0, 1, 1, $year),
             mktime(23, 59, 59, 12, 31, $year),
@@ -106,9 +114,9 @@ class DateTime
      */
     public function day($offset = 0, $time = null)
     {
-        $timestamp = null === $time ? time() : $time;
+        null === $time && $time = time();
         $offset = (int) $offset;
-        return $timestamp + 3600 * 24 * $offset;
+        return $time + 3600 * 24 * $offset;
     }
 
     /**
@@ -121,9 +129,9 @@ class DateTime
      */
     public function week($offset = 0, $time = null)
     {
-        $timestamp = null === $time ? time() : $time;
+        null === $time && $time = time();
         $offset = (int) $offset;
-        return $timestamp + 3600 * 24 * 7 * $offset;
+        return $time + 3600 * 24 * 7 * $offset;
     }
 
     /**
@@ -136,9 +144,9 @@ class DateTime
      */
     public function month($offset = 0, $time = null)
     {
-        $timestamp = null === $time ? time() : $time;
+        null === $time && $time = time();
         $offset = (int) $offset;
-        return $timestamp + 3600 * 24 * date('t', $timestamp) * $offset;
+        return $time + 3600 * 24 * date('t', $time) * $offset;
     }
 
     /**
@@ -151,9 +159,9 @@ class DateTime
      */
     public function year($offset = 0, $time = null)
     {
-        $timestamp = null === $time ? time() : $time;
+        null === $time && $time = time();
         $offset = (int) $offset;
-        return $timestamp + 3600 * 24 * (date('z', mktime(0, 0, 0, 12, 31, date('Y', $timestamp))) + 1) * $offset;
+        return $time + 3600 * 24 * (date('z', mktime(0, 0, 0, 12, 31, date('Y', $time))) + 1) * $offset;
     }
 
     /**
@@ -165,8 +173,8 @@ class DateTime
      */
     public function weekName($time = null)
     {
-        $timestamp = null === $time ? time() : $time;
-        return date('l', $timestamp);
+        null === $time && $time = time();
+        return date('l', $time);
     }
 
     /**
@@ -178,8 +186,8 @@ class DateTime
      */
     public function monthName($time = null)
     {
-        $timestamp = null === $time ? time() : $time;
-        return date('F', $timestamp);
+        null === $time && $time = time();
+        return date('F', $time);
     }
 
     /**
@@ -191,8 +199,8 @@ class DateTime
      */
     public function isLeapYear($time = null)
     {
-        $timestamp = null === $time ? time() : $time;
-        return (bool) date('L', $timestamp);
+        null === $time && $time = time();
+        return (bool) date('L', $time);
     }
 
     /**
@@ -206,7 +214,7 @@ class DateTime
      */
     public function yearPosition($time = null)
     {
-        $timestamp = null === $time ? time() : $time;
-        return (int) date('z', $timestamp) + 1;
+        null === $time && $time = time();
+        return (int) date('z', $time) + 1;
     }
 }
