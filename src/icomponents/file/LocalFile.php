@@ -134,6 +134,7 @@ class LocalFile extends Base implements FileInterface
      */
     private function __hash($fileName)
     {
+        $fileName = $this->getRealpath($fileName);
         return md5($fileName);
     }
 
@@ -227,16 +228,18 @@ class LocalFile extends Base implements FileInterface
      * @param integer $num 行号
      * @param boolean $autoClose 是否自动关闭文件，默认 false
      *
-     * @return string
+     * @return string|null
      */
     public function line($fileName, $num = 0, $autoClose = false)
     {
+        $spl = $this->spl($fileName);
         foreach ($this->linesGenerator($fileName, $autoClose) as $k => $line) {
             if ($k == $num) {
-                $this->spl($fileName)->rewind();
+                $spl->rewind();
                 return $line;
             }
         }
+        return null;
     }
 
     /**
@@ -252,9 +255,11 @@ class LocalFile extends Base implements FileInterface
     {
         $bufferSize = 0;
         try {
-            while (!$this->spl($fileName)->eof() && $this->splInfo($fileName)->getSize() > $bufferSize) {
+            $spl = $this->spl($fileName);
+            $size = $this->getFilesize($fileName);
+            while (!$spl->eof() && $size > $bufferSize) {
                 $bufferSize += $buffer;
-                yield $this->spl($fileName)->fread($bufferSize);
+                yield $spl->fread($bufferSize);
             }
         } finally {
             true === $autoClose && $this->close($fileName);
@@ -502,7 +507,7 @@ class LocalFile extends Base implements FileInterface
                 header('Accept-Ranges:bytes');
                 header('Content-Length:' . $this->getFilesize($originName));
                 header('Content-Disposition: attachment; filename=' . $downloadName);
-                foreach ($this->dataGenerator($originName) as $data) {
+                foreach ($this->dataGenerator($originName, true) as $data) {
                     echo $data;
                 }
             }
