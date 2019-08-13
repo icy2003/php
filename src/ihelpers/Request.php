@@ -186,7 +186,7 @@ class Request
      */
     public function isAjax()
     {
-        return 'XMLHttpRequest' === Arrays::first(I::get($this->getHeaders(), 'x-requested-with'));
+        return 'XMLHttpRequest' === Arrays::first((array) I::get($this->getHeaders(), 'x-requested-with', []));
     }
 
     /**
@@ -373,7 +373,7 @@ class Request
     /**
      * 获取主机
      *
-     * @return array
+     * @return string
      */
     public function getHostInfo()
     {
@@ -381,7 +381,7 @@ class Request
             $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
             if (I::get($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim(Arrays::first(explode(',', Arrays::first(I::get($this->getHeaders(), 'x-forward-host')))));
+                $this->__hostInfo = $http . '://' . trim((string) Arrays::first(explode(',', (string) Arrays::first((array) I::get($this->getHeaders(), 'x-forward-host', [])))));
             } elseif (I::get($this->getHeaders(), 'host')) {
                 $this->__hostInfo = $http . '://' . Arrays::first(I::get($this->getHeaders(), 'host'));
             } elseif (isset($_SERVER['SERVER_NAME'])) {
@@ -464,7 +464,7 @@ class Request
      */
     public function getQueryString()
     {
-        return I::get($_SERVER, 'QUERY_STRING', '');
+        return (string) I::get($_SERVER, 'QUERY_STRING', '');
     }
 
     /**
@@ -478,7 +478,7 @@ class Request
             return true;
         }
         foreach ($this->__secureProtocolHeaders as $header => $values) {
-            if (($headerValue = I::get($this->getHeaders(), $header)) !== null) {
+            if (($headerValue = (string) I::get($this->getHeaders(), $header)) !== null) {
                 foreach ($values as $value) {
                     if (strcasecmp($headerValue, $value) === 0) {
                         return true;
