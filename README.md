@@ -1,6 +1,6 @@
 # icy2003 的 PHP 库
 
-**icy2003/php** 是一个工具库，它诞生的核心思想是：**功能丰富、简洁明了、执行高效、猜你所想**
+**icy2003/php** 是一个工具集，它功能丰富、执行高效、注释完整、使用简单
 
 [![Build Status](https://travis-ci.com/icy2003/php.svg?branch=master)](https://travis-ci.com/icy2003/php)
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
@@ -8,57 +8,16 @@
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/icy2003/php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/)
 [![Code Coverage](https://scrutinizer-ci.com/g/icy2003/php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/?branch=master)
 
-**功能丰富**
+## 功能
 
-涉及功能例如有：数组操作、字符串操作、文件操作、图片处理、微信支付宝支付等
+包括但不限于以下列表：
 
-如果说 PHP 作为工具是一把瑞士军刀，那 icy2003/php 会是 PHP 的瑞士军刀
-
-从最开始我只是想获得随机字符串（`Strings::random`）开始，到此文档更新为止，icy2003/php 包含的方法已有 **700+** 个！尽管这只是 PHP 里的沧海一粟，但是足以应付 PHP 使用过程中大部分遇到的问题
-
-**简洁明了**
-
-方法的命名简洁明了，尽可能在有限的字符长度里完整表达一个方法的含义，但又不故意缩减字符
-
-例如：`Xml::toArray` 表示 XML 转成数组，我没有把它命名为 Xml:convertToArray 或是 Xml::toArr，前者太啰嗦，后者过度省略，此外，xml2array 这种命名的会引起一部分人的厌恶
-
-**执行高效**
-
-最直接的就是我不使用双引号 `""` 和使用 `===`
-
-所有的封装最开始都是一碗面条，直到抽象为最基础的小石头，在这个城堡的构建过程中，每个小石头都有它最精简的表达方式，必要时我还会反复测试效率甚至寻找其他解决方法
-
-**猜你所想**
-
-众所周知，PHP 有八（读作：三）大数据类型：数组、字符串、对象<del>以及不太重要的整数、浮点数、null、资源、布尔这五种类型</del>
-
-PHP 建议你注意数据的类型（比如 PHP7 的类型约束），但相比那些强类型语言，PHP 太包容了！这会让那些从别的语言转到 PHP 来的人感到困惑，因为在他们概念里的可变数组、键值对、队列、栈等等东西在 PHP 这里都叫数组，这会让小白感到十分舒服，数据类型模糊化让 PHP 门槛很低，但我认为这远远不够
-
-icy2003/php 为了让所有人都轻松使用，它采用了更加包容的方式。许多可选参数支持多种类型，然后猜测你可能会用它来干嘛，并事先替你做一部分事情
-
-例如：对于删除一个文件夹，弹出一个“**删除失败，文件夹里包含文件**”这种提示来说，实在令人沮丧，如果你也发现了这一点，那你可以使用：
-
-```php
-(new LocalFile())->deleteDir('xxx');
-```
-
-它绝对会帮你把名为“xxx”的文件夹里的文件也一起删掉，对了，还有里面的各种嵌套文件夹，你需要在意的只是“**删除哪个文件夹**”，仅此而已
-
-再例如： `Arrays::count`，这个函数用于获取数组元素个数，似乎这并没有什么好扩展的，但是，如果你的需求变为了“获取数组里偶数的个数”，那你可能需要它了：
-
-```php
-// $count 值为 3，如果要排除 '2'，可以自行写对应的逻辑
-$array = [1, 2, 3, 4, '2'];
-$count = Arrays::count($array, function($row){
-    return $row % 2 === 0;
-});
-```
-
-它为你省去了用 `foreach` 的统计部分，毕竟你可能更需要关注“**什么是偶数**”，而不是“**如何用循环筛选偶数**”这件事。更多用法可以参看 `Arrays::count` 的注释（它真的还有其他凶残的用法）
-
-icy2003/php 给你更加宽松的数据类型要求、环境要求以及猜测你需要什么，总结一下就是：我不管，我就要！
-
-如果你喜欢这样的 **icy2003/php** ，给个 star 吧~
+1. 数组字符串的各种操作
+2. 本地、ftp、sftp 等的文件操作，例如：批量删除、添加、复制、剪切文件（夹）
+3. 编码转换、时间转换、请求处理、缓存、文本处理、数学计算、图片处理、常用正则等
+4. 针对 yii2、phpoffice 等的扩展
+5. 微信支付宝的支付、退款等
+6. 百度 AI 接口
 
 ## 文档
 
@@ -72,78 +31,6 @@ composer require phpdocumentor/phpdocumentor 2.*
 ./vendor/bin/phpdoc -d ./src -t ./docs
 ```
 
-**icy2003/php** 对编辑器的提示支持也很好，在使用过程中就可以看到对应函数的说明
-
-
-
-## 功能
-
-目前分为四个部分：助手函数（ihelpers）、其他库扩展（iexts）、组件（icomponents）和第三方接口（iapis）
-以及一个最常用的通用静态类：I.php，下面是它的部分方法简单介绍：
-
-- get：这个函数就是它名字本身的含义：“获取”，获取什么？很多，猜你所想，比如：
-
-    1. 无视数组层级获取值
-        ```php
-        // 如果 $array['a']['b']['c']['d']['e'] 值为 null（或者中间就断了），给默认值 '1'
-        I::get($array, 'a.b.c.d.e', '1')
-        ```
-    2. 获取字符串 0 位置的字符
-        ```php
-        // 值为 'a'
-        I::get('abcde', 0)
-        ```
-    3. 获取对象的属性
-        ```php
-        // 尝试调用 $object->getName()，如果没有该函数，尝试获取公有属性 name，支持无限层级
-        I::get($object, 'name');
-        ```
-    更多功能可以在使用它时的代码注释里看到，现在它几乎成为 icy2003/php 的核心函数
-- displayErrors：显示 PHP 错误，一个使用频率很高的操作
-- getAlias：熟悉 Yii2 的人应该很眼熟，它对 Yii2 的别名进行了改进（等你发现），当然你完全可以用 I::getAlias 代替 Yii2::getAlias
-
-### ihelpers
-
-以下只是部分展示，不代表所有类：
-
-- Arrays：各式各样的数组操作！不怕没有你要的操作，就怕你想不到有这种操作！
-- Charset：编码转换，别再为 UTF-8 烦恼了
-- Color：十六进制、RGB、CMYK 的颜色值转换，也支持例如“red”的英文单词颜色转换
-- DateTime：老板说：“我要一个下拉选择框，可以显示最近三天、上个星期、今年等的数据”，请用这个类甩他一脸！
-- File：请使用 icomponents 的 file 系列，那里有你想要的
-- Http：后端发送 GET、POST 请求，支持异步操作
-- Image：缩放、裁剪、水印、翻转、旋转图片，生成验证码、后端输出图片等
-- Json：简单的 Json 操作封装
-- Markdown：快速组装 Markdown 文本
-- Regular：常见正则表达式，以后请不要蠢蠢地写这些写烂的正则了好么？何况不一定准
-- Request：移植于 Yii2 的用于接收前端数据的类
-- Strings：随机数、密码以及校验、驼峰下划线转换等字符串操作，元老级别的一个类，同样是丰富的操作！
-- Timer：计时器
-- Upload：文件的表单上传
-- View：视图渲染
-- Xml：Xml 操作类
-
-### iexts
-
-目前是 Yii2 和 phpoffice 的一些问题的修复
-
-顺便一提 phpoffice，作者不仅采用了我某个小功能的代码，作者还告诉我，他正在计划重构这货（phpoffice）。的确，现在的 phpoffice 有很多不尽如人意的问题，期待一下吧，你也许可以从这里找到一些好用的方法（至少是 phpoffice 没有提供或者有问题的）
-
-### icomponents
-
-- file：对文件和目录的操作。例如创建、删除、复制、移动目录，写入、读取、删除、复制、移动、上传、下载文件等，并且它们尽可能会是递归操作，所以你不再需要担心“该目录下存在文件”这种报错。支持本地文件、ftp、sftp！更多环境还有三十秒到达战场……
-- cache：缓存组件。目前只有文件缓存，此组件还在开发中
-- excel：Excel 函数的实现。Excel 里有很多有意思的数学计算，为什么不移植过来呢？
-
-### iapis
-
-暂时计划会全部实现微信和支付宝的支付相关接口
-
-已经完成：
-
-- 微信：统一下单、退款等
-- 支付宝：APP 支付、退款等
-
 ## 地址
 
 -  [github](https://github.com/icy2003/php)
@@ -151,10 +38,14 @@ composer require phpdocumentor/phpdocumentor 2.*
 
 ## 安装
 
-composer 安装，暂时是开发版，请使用以下命令：
+composer 安装，目前为开发版
 
 ```cmd
 composer require icy2003/php dev-master
 ```
 
-`composer update` 的时候无脑选右（Y）
+## 补充说明和未来计划
+
+1. 目前不打算实现 db，推荐使用 yii2
+2. 目前不打算实现二维码，请自行找库或者调用别家 API
+3. 计划编写完整的测试用例
