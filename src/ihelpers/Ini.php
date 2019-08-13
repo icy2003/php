@@ -57,13 +57,16 @@ class Ini
         $this->_file = $file;
         if (self::TYPE_AUTO === $type) {
             $local = new LocalFile();
-            $content = $local->getFileContent($file);
-            if (Json::isJson($content)) {
-                $this->_type = self::TYPE_JSON;
-            } elseif (Xml::isXml($content)) {
-                $this->_type = self::TYPE_XML;
-            } else {
-                $this->_type = self::TYPE_INI;
+            $extension = $local->getExtension($file);
+            switch ($extension) {
+                case 'json':
+                    $this->_type = self::TYPE_JSON;
+                    break;
+                case 'xml':
+                    $this->_type = self::TYPE_XML;
+                    break;
+                default:
+                    $this->_type = self::TYPE_INI;
             }
         }
     }

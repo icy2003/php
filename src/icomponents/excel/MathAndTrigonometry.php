@@ -435,13 +435,12 @@ trait MathAndTrigonometry
      */
     public static function factdouble($number)
     {
-        $number = floor($number);
         if ($number == 0) {
             return 1;
         }
         $result = 1;
         $isEven = $number % 2 == 0;
-        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, $number, 2) as $num) {
+        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, (int) $number, 2) as $num) {
             $result *= $num;
         }
         return $result;
@@ -682,7 +681,7 @@ trait MathAndTrigonometry
      *
      * @param double $number1 Number1 是必需的，后续数字是可选的
      *
-     * @return void
+     * @return double
      */
     public static function multinomial($number1)
     {

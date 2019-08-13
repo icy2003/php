@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.com/icy2003/php.svg?branch=master)](https://travis-ci.com/icy2003/php)
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/icy2003/php)
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/icy2003/php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/)
 [![Code Coverage](https://scrutinizer-ci.com/g/icy2003/php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/?branch=master)

@@ -76,7 +76,7 @@ class NLP extends Base
         ]));
 
         $this->_toArrayCall = function ($result) {
-            return Arrays::column(I::get($result, 'items'), 'item');
+            return Arrays::column((array) I::get($result, 'items', []), 'item');
         };
 
         return $this;
@@ -104,7 +104,7 @@ class NLP extends Base
             'charset' => 'UTF-8',
         ]));
         $this->_toArrayCall = function ($result) {
-            return Arrays::column(I::get($result, 'items'), 'word');
+            return Arrays::column((array) I::get($result, 'items', []), 'word');
         };
 
         return $this;
