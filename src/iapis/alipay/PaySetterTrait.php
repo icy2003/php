@@ -206,6 +206,7 @@ trait PaySetterTrait
      */
     public function setBizContentTotalAmount($totalAmount)
     {
+        $totalAmount = number_format($totalAmount, 2, '.', '');
         return $this->setBizContent('total_amount', $totalAmount);
     }
 
