@@ -161,7 +161,7 @@ class DateTime
     {
         null === $time && $time = time();
         $offset = (int) $offset;
-        return $time + 3600 * 24 * (date('z', mktime(0, 0, 0, 12, 31, (int) date('Y', $time))) + 1) * $offset;
+        return mktime((int) date('H', $time), (int) date('i', $time), (int) date('s', $time), (int) date('m', $time), (int) date('d', $time), (int) date('Y', $time) + 1);
     }
 
     /**
