@@ -623,4 +623,18 @@ class Strings
         $array = explode(PHP_EOL, $string);
         return Arrays::count($array);
     }
+
+    /**
+     * 字符串替换
+     *
+     * @param string $string
+     * @param array $replaceArray 键值对替换
+     * @param integer $count 如果给定，则引用返回替换次数
+     *
+     * @return string
+     */
+    public static function replace($string, $replaceArray, &$count = null)
+    {
+        return str_replace(array_keys($replaceArray), array_values($replaceArray), $string, $count);
+    }
 }
