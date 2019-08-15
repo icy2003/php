@@ -531,10 +531,7 @@ class LocalFile extends Base implements FileInterface
     {
         Header::xPoweredBy();
         set_time_limit(0);
-        if (is_string($fileName)) {
-            $fileName = [$fileName, Charset::toCn($this->getBasename($fileName))];
-        }
-        list($originName, $downloadName) = $fileName;
+        list($originName, $downloadName) = $this->fileMap($fileName);
         $originName = $this->__file($originName);
         try {
             $ip = I::get($config, self::C_DOWNLOAD_IP, '*');
@@ -574,6 +571,28 @@ class LocalFile extends Base implements FileInterface
             // 必须要终止掉，防止发送其他数据导致错误
             die;
         }
+    }
+
+    /**
+     * 返回文件映射
+     *
+     * @param string|array $file 支持别名
+     *
+     * @return array
+     */
+    public function fileMap($file)
+    {
+        if (is_string($file)) {
+            $file = [$file, Charset::toCn($this->getBasename($file))];
+        } elseif (is_array($file)) {
+            $file = Arrays::lists($file, 2);
+            if ($this->isDir($file[1])) {
+                $file[1] = rtrim($file[1], '/') . '/' . Charset::toCn($this->getBasename($file[0]));
+            }
+        } else {
+            $file = ['', ''];
+        }
+        return $file;
     }
 
     /**

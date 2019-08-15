@@ -11,6 +11,8 @@ namespace icy2003\php\ihelpers;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -150,5 +152,29 @@ class Http
         }, function (RequestException $err) use ($error) {
             $error && $error($err);
         });
+    }
+
+    /**
+     * 下载文件
+     *
+     * - $file 是字符串，则会从远程文件下载到当前目录的同名文件
+     * - $file 是数组，必须为两元素数组，如果元素二是路径，则下载到对应路径，如果元素二是文件，则下载为指定文件
+     * - 支持中文
+     *
+     * @param string|array $file
+     *
+     * @return boolean
+     */
+    public function download($file)
+    {
+        list($from, $to) = (new LocalFile())->fileMap($file);
+        try{
+            (new Http())->get($from, [], [
+                'save_to' => I::getAlias($to),
+            ]);
+            return true;
+        }catch(RequestException $e){
+            return false;
+        }
     }
 }
