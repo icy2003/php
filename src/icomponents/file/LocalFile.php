@@ -55,7 +55,7 @@ class LocalFile extends Base implements FileInterface
     {
         setlocale(LC_ALL, $locale);
         clearstatcache();
-        $this->_functions['loader'] = function ($fileName) {
+        $this->_functions['loader'] = function ($fileName, $mode = 'rb') {
             $hashName = $this->__hash($fileName);
             $this->_attributes[$hashName] = I::get($this->_attributes, $hashName, [
                 'isCached' => false,
@@ -67,6 +67,13 @@ class LocalFile extends Base implements FileInterface
                 'spl' => null,
                 'splInfo' => null,
             ]);
+            try {
+                $this->chmod($this->_attributes[$hashName]['file']);
+                null === $this->_attributes[$hashName]['spl'] && $this->_attributes[$hashName]['spl'] = new \SplFileObject($this->__file($fileName), $mode);
+                null === $this->_attributes[$hashName]['splInfo'] && $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($this->__file($fileName));
+            } catch (Exception $e) {
+
+            }
             // 如果已经被缓存了，直接返回
             if (true === $this->_attributes[$hashName]['isCached']) {
                 return;
@@ -80,6 +87,13 @@ class LocalFile extends Base implements FileInterface
                     curl_setopt($curl, CURLOPT_NOBODY, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($curl, CURLOPT_HEADER, true);
+                    // 公用名(Common Name)一般来讲就是填写你将要申请SSL证书的域名 (domain)或子域名(sub domain)
+                    // - 设置为 1 是检查服务器SSL证书中是否存在一个公用名(common name)
+                    // - 设置成 2，会检查公用名是否存在，并且是否与提供的主机名匹配
+                    // - 0 为不检查名称。 在生产环境中，这个值应该是 2（默认值）
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+                    // 禁止 cURL 验证对等证书（peer's certificate）。要验证的交换证书可以在 CURLOPT_CAINFO 选项中设置
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
                     $result = curl_exec($curl);
                     if ($result && $info = curl_getinfo($curl)) {
                         if (200 == $info['http_code']) {
@@ -121,10 +135,9 @@ class LocalFile extends Base implements FileInterface
                 }
             } else {
                 $this->_attributes[$hashName]['isLocal'] = true;
-                if ($this->_attributes[$hashName]['isExists'] = file_exists($this->_attributes[$hashName]['file'])) {
+                $this->_attributes[$hashName]['isExists'] = file_exists($this->_attributes[$hashName]['file']);
+                if ($this->_attributes[$hashName]['isExists']) {
                     $this->_attributes[$hashName]['fileSize'] = filesize($this->_attributes[$hashName]['file']);
-                    $this->_attributes[$hashName]['spl'] = new \SplFileObject($this->_attributes[$hashName]['file']);
-                    $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($this->_attributes[$hashName]['file']);
                 }
             }
         };
@@ -139,7 +152,6 @@ class LocalFile extends Base implements FileInterface
      */
     private function __hash($fileName)
     {
-        $fileName = $this->getRealpath($fileName);
         return md5($fileName);
     }
 
@@ -160,12 +172,13 @@ class LocalFile extends Base implements FileInterface
      *
      * @param string $fileName
      * @param string $name
+     * @param string $mode 读写的模式，默认 rb
      *
      * @return mixed
      */
-    public function attribute($fileName, $name)
+    public function attribute($fileName, $name, $mode = 'rb')
     {
-        I::call($this->_functions['loader'], [$fileName]);
+        I::call($this->_functions['loader'], [$fileName, $mode]);
         return I::get($this->_attributes, $this->__hash($fileName) . '.' . $name);
     }
 
@@ -173,16 +186,17 @@ class LocalFile extends Base implements FileInterface
      * 获取文件对象
      *
      * @param string $fileName
+     * @param string $mode 读写的模式，默认 rb
      *
      * @return \SplFileObject
      */
-    public function spl($fileName)
+    public function spl($fileName, $mode = 'rb')
     {
-        $spl = $this->attribute($fileName, 'spl');
+        $spl = $this->attribute($fileName, 'spl', $mode);
         if ($spl instanceof \SplFileObject) {
             return $spl;
         }
-        throw new Exception('非本地文件，不支持 spl 属性');
+        throw new Exception('文件打开失败：' . $fileName);
     }
 
     /**
@@ -198,7 +212,7 @@ class LocalFile extends Base implements FileInterface
         if ($splInfo instanceof \SplFileInfo) {
             return $splInfo;
         }
-        throw new Exception('非本地文件，不支持 splInfo 属性');
+        throw new Exception('文件打开失败：' . $fileName);
     }
 
     /**
@@ -412,7 +426,11 @@ class LocalFile extends Base implements FileInterface
      */
     public function getRealpath($path)
     {
-        return realpath($this->__file($path));
+        $file = realpath($this->__file($path));
+        if (false === $file) {
+            $file = $path;
+        }
+        return $file;
     }
 
     /**
@@ -482,11 +500,32 @@ class LocalFile extends Base implements FileInterface
     }
 
     /**
+     * - 从远程下载文件到本地
+     * - @param callback|null $callback 执行中的回调
+     *
      * @ignore
      */
-    public function downloadFile($fromFile, $toFile = null, $overwrite = true)
+    public function downloadFile($fromFile, $toFile = null, $overwrite = true, $callback = null)
     {
-        return false;
+        if (null === $toFile) {
+            list($fromFile, $toFile) = $this->fileMap($fromFile);
+        } else {
+            list($fromFile) = $this->fileMap($fromFile);
+        }
+        if ($this->isFile($toFile) && false === $overwrite) {
+            return true;
+        }
+        $fromSpl = $this->spl($fromFile, 'rb');
+        $toSpl = $this->spl($toFile, 'wb');
+        $size = 0;
+        $total = $this->getFilesize($fromFile);
+        while (false === $fromSpl->eof()) {
+            $out = $fromSpl->fread(1024 * 8);
+            $toSpl->fwrite($out);
+            $size += Strings::byteLength($out);
+            I::call($callback, [$size, $total]);
+        }
+        $this->close([$fromFile, $toFile]);
     }
 
     /**
@@ -507,7 +546,7 @@ class LocalFile extends Base implements FileInterface
     const C_DOWNLOAD_X_SEND_FILE_ROOT = 'xSendFileRoot';
 
     /**
-     * 客户端向服务端发起下载请求
+     * 服务端给客户端提供下载请求
      *
      * @param string|array $fileName 如果是数组，第一个元素是原名，第二个元素为下载名，原名需要指定路径，下载名不需要
      * @param null|array $config 配置项
@@ -634,10 +673,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                chmod($subFile, $mode);
+                @chmod($subFile, $mode);
             }
         }
-        return (bool) chmod($file, $mode);
+        return (bool) @chmod($file, $mode);
     }
 
     /**
