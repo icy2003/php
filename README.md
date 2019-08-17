@@ -22,15 +22,7 @@
 
 ## 文档
 
-**icy2003/php** 是基于 [phpdocumentor](https://www.phpdoc.org/) 标准格式写的注释，因此你可以轻易使用 phpdocumentor 生成一份完整详细的文档
-
-```shell
-composer require phpdocumentor/phpdocumentor 2.*
-# windows
-./vendor/bin/phpdoc.bat -d ./src -t ./docs
-# linux
-./vendor/bin/phpdoc -d ./src -t ./docs
-```
+请查看注释，有能力者可以使用 phpdocumentor 生成文档
 
 ## 地址
 

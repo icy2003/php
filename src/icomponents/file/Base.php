@@ -7,38 +7,11 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 namespace icy2003\php\icomponents\file;
+use icy2003\php\ihelpers\Charset;
+use icy2003\php\ihelpers\Arrays;
 
 /**
  * 文件抽象类
- *
- * - getCommandResult()：获得命令返回值
- * - getBasename()：返回路径中的文件名部分
- * - getDirname()：返回路径中的目录部分
- * - isFile()：是否是一个文件
- * - isDir()：是否是一个目录
- * - getRealpath()：返回规范化的绝对路径名
- * - getLists()：列出指定路径中的文件和目录
- * - getFilesize()：取得文件大小
- * - getFileContent()：将整个文件读入一个字符串
- * - putFileContent()：创建一个文件（目录会被递归地创建），并用字符串（资源）填充进文件
- * - createDir()：递归地创建目录
- * - deleteFile()：删除一个文件
- * - deleteDir()：递归地删除目录
- * - copyFile()：复制文件（目录会被递归地创建）
- * - copyDir()：递归地复制目录
- * - moveFile()：移动文件（目录会被递归地创建）
- * - moveDir()：递归地移动目录
- * - uploadFile()：上传文件
- * - downloadFile()：下载文件
- * - chown()：改变文件（目录）的创建者
- * - chgrp()：改变一个文件（目录）的群组
- * - chmod()：改变文件（目录）的安全模式
- * - symlink()：建立符号连接
- * - close()：关闭文件句柄
- * - _copy(): 非递归地复制文件
- * - _move()：非递归地移动文件
- * - _mkdir()：非递归地创建目录
- * - _rmdir()：非递归地删除目录
  */
 abstract class Base
 {
@@ -317,24 +290,22 @@ abstract class Base
     /**
      * 上传文件
      *
-     * @param string $toFile 目标文件
-     * @param string $fromFile 源文件，如果是 null，则表示当前目录下的同名文件
+     * @param string|array $fileMap @see self::fileMap()
      * @param boolean $overwrite 是否覆盖，默认 true，即：是
      *
      * @return boolean
      */
-    abstract public function uploadFile($toFile, $fromFile = null, $overwrite = true);
+    abstract public function uploadFile($fileMap, $overwrite = true);
 
     /**
      * 下载文件
      *
-     * @param string $fromFile 源文件
-     * @param string $toFile 目标文件，如果是 null，则表示当前目录下的同名文件
+     * @param string|array $fileMap @see self::fileMap()
      * @param boolean $overwrite 是否覆盖，默认 true，即：是
      *
      * @return boolean
      */
-    abstract public function downloadFile($fromFile, $toFile = null, $overwrite = true);
+    abstract public function downloadFile($fileMap, $overwrite = true);
 
     /**
      * 改变文件（目录）的创建者
@@ -442,5 +413,29 @@ abstract class Base
     public function __destruct()
     {
         $this->close();
+    }
+
+    /**
+     * 返回文件映射
+     *
+     * - 支持别名
+     *
+     * @param string|array $file 数组：[[带路径的文件名],[不带路径的文件名]]，字符串会转成数组
+     *
+     * @return array
+     */
+    public function fileMap($file)
+    {
+        if (is_string($file)) {
+            $file = [$file, Charset::toCn($this->getBasename($file))];
+        } elseif (is_array($file)) {
+            $file = Arrays::lists($file, 2);
+            if ($this->isDir($file[1])) {
+                $file[1] = rtrim($file[1], '/') . '/' . Charset::toCn($this->getBasename($file[0]));
+            }
+        } else {
+            $file = ['', ''];
+        }
+        return $file;
     }
 }
