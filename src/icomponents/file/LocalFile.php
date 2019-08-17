@@ -136,24 +136,26 @@ class LocalFile extends Base implements FileInterface
             // 加载网络文件
             if ('curl' === $this->_c['loader'] && extension_loaded('curl')) {
                 $curl = curl_init($fileName);
-                curl_setopt($curl, CURLOPT_NOBODY, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_HEADER, true);
-                // 公用名(Common Name)一般来讲就是填写你将要申请SSL证书的域名 (domain)或子域名(sub domain)
-                // - 设置为 1 是检查服务器SSL证书中是否存在一个公用名(common name)
-                // - 设置成 2，会检查公用名是否存在，并且是否与提供的主机名匹配
-                // - 0 为不检查名称。 在生产环境中，这个值应该是 2（默认值）
-                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-                // 禁止 cURL 验证对等证书（peer's certificate）。要验证的交换证书可以在 CURLOPT_CAINFO 选项中设置
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-                $result = curl_exec($curl);
-                if ($result && $info = curl_getinfo($curl)) {
-                    if (200 == $info['http_code']) {
-                        $this->_attributes[$hashName]['isExists'] = true;
-                        $this->_attributes[$hashName]['fileSize'] = (int) $info['download_content_length'];
+                if (is_resource($curl)) {
+                    curl_setopt($curl, CURLOPT_NOBODY, true);
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_HEADER, true);
+                    // 公用名(Common Name)一般来讲就是填写你将要申请SSL证书的域名 (domain)或子域名(sub domain)
+                    // - 设置为 1 是检查服务器SSL证书中是否存在一个公用名(common name)
+                    // - 设置成 2，会检查公用名是否存在，并且是否与提供的主机名匹配
+                    // - 0 为不检查名称。 在生产环境中，这个值应该是 2（默认值）
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+                    // 禁止 cURL 验证对等证书（peer's certificate）。要验证的交换证书可以在 CURLOPT_CAINFO 选项中设置
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+                    $result = curl_exec($curl);
+                    if ($result && $info = curl_getinfo($curl)) {
+                        if (200 == $info['http_code']) {
+                            $this->_attributes[$hashName]['isExists'] = true;
+                            $this->_attributes[$hashName]['fileSize'] = (int) $info['download_content_length'];
+                        }
                     }
+                    curl_close($curl);
                 }
-                curl_close($curl);
                 return $this;
             }
             if ('fsockopen' === $this->_c['loader']) {
@@ -171,8 +173,8 @@ class LocalFile extends Base implements FileInterface
                         preg_match('/HTTP.*(\s\d{3}\s)/', $line, $arr) && $this->_attributes[$hashName]['isExists'] = true;
                         preg_match('/Content-Length:(.*)/si', $line, $arr) && $this->_attributes[$hashName]['fileSize'] = (int) trim($arr[1]);
                     }
+                    fclose($fp);
                 }
-                fclose($fp);
                 return $this;
             }
             if ('fopen' === $this->_c['loader'] && (bool) ini_get('allow_url_fopen')) {
@@ -214,7 +216,7 @@ class LocalFile extends Base implements FileInterface
      * @param string $fileName
      * @param string $mode 读写的模式，默认 rb
      *
-     * @return \SplFileObject
+     * @return \SplFileObject|null
      */
     public function spl($fileName, $mode = 'rb')
     {
@@ -229,7 +231,7 @@ class LocalFile extends Base implements FileInterface
      *
      * @param string $fileName
      *
-     * @return \SplFileInfo
+     * @return \SplFileInfo|null
      */
     public function splInfo($fileName)
     {
@@ -598,7 +600,7 @@ class LocalFile extends Base implements FileInterface
         list($originName, $downloadName) = $this->fileMap($fileName);
         $originName = $this->__file($originName);
         try {
-            $ip = I::get($config, self::C_DOWNLOAD_IP, '*');
+            $ip = (string) I::get($config, self::C_DOWNLOAD_IP, '*');
             if ('*' !== $ip) {
                 C::assertTrue(Arrays::in((new Request())->getUserIP(), Strings::toArray($ip)), 'http/1.1 403.6 此 IP 禁止访问');
             }
@@ -608,14 +610,14 @@ class LocalFile extends Base implements FileInterface
                 header('Accept-Ranges:bytes');
                 header('Content-Length:' . $fileSize);
                 header('Content-Disposition: attachment; filename=' . $downloadName);
-                $speed = I::get($config, self::C_DOWNLOAD_SPEED, 0);
+                $speed = (int) I::get($config, self::C_DOWNLOAD_SPEED, 0);
                 $xSendFile = I::get($config, self::C_DOWNLOAD_X_SEND_FILE, false);
-                $xSendFileRoot = I::get($config, self::C_DOWNLOAD_X_SEND_FILE_ROOT, '/protected/');
+                $xSendFileRoot = (string) I::get($config, self::C_DOWNLOAD_X_SEND_FILE_ROOT, '/protected/');
                 if (true === $xSendFile) {
                     $path = rtrim($xSendFileRoot, '/') . '/' . $this->getBasename($originName);
                     header('X-Accel-Redirect: ' . $path); // Nginx、Cherokee 实现了该头
                     header('X-Sendfile: ' . $path); // Apache、Lighttpd v1.5、Cherokee 实现了该头
-                    header('X-LIGHTTPD-send-file: ', $path); // Lighttpd v1.4 实现了该头
+                    header('X-LIGHTTPD-send-file: ' . $path); // Lighttpd v1.4 实现了该头
                     if ($speed) {
                         header('X-Accel-Limit-Rate: ' . $speed); // 单位 kb/s
                     }

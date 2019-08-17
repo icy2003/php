@@ -22,7 +22,7 @@ abstract class Base
      *
      * @param string $command 命令
      *
-     * @return string
+     * @return string|false
      */
     abstract public function getCommandResult($command);
 
