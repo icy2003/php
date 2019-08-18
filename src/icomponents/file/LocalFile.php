@@ -459,7 +459,7 @@ class LocalFile extends Base implements FileInterface
         $path = $this->__file($path);
         $realPath = realpath($path);
         false === $realPath && $realPath = $path;
-        return $realPath;
+        return Strings::replace($realPath, ["\\"=>'/']);
     }
 
     /**
