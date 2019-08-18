@@ -116,9 +116,9 @@ class LocalFile extends Base implements FileInterface
             'spl' => null,
             'splInfo' => null,
         ]);
+        null === $this->_attributes[$hashName]['splInfo'] && $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($fileName);
         try {
             null === $this->_attributes[$hashName]['spl'] && $this->_attributes[$hashName]['spl'] = new \SplFileObject($fileName, $this->_c['mode']);
-            null === $this->_attributes[$hashName]['splInfo'] && $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($fileName);
         } catch (Exception $e) {
             // 报错了也得继续跑，如果跑完一次 spl 和 splInfo 属性还是 null，在调用它们的时候自然会报错
             $this->_c['error'] = $e->getMessage();
@@ -320,7 +320,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getATime($fileName)
     {
-        return $this->spl($fileName)->getATime();
+        return $this->splInfo($fileName)->getATime();
     }
 
     /**
@@ -336,7 +336,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getCTime($fileName)
     {
-        return $this->spl($fileName)->getCTime();
+        return $this->splInfo($fileName)->getCTime();
     }
 
     /**
@@ -344,7 +344,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getExtension($fileName)
     {
-        return $this->spl($fileName)->getExtension();
+        return $this->splInfo($fileName)->getExtension();
     }
 
     /**
@@ -352,7 +352,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFilename($fileName)
     {
-        return $this->spl($fileName)->getFilename();
+        return $this->splInfo($fileName)->getFilename();
     }
 
     /**
@@ -360,7 +360,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getMtime($fileName)
     {
-        return $this->spl($fileName)->getMTime();
+        return $this->splInfo($fileName)->getMTime();
     }
 
     /**
@@ -376,7 +376,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getPerms($path)
     {
-        return $this->spl($path)->getPerms();
+        return $this->splInfo($path)->getPerms();
     }
 
     /**
@@ -392,7 +392,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getType($path)
     {
-        return $this->spl($path)->getType();
+        return $this->splInfo($path)->getType();
     }
 
     /**
@@ -400,7 +400,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isDir($dir)
     {
-        return $this->spl($dir)->isDir();
+        return $this->splInfo($dir)->isDir();
     }
 
     /**
@@ -416,7 +416,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isFile($file)
     {
-        return (bool) $this->attribute($file, 'isExists');
+        return $this->splInfo($file)->isFile();
     }
 
     /**
@@ -424,7 +424,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isLink($link)
     {
-        return $this->spl($link)->isLink();
+        return $this->splInfo($link)->isLink();
     }
 
     /**
@@ -432,7 +432,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isReadable($path)
     {
-        return $this->spl($path)->isReadable();
+        return $this->splInfo($path)->isReadable();
     }
 
     /**
@@ -440,7 +440,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isWritable($path)
     {
-        return $this->spl($path)->isWritable();
+        return $this->splInfo($path)->isWritable();
     }
 
     /**
@@ -456,10 +456,9 @@ class LocalFile extends Base implements FileInterface
      */
     public function getRealpath($path)
     {
+        $path = $this->__file($path);
         $realPath = realpath($path);
-        if (false === $realPath) {
-            $realPath = $path;
-        }
+        false === $realPath && $realPath = $path;
         return $realPath;
     }
 
@@ -538,11 +537,13 @@ class LocalFile extends Base implements FileInterface
     {
         set_time_limit(0);
         list($fromFile, $toFile) = $this->fileMap($fileMap);
+        $toSpl = $this->spl($toFile, 'wb');
         if ($this->isFile($toFile) && false === $overwrite) {
+            $this->close($toFile);
+            I::call($finishCallback, [$toSpl]);
             return true;
         }
         $fromSpl = $this->spl($fromFile, 'rb');
-        $toSpl = $this->spl($toFile, 'wb');
         $size = 0;
         $total = $this->getFilesize($fromFile);
         while (false === $fromSpl->eof()) {
