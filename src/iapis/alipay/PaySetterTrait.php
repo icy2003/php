@@ -206,6 +206,7 @@ trait PaySetterTrait
      */
     public function setBizContentTotalAmount($totalAmount)
     {
+        $totalAmount = number_format($totalAmount, 2, '.', '');
         return $this->setBizContent('total_amount', $totalAmount);
     }
 
@@ -326,7 +327,7 @@ trait PaySetterTrait
      */
     public function setBizContentExtendParams($key, $value)
     {
-        $array = I::get($this->_values, 'biz_content.extend_params', []);
+        $array = (array) I::get($this->_values, 'biz_content.extend_params', []);
         $array[$key] = $value;
         return $this->setBizContent('extend_params', $array);
     }
@@ -476,7 +477,7 @@ trait PaySetterTrait
      */
     public function setBizContentExtUserInfo($key, $value)
     {
-        $array = I::get($this->_values, 'biz_content.ext_user_info', []);
+        $array = (array) I::get($this->_values, 'biz_content.ext_user_info', []);
         $array[$key] = $value;
         return $this->setBizContent('ext_user_info', $array);
     }

@@ -9,6 +9,7 @@
 namespace icy2003\php\ihelpers;
 
 use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 
 /**
@@ -64,9 +65,7 @@ class Image
     private function __parseImage($image)
     {
         $image = I::getAlias($image);
-        if (false === ($size = @getimagesize($image))) {
-            throw new Exception('不是有效的图片：' . $image);
-        }
+        C::assertTrue(is_array($size = @getimagesize($image)), '不是有效的图片：' . $image);
         // static::$_instance->_attributes['size'] = $size;
         $width = $size[0];
         $height = $size[1];
@@ -142,13 +141,13 @@ class Image
     /**
      * 缩放图片
      *
-     * @param array|int $zoom 数组或数字，如：数组[1, 0.5]表示宽不变，高变成一半，如果是整数，表示等比例缩放
+     * @param array|integer $zoom 数组或数字，如：数组[1, 0.5]表示宽不变，高变成一半，如果是整数，表示等比例缩放
      *
      * @return static
      */
     public function zoom($zoom = 1)
     {
-        if (is_array($zoom) && 2 === count($zoom)) {
+        if (2 === Arrays::count($zoom)) {
             list($zoomWidth, $zoomHeight) = $zoom;
             $zoomWidth *= $this->_attributes['width'];
             $zoomHeight *= $this->_attributes['height'];

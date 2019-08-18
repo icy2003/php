@@ -450,7 +450,7 @@ class Arrays
      * - count：在非数组情况下，除了 null 会返回 0，其他都返回 1，囧
      * - $callback 参数用于对符合条件的项做筛选
      *
-     * @param array $array 数组
+     * @param array|mixed $array 数组
      * @param callback|mixed $callback 回调，返回回调值为 true 的项，如果此参数是非回调类型，表示查询和此值严格相等的项
      * @param boolean $isStrict 是否为严格模式，如果为 false，回调值为 true 值的也会返回，为字符串时不使用严格比较
      *
@@ -821,7 +821,7 @@ class Arrays
         }
         foreach ($array as $key => $row) {
             $result = I::call($search, [$row]);
-            if (true === $isStrict && true === $result || false === $isStrict && true == $result) {
+            if ((true === $isStrict && true === $result) || (false === $isStrict && true == $result)) {
                 return $key;
             }
         }
@@ -870,7 +870,7 @@ class Arrays
      * in_array 的扩展
      *
      * @param mixed $value
-     * @param array $array
+     * @param array|mixed $array
      * @param boolean $isStrict 是否严格匹配，默认 false，即不严格
      * @param boolean $ignoreCase 是否忽略大小写，默认 false，不忽略
      *

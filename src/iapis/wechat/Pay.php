@@ -9,14 +9,15 @@
 namespace icy2003\php\iapis\wechat;
 
 use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
+use icy2003\php\ihelpers\Header;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Request;
 use icy2003\php\ihelpers\Strings;
 use icy2003\php\ihelpers\Url;
 use icy2003\php\ihelpers\Xml;
-use icy2003\php\ihelpers\Header;
 
 /**
  * Pay 支付
@@ -38,15 +39,15 @@ class Pay
     public function __construct($mchid, $appid, $apiKey)
     {
         $this->_mchId = $mchid;
-        if(null === $this->_mchId){
+        if (null === $this->_mchId) {
             throw new Exception("缺少商户号");
         }
         $this->_appId = $appid;
-        if(null === $this->_appId){
+        if (null === $this->_appId) {
             throw new Exception("缺少应用 ID");
         }
         $this->_apiKey = $apiKey;
-        if(null === $this->_apiKey){
+        if (null === $this->_apiKey) {
             throw new Exception("缺少密钥");
         }
     }
@@ -211,9 +212,7 @@ class Pay
      */
     public function getCallArray()
     {
-        if (false === $this->isSuccess()) {
-            throw new Exception(I::get($this->_result, 'return_msg'));
-        }
+        C::assertTrue($this->isSuccess(), (string) I::get($this->_result, 'return_msg'));
         $array = [];
         if ('APP' === I::get($this->_values, 'trade_type')) {
             $array = [
@@ -245,9 +244,7 @@ class Pay
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
-        if ('SUCCESS' !== I::get($array, 'return_code') || 'SUCCESS' !== I::get($array, 'result_code')) {
-            throw new Exception(I::get($array, 'return_msg'));
-        }
+        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string) I::get($array, 'return_msg'));
         $temp = $array;
         $sign = $temp['sign'];
         unset($temp['sign']);
@@ -482,9 +479,7 @@ class Pay
      */
     public function shortUrl()
     {
-        if (null === ($longUrl = I::get($this->_values, 'long_url'))) {
-            throw new Exception('缺少 long_url 参数！');
-        }
+        C::assertTrue(null !== ($longUrl = (string) I::get($this->_values, 'long_url')), '缺少 long_url 参数！');
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
@@ -509,9 +504,7 @@ class Pay
      */
     public function getQrcodeUrl()
     {
-        if (null === ($productId = I::get($this->_values, 'product_id'))) {
-            throw new Exception('缺少 product_id 参数！');
-        }
+        C::assertTrue(null !== ($productId = (string) I::get($this->_values, 'product_id')), '缺少 product_id 参数！');
         $values = [
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,

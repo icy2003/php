@@ -200,32 +200,29 @@ class I
      *
      * @var array
      */
-    public static $aliases = [];
+    public static $aliases = [
+        '@vendor' => __DIR__ . '/../../../../vendor',
+        '@icy2003/php_tests' => __DIR__ . '/../tests',
+        '@icy2003/php_runtime' => __DIR__ . '/../runtime',
+        '@icy2003/php' => __DIR__,
+    ];
 
     /**
      * 用别名获取真实路径
      *
      * @param string $alias 别名
-     * @param bool $loadNew 是否加载新别名到 I 里，默认否
      *
      * @return string|boolean
      */
-    public static function getAlias($alias, $loadNew = false)
+    public static function getAlias($alias)
     {
+        $alias = Strings::replace($alias, ["\\" => '/']);
         if (strncmp($alias, '@', 1)) {
             return $alias;
         }
         $localFile = new LocalFile();
-        $aliases = [
-            '@vendor' => __DIR__ . '/../../../../vendor',
-            '@icy2003/php_tests' => __DIR__ . '/../tests',
-            '@icy2003/php_runtime' => __DIR__ . '/../runtime',
-            '@icy2003/php' => __DIR__,
-        ];
-        foreach ($aliases as $k => $v) {
-            if (false === array_key_exists($k, static::$aliases)) {
-                static::$aliases[$k] = $localFile->getRealpath($v);
-            }
+        foreach (static::$aliases as $k => $v) {
+            static::$aliases[$k] = $localFile->getRealpath($v);
         }
 
         $pos = 0;
@@ -252,7 +249,7 @@ class I
         }
         // 对 Yii2 的支持
         if ($result = self::call(['\Yii', 'getAlias'], [$alias])) {
-            true === $loadNew && self::setAlias($alias, $result);
+            self::setAlias($alias, $result);
             return $result;
         }
 
@@ -280,7 +277,11 @@ class I
     public static function setAlias($alias, $path)
     {
         // 对 Yii2 的支持
-        self::call(['\Yii', 'setAlias'], [$alias, $path]);
+        try {
+            self::call(['\Yii', 'getAlias'], [$alias]);
+        } catch (Exception $e) {
+            self::call(['\Yii', 'setAlias'], [$alias, $path]);
+        }
         if (strncmp($alias, '@', 1)) {
             $alias = '@' . $alias;
         }

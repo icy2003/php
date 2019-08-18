@@ -9,9 +9,9 @@
 
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\I;
-use icy2003\php\C;
 use Exception;
+use icy2003\php\C;
+use icy2003\php\I;
 
 /**
  * 字符串类
@@ -240,7 +240,7 @@ class Strings
      */
     public static function split($string)
     {
-        return preg_split('/(?<!^)(?!$)/u', $string);
+        return (array) preg_split('/(?<!^)(?!$)/u', $string);
     }
 
     /**
@@ -351,7 +351,7 @@ class Strings
         $salt = sprintf('$2y$%02d$', $cost);
         $salt .= str_replace('+', '.', substr(base64_encode(self::random(20)), 0, 22));
         $hash = crypt($password, $salt);
-        C::assertNotTrue(!is_string($hash) || strlen($hash) !== 60 , '未知错误');
+        C::assertNotTrue(!is_string($hash) || strlen($hash) !== 60, '未知错误');
         return $hash;
     }
 
@@ -465,11 +465,14 @@ class Strings
      */
     public static function looksLike($string1, $string2, $array = ['0oO', 'yv', 'ij', '1lI'])
     {
-        if(self::length($string1) !== self::length($string2)){
+        if (self::length($string1) !== self::length($string2)) {
             return false;
         }
         $array1 = self::split($string1);
         $array2 = self::split($string2);
+        if (empty($array1)) {
+            return true;
+        }
         foreach ($array1 as $index => $char1) {
             $char1 = strtolower($char1);
             $char2 = strtolower($array2[$index]);
@@ -503,7 +506,7 @@ class Strings
      * @param string $text
      * @param boolean $returnArray 是否拆分返回数组，默认 false
      *
-     * @return mixed
+     * @return array|string
      */
     public static function toPinyin($text, $returnArray = false)
     {
@@ -545,11 +548,11 @@ class Strings
      * @param string $text
      * @param boolean $returnArray 是否拆分返回数组，默认 false
      *
-     * @return mixed
+     * @return array|string
      */
     public static function toPinyinFirst($text, $returnArray = false)
     {
-        $array = self::toPinyin($text, true);
+        $array = (array) self::toPinyin($text, true);
         $result = array_map(function ($row) {
             return self::sub($row, 0, 1);
         }, $array);
@@ -583,7 +586,7 @@ class Strings
             return $string;
         }
         if (3 === Arrays::count($modeArray)) {
-            C::assertTrue('?' === $modeArray[1] , '模式错误，三段时，? 符必须在中间，例如：3?4');
+            C::assertTrue('?' === $modeArray[1], '模式错误，三段时，? 符必须在中间，例如：3?4');
             return self::sub($string, 0, $modeArray[0]) . $hideChar . self::sub($string, $length - $modeArray[2], $modeArray[2]);
         } elseif (2 === $modeCount) {
             if ('?' === $modeArray[0]) {
@@ -619,5 +622,19 @@ class Strings
     {
         $array = explode(PHP_EOL, $string);
         return Arrays::count($array);
+    }
+
+    /**
+     * 字符串替换
+     *
+     * @param string $string
+     * @param array $replaceArray 键值对替换
+     * @param integer $count 如果给定，则引用返回替换次数
+     *
+     * @return string
+     */
+    public static function replace($string, $replaceArray, &$count = null)
+    {
+        return str_replace(array_keys($replaceArray), array_values($replaceArray), $string, $count);
     }
 }

@@ -107,7 +107,7 @@ class Pay
         $params = array_filter($params);
         foreach ($params as $key => $value) {
             if ('sign' !== $key && false === Strings::isStartsWith($value, '@')) {
-                $array[] = $key . '=' . Charset::convertTo($value, I::get($this->_values, 'charset', 'utf-8'));
+                $array[] = $key . '=' . Charset::convertTo($value, (string) I::get($this->_values, 'charset', 'utf-8'));
             }
         }
         $string = implode('&', $array);

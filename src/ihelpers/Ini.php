@@ -18,6 +18,10 @@ use icy2003\php\icomponents\file\LocalFile;
 class Ini
 {
     /**
+     * 自动判断
+     */
+    const TYPE_AUTO = 'auto';
+    /**
      * 自定义 ini 配置
      */
     const TYPE_INI = 'ini';
@@ -29,7 +33,6 @@ class Ini
      * XML 配置
      */
     const TYPE_XML = 'xml';
-
     /**
      * 配置类型
      *
@@ -46,13 +49,26 @@ class Ini
     /**
      * 构造函数
      *
-     * @param string $file
+     * @param string $file 文件路径或者别名
      * @param string $type
      */
-    public function __construct($file, $type = self::TYPE_INI)
+    public function __construct($file, $type = self::TYPE_AUTO)
     {
         $this->_file = $file;
-        $this->_type = $type;
+        if (self::TYPE_AUTO === $type) {
+            $local = new LocalFile();
+            $extension = $local->getExtension($file);
+            switch ($extension) {
+                case 'json':
+                    $this->_type = self::TYPE_JSON;
+                    break;
+                case 'xml':
+                    $this->_type = self::TYPE_XML;
+                    break;
+                default:
+                    $this->_type = self::TYPE_INI;
+            }
+        }
     }
 
     /**
@@ -70,7 +86,9 @@ class Ini
                 if (Strings::isStartsWith(trim($line), '#')) {
                     continue;
                 }
-                list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {return trim($row);});
+                list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {
+                    return trim($row);
+                });
                 $array[$name] = $value;
                 // 如果值被 [] 包括，则以英文逗号为分割，将值变成数组
                 if (Strings::isStartsWith($value, '[') && Strings::isEndsWith($value, ']')) {

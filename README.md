@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.com/icy2003/php.svg?branch=master)](https://travis-ci.com/icy2003/php)
 [![Total Downloads](https://poser.pugx.org/icy2003/php/downloads)](https://packagist.org/packages/icy2003/php)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/icy2003/php)
 [![License](https://poser.pugx.org/icy2003/php/license)](https://packagist.org/packages/icy2003/php)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/icy2003/php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/)
 [![Code Coverage](https://scrutinizer-ci.com/g/icy2003/php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/icy2003/php/?branch=master)
@@ -21,15 +22,7 @@
 
 ## 文档
 
-**icy2003/php** 是基于 [phpdocumentor](https://www.phpdoc.org/) 标准格式写的注释，因此你可以轻易使用 phpdocumentor 生成一份完整详细的文档
-
-```shell
-composer require phpdocumentor/phpdocumentor 2.*
-# windows
-./vendor/bin/phpdoc.bat -d ./src -t ./docs
-# linux
-./vendor/bin/phpdoc -d ./src -t ./docs
-```
+请查看注释，有能力者可以使用 phpdocumentor 生成文档
 
 ## 地址
 

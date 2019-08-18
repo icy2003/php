@@ -77,7 +77,7 @@ class OCR extends Base
             'access_token' => $this->_token,
         ]));
         $this->_toArrayCall = function ($result) {
-            return Arrays::column(I::get($result, 'words_result'), 'words');
+            return Arrays::column((array) I::get($result, 'words_result', []), 'words');
         };
 
         return $this;
@@ -103,7 +103,7 @@ class OCR extends Base
             'access_token' => $this->_token,
         ]));
         $this->_toArrayCall = function ($result) {
-            return Arrays::column(I::get($result, 'words_result'), 'words');
+            return Arrays::column((array) I::get($result, 'words_result', []), 'words');
         };
 
         return $this;
