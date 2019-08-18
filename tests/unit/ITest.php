@@ -110,4 +110,9 @@ class ITest extends \Codeception\Test\Unit
         $this->tester->assertTrue(true);
     }
 
+    public function testSetAlias(){
+        I::setAlias('@_data', '@icy2003/php_tests/_data');
+        $this->tester->assertEquals(I::getAlias('@_data'), I::getAlias('@icy2003/php_tests/_data'));
+    }
+
 }

@@ -198,7 +198,7 @@ class LocalFileTest extends \Codeception\Test\Unit
     {
         $local = new LocalFile();
         $file = '@icy2003/php_tests/_data/data.txt';
-        $this->tester->assertEquals($local->getRealpath($file), realpath(I::getAlias($file)));
+        $this->tester->assertEquals($local->getRealpath($file), Strings::replace(realpath(I::getAlias($file)), ["\\" => '/']));
     }
 
     public function testGetLists()
@@ -322,7 +322,7 @@ class LocalFileTest extends \Codeception\Test\Unit
         $file2 = '@icy2003/php_tests/_data/data2.txt';
         $file3 = '@icy2003/php_tests/_data/data3.txt';
         $local->copyFile($file, $file2);
-        $local->moveFile($file2 , $file3);
+        $local->moveFile($file2, $file3);
         $this->tester->assertFileNotExists(I::getAlias($file2));
         $this->tester->assertFileExists(I::getAlias($file3));
         $local->deleteFile($file3);
