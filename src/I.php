@@ -216,6 +216,7 @@ class I
      */
     public static function getAlias($alias)
     {
+        $alias = Strings::replace($alias, ["\\" => '/']);
         if (strncmp($alias, '@', 1)) {
             return $alias;
         }
