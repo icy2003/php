@@ -44,12 +44,10 @@ class Xml
             return [];
         }
         $isDisabled = libxml_disable_entity_loader(true);
-        if ($xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA)) {
-            $array = Json::decode(Json::encode($xml), true);
-            libxml_disable_entity_loader($isDisabled);
-            return $array;
-        }
-        return [];
+        $xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $array = Json::decode(Json::encode($xml), true);
+        libxml_disable_entity_loader($isDisabled);
+        return $array;
     }
 
     /**
@@ -78,20 +76,5 @@ class Xml
         }
         true === $isRoot && $xmlstring .= '</xml>';
         return $xmlstring;
-    }
-
-    /**
-     * 获取 Xml 字符串里的参数
-     *
-     * @param string $xmlString Xml 字符串
-     * @param string $key @see \icy2003\php\I::get
-     * @param mixed $defaultValue
-     *
-     * @return mixed
-     */
-    public static function get($xmlString, $key, $defaultValue = null)
-    {
-        $array = self::toArray($xmlString);
-        return I::get($array, $key, $defaultValue);
     }
 }
