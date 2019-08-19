@@ -79,7 +79,6 @@ class LocalFile extends Base implements FileInterface
      */
     private function __hash($fileName)
     {
-        $fileName = $this->__file($fileName);
         return md5($fileName);
     }
 
@@ -104,7 +103,7 @@ class LocalFile extends Base implements FileInterface
      */
     protected function _load($fileName)
     {
-        $fileName = $this->__file($fileName);
+        $fileName = $this->getRealpath($fileName);
         $hashName = $this->__hash($fileName);
         $this->_attributes[$hashName] = I::get($this->_attributes, $hashName, [
             'file' => $fileName,
@@ -118,7 +117,10 @@ class LocalFile extends Base implements FileInterface
         ]);
         null === $this->_attributes[$hashName]['splInfo'] && $this->_attributes[$hashName]['splInfo'] = new \SplFileInfo($fileName);
         try {
-            null === $this->_attributes[$hashName]['spl'] && $this->_attributes[$hashName]['spl'] = new \SplFileObject($fileName, $this->_c['mode']);
+            $splInfo = $this->_attributes[$hashName]['splInfo'];
+            if (true !== $splInfo->isDir()) {
+                null === $this->_attributes[$hashName]['spl'] && $this->_attributes[$hashName]['spl'] = new \SplFileObject($fileName, $this->_c['mode']);
+            }
         } catch (Exception $e) {
             // 报错了也得继续跑，如果跑完一次 spl 和 splInfo 属性还是 null，在调用它们的时候自然会报错
             $this->_c['error'] = $e->getMessage();
@@ -207,7 +209,7 @@ class LocalFile extends Base implements FileInterface
     public function attribute($fileName, $name)
     {
         $this->_load($fileName);
-        return I::get($this->_attributes, $this->__hash($fileName) . '.' . $name);
+        return I::get($this->_attributes, $this->__hash($this->getRealpath($fileName)) . '.' . $name);
     }
 
     /**
@@ -320,7 +322,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getATime($fileName)
     {
-        return $this->splInfo($fileName)->getATime();
+        return fileatime($this->__file($fileName));
     }
 
     /**
@@ -336,7 +338,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getCTime($fileName)
     {
-        return $this->splInfo($fileName)->getCTime();
+        return filectime($this->__file($fileName));
     }
 
     /**
@@ -344,7 +346,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getExtension($fileName)
     {
-        return $this->splInfo($fileName)->getExtension();
+        return pathinfo($this->__file($fileName), PATHINFO_EXTENSION);
     }
 
     /**
@@ -352,7 +354,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFilename($fileName)
     {
-        return $this->splInfo($fileName)->getFilename();
+        return pathinfo($this->__file($fileName), PATHINFO_FILENAME);
     }
 
     /**
@@ -360,7 +362,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getMtime($fileName)
     {
-        return $this->splInfo($fileName)->getMTime();
+        return filemtime($this->__file($fileName));
     }
 
     /**
@@ -376,7 +378,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getPerms($path)
     {
-        return $this->splInfo($path)->getPerms();
+        return fileperms($this->__file($path));
     }
 
     /**
@@ -392,7 +394,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getType($path)
     {
-        return $this->splInfo($path)->getType();
+        return filetype($this->__file($path));
     }
 
     /**
@@ -400,7 +402,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isDir($dir)
     {
-        return $this->splInfo($dir)->isDir();
+        return is_dir($this->__file($dir));
     }
 
     /**
@@ -416,7 +418,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isFile($file)
     {
-        return $this->splInfo($file)->isFile();
+        return is_file($this->__file($file));
     }
 
     /**
@@ -424,7 +426,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isLink($link)
     {
-        return $this->splInfo($link)->isLink();
+        return is_link($this->__file($link));
     }
 
     /**
@@ -432,7 +434,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isReadable($path)
     {
-        return $this->splInfo($path)->isReadable();
+        return is_readable($this->__file($path));
     }
 
     /**
@@ -440,7 +442,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function isWritable($path)
     {
-        return $this->splInfo($path)->isWritable();
+        return is_writable($this->__file($path));
     }
 
     /**
@@ -458,8 +460,8 @@ class LocalFile extends Base implements FileInterface
     {
         $path = $this->__file($path);
         $realPath = realpath($path);
-        false === $realPath && $realPath = $path;
-        return Strings::replace($realPath, ["\\"=>'/']);
+        false === $realPath && $realPath = parent::getRealpath($path);
+        return Strings::replace($realPath, ["\\" => '/']);
     }
 
     /**
@@ -649,10 +651,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                /** @scrutinizer ignore-unhandled */ @chown($subFile, $user);
+                /** @scrutinizer ignore-unhandled */@chown($subFile, $user);
             }
         } elseif ($this->isFile($file)) {
-            return /** @scrutinizer ignore-unhandled */ @chown($file, $user);
+            return /** @scrutinizer ignore-unhandled */@chown($file, $user);
         } else {
             return false;
         }
@@ -667,10 +669,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                /** @scrutinizer ignore-unhandled */ @chgrp($subFile, $group);
+                /** @scrutinizer ignore-unhandled */@chgrp($subFile, $group);
             }
         } elseif ($this->isFile($file)) {
-            return /** @scrutinizer ignore-unhandled */ @chgrp($file, $group);
+            return /** @scrutinizer ignore-unhandled */@chgrp($file, $group);
         } else {
             return false;
         }
@@ -685,10 +687,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                /** @scrutinizer ignore-unhandled */ @chmod($subFile, $mode);
+                /** @scrutinizer ignore-unhandled */@chmod($subFile, $mode);
             }
         } elseif ($this->isFile($file)) {
-            return /** @scrutinizer ignore-unhandled */ @chmod($file, $mode);
+            return /** @scrutinizer ignore-unhandled */@chmod($file, $mode);
         } else {
             return false;
         }
@@ -710,10 +712,10 @@ class LocalFile extends Base implements FileInterface
     public function close($fileName = null)
     {
         if (is_string($fileName)) {
-            $fileName = [$this->__hash($fileName)];
+            $fileName = [$this->__hash($this->getRealpath($fileName))];
         } elseif (is_array($fileName)) {
             foreach ($fileName as $k => $name) {
-                $fileName[$k] = $this->__hash($name);
+                $fileName[$k] = $this->__hash($this->getRealpath($name));
             }
         }
         foreach ($this->_attributes as $hashName => /** @scrutinizer ignore-unused */$attribute) {

@@ -82,7 +82,7 @@ interface FileInterface
      *
      * @param string $path
      *
-     * @return integer
+     * @return integer|false
      */
     public function getPerms($path);
 
@@ -102,7 +102,7 @@ interface FileInterface
      *
      * @param string $path
      *
-     * @return string
+     * @return string|false
      */
     public function getType($path);
 

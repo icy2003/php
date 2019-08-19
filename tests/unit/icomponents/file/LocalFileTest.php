@@ -107,7 +107,7 @@ class LocalFileTest extends \Codeception\Test\Unit
     {
         $local = new LocalFile();
         $file = '@icy2003/php_tests/_data/data.txt';
-        $this->tester->assertEquals($local->getFilename($file), 'data.txt');
+        $this->tester->assertEquals($local->getFilename($file), 'data');
     }
 
     public function testGetMTime()
