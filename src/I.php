@@ -9,7 +9,6 @@
 namespace icy2003\php;
 
 use Exception;
-use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\ihelpers\Strings;
 use ReflectionClass;
 
@@ -219,10 +218,6 @@ class I
         $alias = Strings::replace($alias, ["\\" => '/']);
         if (strncmp($alias, '@', 1)) {
             return $alias;
-        }
-        $localFile = new LocalFile();
-        foreach (static::$aliases as $k => $v) {
-            static::$aliases[$k] = $localFile->getRealpath($v);
         }
 
         $pos = 0;

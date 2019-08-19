@@ -649,10 +649,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                @chown($subFile, $user);
+                /** @scrutinizer ignore-unhandled */ @chown($subFile, $user);
             }
         } elseif ($this->isFile($file)) {
-            return @chown($file, $user);
+            return /** @scrutinizer ignore-unhandled */ @chown($file, $user);
         } else {
             return false;
         }
@@ -667,10 +667,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                @chgrp($subFile, $group);
+                /** @scrutinizer ignore-unhandled */ @chgrp($subFile, $group);
             }
         } elseif ($this->isFile($file)) {
-            return @chgrp($file, $group);
+            return /** @scrutinizer ignore-unhandled */ @chgrp($file, $group);
         } else {
             return false;
         }
@@ -685,10 +685,10 @@ class LocalFile extends Base implements FileInterface
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                @chmod($subFile, $mode);
+                /** @scrutinizer ignore-unhandled */ @chmod($subFile, $mode);
             }
         } elseif ($this->isFile($file)) {
-            return @chmod($file, $mode);
+            return /** @scrutinizer ignore-unhandled */ @chmod($file, $mode);
         } else {
             return false;
         }
