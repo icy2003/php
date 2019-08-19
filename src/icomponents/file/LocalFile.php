@@ -219,6 +219,7 @@ class LocalFile extends Base implements FileInterface
      * @param string $mode 读写的模式，默认 rb
      *
      * @return \SplFileObject|null
+     * @throws Exception
      */
     public function spl($fileName, $mode = 'rb')
     {
@@ -233,12 +234,11 @@ class LocalFile extends Base implements FileInterface
      *
      * @param string $fileName
      *
-     * @return \SplFileInfo|null
+     * @return \SplFileInfo
      */
     public function splInfo($fileName)
     {
         $splInfo = $this->attribute($fileName, 'splInfo');
-        C::assertTrue($splInfo instanceof \SplFileInfo, '文件打开失败：' . $fileName);
         return $splInfo;
     }
 
