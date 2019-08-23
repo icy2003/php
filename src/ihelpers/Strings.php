@@ -473,6 +473,7 @@ class Strings
         if (empty($array1)) {
             return true;
         }
+        $isEqual = false;
         foreach ($array1 as $index => $char1) {
             $char1 = strtolower($char1);
             $char2 = strtolower($array2[$index]);

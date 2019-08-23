@@ -219,7 +219,7 @@ class FtpFile extends Base
     protected function _copy($fromFile, $toFile)
     {
         if ($fp = fopen("php://temp", 'r+')) {
-            /** @scrutinizer ignore-unhandled */ @ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
+            /** @scrutinizer ignore-unhandled */@ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
             rewind($fp);
             return @ftp_fput($this->_conn, $toFile, $fp, FTP_BINARY, 0);
         }

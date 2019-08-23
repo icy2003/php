@@ -189,7 +189,7 @@ class Validator
             throw new Exception('range error');
         }
         $value = I::get($data, $field);
-        $range = I::get($rule, 'range', []);
+        $range = (array) I::get($rule, 'range', []);
         $isStrict = (bool) I::get($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
             $this->__messages[$field][] = I::get($rule, 'message', $field . ' 不在范围内');
