@@ -31,6 +31,12 @@ class LocalFileTest extends \Codeception\Test\Unit
         } catch (Exception $e) {
             $this->tester->assertTrue(true);
         }
+        try {
+            $local = new LocalFile();
+            $local->spl($remoteFile . 'x');
+        } catch (Exception $e) {
+            $this->tester->assertTrue(true);
+        }
     }
 
     public function testSpl()
@@ -164,6 +170,8 @@ class LocalFileTest extends \Codeception\Test\Unit
         $local = new LocalFile();
         $this->tester->assertTrue($local->isFile('@icy2003/php_tests/_data/data.txt'));
         $this->tester->assertFalse($local->isFile('@icy2003/php_tests/_data'));
+        $this->tester->assertTrue($local->isFile('https://mirrors.aliyun.com/composer/composer.phar'));
+        $this->tester->assertFalse($local->isFile('https://mirrors.aliyun.com/composer/composer.pharx'));
     }
 
     public function testIsLink()
@@ -286,6 +294,7 @@ class LocalFileTest extends \Codeception\Test\Unit
         $remoteFile = 'https://mirrors.aliyun.com/composer/composer.phar';
         $localFile = '@icy2003/php_tests/_data/composer.phar';
         $local = new LocalFile();
+        $local->chmod('@icy2003/php_tests/_data', 0777);
         $local->downloadFile([$remoteFile, $localFile], true, function ($size, $total) {
             $this->tester->assertIsInt($size);
             $this->tester->assertIsInt($total);
@@ -302,6 +311,7 @@ class LocalFileTest extends \Codeception\Test\Unit
     {
         $local = new LocalFile();
         $local->chmod('@icy2003/php_tests/_data', 0777, FileConstants::RECURSIVE);
+        $local->chmod('@icy2003/php_tests/_data', 0777, FileConstants::RECURSIVE_DISABLED);
         $this->tester->assertTrue(true);
     }
 
