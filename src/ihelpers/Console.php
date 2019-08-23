@@ -146,11 +146,11 @@ class Console
     /**
      * 标准命令行输入
      *
-     * @return string|false
+     * @return string
      */
     public static function stdin()
     {
-        return fgets(\STDIN);
+        return rtrim((string) fgets(\STDIN), PHP_EOL);
     }
 
     /**
@@ -169,16 +169,21 @@ class Console
      * 输入提示
      *
      * @param string $prompt 输入提示
+     * @param mixed $defaultValue 默认值
      *
-     * @return string|false
+     * @return string
      */
-    public static function input($prompt = null)
+    public static function input($prompt = null, $defaultValue = '')
     {
         if (isset($prompt)) {
             self::output($prompt);
         }
 
-        return self::stdin();
+        $input = self::stdin();
+        if ('' === $input) {
+            return (string) $defaultValue;
+        }
+        return $input;
     }
 
     /**
@@ -188,9 +193,26 @@ class Console
      *
      * @return integer|false
      */
-    public static function output($string = null)
+    public static function output($string = null, $format = [])
     {
+        if (!empty($format)) {
+            $string = self::ansiFormat($string, $format);
+        }
         return self::stdout($string . PHP_EOL);
+    }
+
+    /**
+     * 输出列表
+     *
+     * @param array $array
+     *
+     * @return void
+     */
+    public static function outputList($array)
+    {
+        foreach($array as $string){
+            self::output($string);
+        }
     }
 
     /**
