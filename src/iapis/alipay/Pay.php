@@ -203,7 +203,6 @@ class Pay
             }
             if (null === $callback || true === I::call($callback, [$array, $isPay, $isRefund, $isRefundFull])) {
                 echo $this->getNotifyReturn();
-                die;
             }
         }
     }

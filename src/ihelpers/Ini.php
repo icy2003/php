@@ -97,10 +97,10 @@ class Ini
             }
         } elseif (self::TYPE_JSON === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $array = Json::decode($content);
+            $array = Json::decode((string) $content);
         } elseif (self::TYPE_XML === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $array = Xml::toArray($content);
+            $array = Xml::toArray((string) $content);
         }
         return $array;
     }
