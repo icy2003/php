@@ -863,6 +863,7 @@ trait MathAndTrigonometry
             'V' => 5,
             'I' => 1,
         );
+        $amount = [];
         foreach ($roman as $k => $v) {
             if (($amount[$k] = floor($number / $v)) > 0) {
                 $number -= $amount[$k] * $v;

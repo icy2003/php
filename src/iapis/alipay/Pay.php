@@ -170,6 +170,7 @@ class Pay
      * @param callback $callback 回调函数
      *
      * @return void
+     * @info 此函数之后不得有任何输出
      */
     public function notify($callback = null)
     {

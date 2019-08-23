@@ -602,6 +602,7 @@ class LocalFile extends Base implements FileInterface
      * @param callback $callback 下载完成后的回调，参数列表：文件属性数组
      *
      * @return void
+     * @info 此函数之后不得有任何输出
      * @throws Exception
      */
     public function download($fileName, $config = null, $callback = null)

@@ -270,6 +270,7 @@ class Pay
      * @param callback $callback 回调函数，true 或设置回调则输出成功，回调函数提供了微信给的通知数组 $array
      *
      * @return void
+     * @info 此函数之后不得有任何输出
      */
     public function notify($callback = null)
     {
@@ -278,7 +279,6 @@ class Pay
             if (null === $callback || true === I::call($callback, [$array])) {
                 Header::xml();
                 echo $this->getNotifyReturn();
-                die;
             }
         }
     }
