@@ -51,7 +51,7 @@ class Upload
      */
     public static function create($config = [])
     {
-        if (!static::$_instance instanceof static ) {
+        if (!static::$_instance instanceof static) {
             static::$_instance = new static();
             static::$_instance->__formName = I::get($config, 'formName', 'file');
             static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::get($config, 'sizeLimit', 0));
@@ -296,9 +296,9 @@ class Upload
     private function __getSizeLimit($configLimit)
     {
         $array = [
-            Convert::size(I::phpini('upload_max_filesize', 0)),
-            Convert::size(I::phpini('post_max_size', 0)),
-            Convert::size($configLimit),
+            Numbers::toBytes(I::phpini('upload_max_filesize', 0)),
+            Numbers::toBytes(I::phpini('post_max_size', 0)),
+            Numbers::toBytes($configLimit),
         ];
         return min(array_filter($array));
     }

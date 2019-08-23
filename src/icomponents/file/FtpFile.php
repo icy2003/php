@@ -8,6 +8,7 @@
  */
 namespace icy2003\php\icomponents\file;
 
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
 
@@ -31,19 +32,11 @@ class FtpFile extends Base
      */
     public function __construct($config)
     {
-        if (!function_exists('ftp_connect')) {
-            throw new \Exception("请开启 ftp 扩展");
-        }
-        if (!Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff)) {
-            throw new \Exception('缺少 ' . implode(',', $diff) . ' 参数');
-        }
-        $this->_conn = ftp_connect(I::get($config, 'host'), I::get($config, 'port', 21), I::get($config, 'timeout', 90));
-        if (false === $this->_conn) {
-            throw new \Exception("连接失败");
-        }
-        if (false === @ftp_login($this->_conn, I::get($config, 'username'), I::get($config, 'password'))) {
-            throw new \Exception("账号密码错误");
-        }
+        C::assertTrue(function_exists('ftp_connect'), '请开启 ftp 扩展');
+        C::assertTrue(Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff), '缺少 ' . implode(',', $diff) . ' 参数');
+        $this->_conn = ftp_connect((string)I::get($config, 'host'), (int)I::get($config, 'port', 21), (int)I::get($config, 'timeout', 90));
+        C::assertTrue(is_resource($this->_conn), '连接失败');
+        C::assertTrue(@ftp_login($this->_conn, (string)I::get($config, 'username'), (string)I::get($config, 'password')), '账号密码错误');
         ftp_pasv($this->_conn, true);
     }
 
@@ -198,10 +191,10 @@ class FtpFile extends Base
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                /** @scrutinizer ignore-unhandled */ @ftp_chmod($this->_conn, $mode, $subFile);
+                /** @scrutinizer ignore-unhandled */@ftp_chmod($this->_conn, $mode, $subFile);
             }
         }
-        return (bool) /** @scrutinizer ignore-unhandled */ @ftp_chmod($this->_conn, $mode, $file);
+        return (bool)/** @scrutinizer ignore-unhandled */@ftp_chmod($this->_conn, $mode, $file);
     }
 
     /**
@@ -226,7 +219,7 @@ class FtpFile extends Base
     protected function _copy($fromFile, $toFile)
     {
         if ($fp = fopen("php://temp", 'r+')) {
-            @ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
+            /** @scrutinizer ignore-unhandled */@ftp_fget($this->_conn, $fp, $fromFile, FTP_BINARY, 0);
             rewind($fp);
             return @ftp_fput($this->_conn, $toFile, $fp, FTP_BINARY, 0);
         }
@@ -246,7 +239,7 @@ class FtpFile extends Base
      */
     protected function _mkdir($dir, $mode = 0777)
     {
-        $isCreated = @ftp_mkdir($this->_conn, $dir);
+        $isCreated = (bool)@ftp_mkdir($this->_conn, $dir);
         $this->chmod($dir, $mode, FileConstants::RECURSIVE_DISABLED);
         return $isCreated;
     }

@@ -90,7 +90,7 @@ class View
     {
         $level = ob_get_level();
         ob_start();
-        ob_implicit_flush(false);
+        ob_implicit_flush(0);
         extract($params, EXTR_OVERWRITE);
         try {
             require $viewFile;

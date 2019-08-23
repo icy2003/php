@@ -388,7 +388,7 @@ trait MathAndTrigonometry
         if ($number % 2 == 1) {
             $number += 1;
         }
-        return (int) $number;
+        return (int)$number;
     }
 
     /**
@@ -412,7 +412,7 @@ trait MathAndTrigonometry
      */
     public static function fact($number)
     {
-        $number = (int) floor($number);
+        $number = (int)floor($number);
         if ($number == 0) {
             return 1;
         }
@@ -440,7 +440,7 @@ trait MathAndTrigonometry
         }
         $result = 1;
         $isEven = $number % 2 == 0;
-        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, (int) $number, 2) as $num) {
+        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, (int)$number, 2) as $num) {
             $result *= $num;
         }
         return $result;
@@ -637,7 +637,7 @@ trait MathAndTrigonometry
             $arr = [];
             for ($r = 0; $r < $row1; $r++) {
                 for ($c = 0; $c < $col2; $c++) {
-                    $arr[$r][$c] = array_sum(array_map(function ($a1, $a2) {
+                    $arr[$r][$c] = array_sum(array_map(function($a1, $a2) {
                         return $a1 * $a2;
                     }, $array1[$r], Arrays::column($array2, $c)));
                 }
@@ -686,7 +686,7 @@ trait MathAndTrigonometry
     public static function multinomial($number1)
     {
         $numbers = is_array($number1) ? $number1 : func_get_args();
-        return self::fact(array_sum($numbers)) / array_product(array_map(function ($num) {
+        return self::fact(array_sum($numbers)) / array_product(array_map(function($num) {
             return self::fact($num);
         }, $numbers));
     }
@@ -729,7 +729,7 @@ trait MathAndTrigonometry
         if ($number % 2 == 0) {
             $number += 1;
         }
-        return (int) $number;
+        return (int)$number;
     }
 
     /**
@@ -778,7 +778,7 @@ trait MathAndTrigonometry
      */
     public static function quotient($numberator, $denominator)
     {
-        return (int) ($numberator / $denominator);
+        return (int)($numberator / $denominator);
     }
 
     /**
@@ -800,7 +800,7 @@ trait MathAndTrigonometry
      */
     public static function rand()
     {
-        return mt_rand(0, (int) self::power(10, 10)) / self::power(10, 10);
+        return mt_rand(0, (int)self::power(10, 10)) / self::power(10, 10);
     }
 
     /**
@@ -816,11 +816,11 @@ trait MathAndTrigonometry
      */
     public static function randarray($row = 1, $col = 1, $min = 0, $max = null, $isInt = false)
     {
-        null === $max && $max = (int) pow(10, 10);
+        null === $max && $max = (int)pow(10, 10);
         $array = [];
         for ($i = 0; $i < $row; $i++) {
             for ($j = 0; $j < $col; $j++) {
-                $array[$i][$j] = mt_rand($min, $max) + ($isInt ? 0 : mt_rand(0, (int) pow(10, 10)) / pow(10, 10));
+                $array[$i][$j] = mt_rand($min, $max) + ($isInt ? 0 : mt_rand(0, (int)pow(10, 10)) / pow(10, 10));
             }
         }
         return $array;
@@ -863,6 +863,7 @@ trait MathAndTrigonometry
             'V' => 5,
             'I' => 1,
         );
+        $amount = [];
         foreach ($roman as $k => $v) {
             if (($amount[$k] = floor($number / $v)) > 0) {
                 $number -= $amount[$k] * $v;
@@ -986,7 +987,7 @@ trait MathAndTrigonometry
         $k = 1;
         for ($i = 0; $i < $row; $i++) {
             for ($j = 0; $j < $col; $j++) {
-                $array[$i][$j] = $start + ($k++ - 1) * $step;
+                $array[$i][$j] = $start + ($k++ -1) * $step;
             }
         }
         return $array;
@@ -1123,7 +1124,7 @@ trait MathAndTrigonometry
                 array_push($arr[$i], $array[$i]);
             }
         }
-        return array_sum(array_map(function ($rows) {
+        return array_sum(array_map(function($rows) {
             return array_product($rows);
         }, $arr));
     }
@@ -1138,7 +1139,7 @@ trait MathAndTrigonometry
     public static function sumsq($number1)
     {
         $numbers = is_array($number1) ? $number1 : func_get_args();
-        return array_sum(array_map(function ($num) {
+        return array_sum(array_map(function($num) {
             return $num * $num;
         }, $numbers));
     }

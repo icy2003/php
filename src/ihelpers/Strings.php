@@ -112,7 +112,7 @@ class Strings
      */
     public static function toCamel($string)
     {
-        return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function ($matches) {
+        return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function($matches) {
             return ucfirst($matches[1]);
         }, strtolower($string)));
     }
@@ -143,7 +143,7 @@ class Strings
      */
     public static function isStartsWith($string, $search)
     {
-        return (string) $search !== "" && mb_strpos($string, $search) === 0;
+        return (string)$search !== "" && mb_strpos($string, $search) === 0;
     }
 
     /**
@@ -158,7 +158,7 @@ class Strings
      */
     public static function isEndsWith($string, $search)
     {
-        return (string) $search !== "" && mb_substr($string, -static::length($search)) === $search;
+        return (string)$search !== "" && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
@@ -174,7 +174,7 @@ class Strings
      */
     public static function isContains($string, $search, &$pos = null)
     {
-        return (string) $search !== "" && ($pos = mb_strpos($string, $search)) !== false;
+        return (string)$search !== "" && ($pos = mb_strpos($string, $search)) !== false;
     }
 
     /**
@@ -240,7 +240,7 @@ class Strings
      */
     public static function split($string)
     {
-        return (array) preg_split('/(?<!^)(?!$)/u', $string);
+        return (array)preg_split('/(?<!^)(?!$)/u', $string);
     }
 
     /**
@@ -295,7 +295,7 @@ class Strings
      */
     public static function toNumber($string)
     {
-        return (double) $string;
+        return (double)$string;
     }
 
     /**
@@ -473,6 +473,7 @@ class Strings
         if (empty($array1)) {
             return true;
         }
+        $isEqual = false;
         foreach ($array1 as $index => $char1) {
             $char1 = strtolower($char1);
             $char2 = strtolower($array2[$index]);
@@ -538,7 +539,7 @@ class Strings
         } elseif (false === $returnArray) {
             return implode('', $result);
         } else {
-            return implode((string) $returnArray, $result);
+            return implode((string)$returnArray, $result);
         }
     }
 
@@ -552,8 +553,8 @@ class Strings
      */
     public static function toPinyinFirst($text, $returnArray = false)
     {
-        $array = (array) self::toPinyin($text, true);
-        $result = array_map(function ($row) {
+        $array = (array)self::toPinyin($text, true);
+        $result = array_map(function($row) {
             return self::sub($row, 0, 1);
         }, $array);
         if (true === $returnArray) {
@@ -561,7 +562,7 @@ class Strings
         } elseif (false === $returnArray) {
             return implode('', $result);
         } else {
-            return implode((string) $returnArray, $result);
+            return implode((string)$returnArray, $result);
         }
     }
 

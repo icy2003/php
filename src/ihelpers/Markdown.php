@@ -139,7 +139,7 @@ class Markdown
      */
     public static function ul($array)
     {
-        return implode(PHP_EOL, array_map(function ($row) {
+        return implode(PHP_EOL, array_map(function($row) {
             return '- ' . self::__text($row);
         }, $array));
     }
@@ -231,7 +231,7 @@ class Markdown
      * @param bool $isDone 是否完成
      * @param int $level 层级，默认1
      *
-     * @return void
+     * @return string
      */
     public static function todo($line, $isDone, $level = 1)
     {
@@ -256,7 +256,7 @@ class Markdown
     public static function start()
     {
         ob_start();
-        ob_implicit_flush(false);
+        ob_implicit_flush(0);
     }
 
     /**

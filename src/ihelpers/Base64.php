@@ -69,7 +69,7 @@ class Base64
     {
         $base64 = false;
         $local = new LocalFile();
-        $local->isFile($file) && $base64 = base64_encode($local->getFileContent($file));
+        $local->isFile($file) && $base64 = base64_encode((string)$local->getFileContent($file));
         return $base64;
     }
 
@@ -86,6 +86,6 @@ class Base64
     public static function toFile($string, $file = null)
     {
         null === $file && $file = './Base64_toFile_' . date('YmdHis') . '.txt';
-        return (bool) file_put_contents($file, base64_decode($string));
+        return (bool)file_put_contents($file, base64_decode($string));
     }
 }

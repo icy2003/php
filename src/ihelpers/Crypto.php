@@ -499,6 +499,6 @@ class Crypto
     public function isVerify($data, $signature, $signType = OPENSSL_ALGO_SHA256)
     {
         C::assertNotTrue(null === $this->_pemPublic, '请使用 setPair 提供公钥');
-        return (boolean) openssl_verify($data, $signature, $this->_pemPublic, $signType);
+        return (boolean)openssl_verify($data, $signature, $this->_pemPublic, $signType);
     }
 }

@@ -55,9 +55,9 @@ class Http
         $promise = $client->requestAsync('GET', $url, [
             'query' => $get,
         ]);
-        $promise->then(function (ResponseInterface $res) use ($success) {
+        $promise->then(function(ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function (RequestException $err) use ($error) {
+        }, function(RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
@@ -101,9 +101,9 @@ class Http
             'query' => $get,
             'form_params' => $post,
         ]);
-        $promise->then(function (ResponseInterface $res) use ($success) {
+        $promise->then(function(ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function (RequestException $err) use ($error) {
+        }, function(RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
@@ -147,9 +147,9 @@ class Http
             'query' => $get,
             'body' => $body,
         ]);
-        $promise->then(function (ResponseInterface $res) use ($success) {
+        $promise->then(function(ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function (RequestException $err) use ($error) {
+        }, function(RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
@@ -168,12 +168,12 @@ class Http
     public function download($file)
     {
         list($from, $to) = (new LocalFile())->fileMap($file);
-        try{
+        try {
             (new Http())->get($from, [], [
                 'save_to' => I::getAlias($to),
             ]);
             return true;
-        }catch(RequestException $e){
+        } catch (RequestException $e) {
             return false;
         }
     }
