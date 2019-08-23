@@ -190,7 +190,7 @@ class Validator
         }
         $value = I::get($data, $field);
         $range = I::get($rule, 'range', []);
-        $isStrict = I::get($rule, 'isStrict', false);
+        $isStrict = (bool) I::get($rule, 'isStrict', false);
         if (!in_array($value, $range, $isStrict)) {
             $this->__messages[$field][] = I::get($rule, 'message', $field . ' 不在范围内');
             $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_IN);
@@ -202,8 +202,8 @@ class Validator
         if (!array_key_exists('pattern', $rule)) {
             throw new Exception('pattern error');
         }
-        $value = I::get($data, $field);
-        $pattern = I::get($rule, 'pattern', '//');
+        $value = (string) I::get($data, $field);
+        $pattern = (string) I::get($rule, 'pattern', '//');
         if (!preg_match($pattern, $value)) {
             $this->__messages[$field][] = I::get($rule, 'message', $field . ' 格式不正确');
             $this->__codes[$field][] = I::get($rule, 'code', self::CODE_VALIDATE_MATCH);
