@@ -55,7 +55,7 @@ class ImageProcessing extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'image');
         };
 

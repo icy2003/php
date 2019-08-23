@@ -57,7 +57,7 @@ class FileCache extends Base
     public function __construct($pathRoot = null)
     {
         if (null === $pathRoot) {
-            $this->_pathRoot = (string) I::getAlias('@icy2003/php_runtime/cache');
+            $this->_pathRoot = (string)I::getAlias('@icy2003/php_runtime/cache');
         } else {
             $this->_pathRoot = $pathRoot;
         }

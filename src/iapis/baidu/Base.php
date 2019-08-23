@@ -157,7 +157,7 @@ class Base
             } catch (ClientException $e) {
                 throw new Exception("access_token 获取失败，接口返回为：" . $e->getResponse()->getBody()->getContents());
             }
-            $this->_token = (string) $this->getResult(self::RESULT_TOKEN);
+            $this->_token = (string)$this->getResult(self::RESULT_TOKEN);
         }
         return $this;
     }
@@ -182,7 +182,7 @@ class Base
      */
     public function getError()
     {
-        return (string) I::get($this->_errorMap, I::get($this->_result, 'error_code', 0), '未知错误');
+        return (string)I::get($this->_errorMap, I::get($this->_result, 'error_code', 0), '未知错误');
     }
 
     /**
@@ -225,7 +225,7 @@ class Base
      */
     public function toArray()
     {
-        return (array) I::call($this->_toArrayCall, [$this->getResult()]);
+        return (array)I::call($this->_toArrayCall, [$this->getResult()]);
     }
 
     /**

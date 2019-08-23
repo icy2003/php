@@ -74,8 +74,8 @@ class NLP extends Base
             'charset' => 'UTF-8',
         ]));
 
-        $this->_toArrayCall = function ($result) {
-            return Arrays::column((array) I::get($result, 'items', []), 'item');
+        $this->_toArrayCall = function($result) {
+            return Arrays::column((array)I::get($result, 'items', []), 'item');
         };
 
         return $this;
@@ -102,8 +102,8 @@ class NLP extends Base
             'access_token' => $this->_token,
             'charset' => 'UTF-8',
         ]));
-        $this->_toArrayCall = function ($result) {
-            return Arrays::column((array) I::get($result, 'items', []), 'word');
+        $this->_toArrayCall = function($result) {
+            return Arrays::column((array)I::get($result, 'items', []), 'word');
         };
 
         return $this;
@@ -133,7 +133,7 @@ class NLP extends Base
             'access_token' => $this->_token,
             'charset' => 'UTF-8',
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'score');
         };
 

@@ -76,8 +76,8 @@ class OCR extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
-            return Arrays::column((array) I::get($result, 'words_result', []), 'words');
+        $this->_toArrayCall = function($result) {
+            return Arrays::column((array)I::get($result, 'words_result', []), 'words');
         };
 
         return $this;
@@ -102,8 +102,8 @@ class OCR extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
-            return Arrays::column((array) I::get($result, 'words_result', []), 'words');
+        $this->_toArrayCall = function($result) {
+            return Arrays::column((array)I::get($result, 'words_result', []), 'words');
         };
 
         return $this;
@@ -132,7 +132,7 @@ class OCR extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'words_result');
         };
 
@@ -160,7 +160,7 @@ class OCR extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'words_result');
         };
 
@@ -186,7 +186,7 @@ class OCR extends Base
         ]), [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'words_result');
         };
 
@@ -214,7 +214,7 @@ class OCR extends Base
         $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/idcard', $options, [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             $return = [];
             $words = I::get($result, 'words_result', []);
             foreach ($words as $name => $word) {
@@ -240,7 +240,7 @@ class OCR extends Base
         $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/bankcard', $options, [
             'access_token' => $this->_token,
         ]));
-        $this->_toArrayCall = function ($result) {
+        $this->_toArrayCall = function($result) {
             return I::get($result, 'result');
         };
         return $this;

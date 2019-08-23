@@ -139,7 +139,7 @@ class Markdown
      */
     public static function ul($array)
     {
-        return implode(PHP_EOL, array_map(function ($row) {
+        return implode(PHP_EOL, array_map(function($row) {
             return '- ' . self::__text($row);
         }, $array));
     }

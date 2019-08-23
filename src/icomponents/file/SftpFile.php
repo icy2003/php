@@ -44,13 +44,13 @@ class SftpFile extends Base
         C::assertFunction('ssh2_connect', '请开启 ssh2 扩展');
         C::assertTrue(Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff), '缺少 ' . implode(',', $diff) . ' 参数');
         $this->_conn = ssh2_connect(
-            (string) I::get($config, 'host'),
-            (int) I::get($config, 'port', 22),
-            (array) I::get($config, 'methods', []),
-            (array) I::get($config, 'callback', [])
+            (string)I::get($config, 'host'),
+            (int)I::get($config, 'port', 22),
+            (array)I::get($config, 'methods', []),
+            (array)I::get($config, 'callback', [])
         );
         C::assertNotFalse($this->_conn, '连接失败');
-        C::assertNotFalse(ssh2_auth_password($this->_conn, (string) I::get($config, 'username'), (string) I::get($config, 'password')), '账号密码错误');
+        C::assertNotFalse(ssh2_auth_password($this->_conn, (string)I::get($config, 'username'), (string)I::get($config, 'password')), '账号密码错误');
         $this->_sftp = ssh2_sftp($this->_conn);
         C::assertNotFalse($this->_sftp, '初始化 sftp 失败');
     }
