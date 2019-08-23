@@ -296,9 +296,9 @@ class Upload
     private function __getSizeLimit($configLimit)
     {
         $array = [
-            Convert::size(I::phpini('upload_max_filesize', 0)),
-            Convert::size(I::phpini('post_max_size', 0)),
-            Convert::size($configLimit),
+            Numbers::toBytes(I::phpini('upload_max_filesize', 0)),
+            Numbers::toBytes(I::phpini('post_max_size', 0)),
+            Numbers::toBytes($configLimit),
         ];
         return min(array_filter($array));
     }
