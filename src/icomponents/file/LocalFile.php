@@ -418,7 +418,12 @@ class LocalFile extends Base implements FileInterface
      */
     public function isFile($file)
     {
-        return is_file($this->__file($file));
+        $isLocal = $this->attribute($file, 'isLocal');
+        if (true === $isLocal) {
+            return is_file($this->__file($file));
+        } else {
+            return $this->attribute($file, 'isExists');
+        }
     }
 
     /**
@@ -494,7 +499,10 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFileContent($file)
     {
-        return file_get_contents($this->__file($file));
+        if ($this->isFile($file)) {
+            return file_get_contents($this->__file($file));
+        }
+        return false;
     }
 
     /**
@@ -689,10 +697,8 @@ class LocalFile extends Base implements FileInterface
             foreach ($files as $subFile) {
                 /** @scrutinizer ignore-unhandled */@chmod($subFile, $mode);
             }
-        } elseif ($this->isFile($file)) {
-            return /** @scrutinizer ignore-unhandled */@chmod($file, $mode);
         } else {
-            return false;
+            return /** @scrutinizer ignore-unhandled */@chmod($file, $mode);
         }
     }
 
