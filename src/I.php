@@ -408,4 +408,14 @@ class I
         }
         return true;
     }
+
+    /**
+     * 判断当前操作系统是不是 windows
+     *
+     * @return boolean
+     */
+    public static function isWin()
+    {
+        return 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
+    }
 }
