@@ -291,8 +291,8 @@ class LocalFileTest extends \Codeception\Test\Unit
 
     public function testDownloadFile()
     {
-        $remoteFile = 'https://mirrors.aliyun.com/composer/composer.phar';
-        $localFile = '@icy2003/php_runtime/composer.phar';
+        $remoteFile = 'https://travis-ci.com/icy2003/php.svg';
+        $localFile = '@icy2003/php_runtime/php.svg';
         $local = new LocalFile();
         $local->downloadFile([$remoteFile, $localFile], true, function ($size, $total) {
             $this->tester->assertIsInt($size);
