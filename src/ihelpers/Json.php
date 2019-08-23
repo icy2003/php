@@ -84,14 +84,14 @@ class Json
      */
     public static function ajax($json)
     {
-        header('Content-Type:application/json; charset=utf-8');
+        Header::json();
         if (is_array($json)) {
             $json = self::encode($json);
         }
         if (false === self::isJson($json)) {
             $json = '[]';
         }
-        echo $json;die;
+        echo $json;
     }
 
     /**
