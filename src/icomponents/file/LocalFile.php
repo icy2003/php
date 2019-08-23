@@ -66,7 +66,7 @@ class LocalFile extends Base implements FileInterface
     public function __construct($options = [])
     {
         $this->_c = Arrays::merge($this->_c, $options);
-        setlocale(LC_ALL, (string) I::get($this->_c, 'locale', 'zh_CN.UTF-8'));
+        setlocale(LC_ALL, (string)I::get($this->_c, 'locale', 'zh_CN.UTF-8'));
         clearstatcache();
     }
 
@@ -91,7 +91,7 @@ class LocalFile extends Base implements FileInterface
      */
     private function __file($file)
     {
-        return (string) I::getAlias($file);
+        return (string)I::getAlias($file);
     }
 
     /**
@@ -153,7 +153,7 @@ class LocalFile extends Base implements FileInterface
                     if ($result && $info = curl_getinfo($curl)) {
                         if (200 == $info['http_code']) {
                             $this->_attributes[$hashName]['isExists'] = true;
-                            $this->_attributes[$hashName]['fileSize'] = (int) $info['download_content_length'];
+                            $this->_attributes[$hashName]['fileSize'] = (int)$info['download_content_length'];
                         }
                     }
                     curl_close($curl);
@@ -163,8 +163,8 @@ class LocalFile extends Base implements FileInterface
             if ('fsockopen' === $this->_c['loader']) {
                 $url = parse_url($fileName);
                 $host = $url['host'];
-                $path = (string) I::get($url, 'path', '/');
-                $port = (int) I::get($url, 'port', 80);
+                $path = (string)I::get($url, 'path', '/');
+                $port = (int)I::get($url, 'port', 80);
                 $fp = fsockopen($host, $port);
                 if (is_resource($fp)) {
                     fputs($fp, "GET {$path} HTTP/1.1\r\n");
@@ -173,17 +173,17 @@ class LocalFile extends Base implements FileInterface
                     while (!feof($fp)) {
                         $line = fgets($fp);
                         preg_match('/HTTP.*(\s\d{3}\s)/', $line, $arr) && $this->_attributes[$hashName]['isExists'] = true;
-                        preg_match('/Content-Length:(.*)/si', $line, $arr) && $this->_attributes[$hashName]['fileSize'] = (int) trim($arr[1]);
+                        preg_match('/Content-Length:(.*)/si', $line, $arr) && $this->_attributes[$hashName]['fileSize'] = (int)trim($arr[1]);
                     }
                     fclose($fp);
                 }
                 return $this;
             }
-            if ('fopen' === $this->_c['loader'] && (bool) ini_get('allow_url_fopen')) {
-                $headArray = (array) get_headers($fileName, 1);
+            if ('fopen' === $this->_c['loader'] && (bool)ini_get('allow_url_fopen')) {
+                $headArray = (array)get_headers($fileName, 1);
                 if (preg_match('/200/', $headArray[0])) {
                     $this->_attributes[$hashName]['isExists'] = true;
-                    $this->_attributes[$hashName]['fileSize'] = (int) $headArray['Content-Length'];
+                    $this->_attributes[$hashName]['fileSize'] = (int)$headArray['Content-Length'];
                 }
                 return $this;
             }
@@ -280,7 +280,7 @@ class LocalFile extends Base implements FileInterface
     public function line($fileName, $lineNumber = 0, $autoClose = false)
     {
         $spl = $this->spl($fileName, 'r');
-        $lineNumber = (int) $lineNumber;
+        $lineNumber = (int)$lineNumber;
         foreach ($this->linesGenerator($fileName, $autoClose) as $k => $line) {
             if ($k === $lineNumber) {
                 $spl->rewind();
@@ -386,7 +386,7 @@ class LocalFile extends Base implements FileInterface
      */
     public function getFilesize($fileName)
     {
-        return (int) $this->attribute($fileName, 'fileSize');
+        return (int)$this->attribute($fileName, 'fileSize');
     }
 
     /**
@@ -422,7 +422,7 @@ class LocalFile extends Base implements FileInterface
         if (true === $isLocal) {
             return is_file($this->__file($file));
         } else {
-            return (bool) $this->attribute($file, 'isExists');
+            return (bool)$this->attribute($file, 'isExists');
         }
     }
 
@@ -612,7 +612,7 @@ class LocalFile extends Base implements FileInterface
         list($originName, $downloadName) = $this->fileMap($fileName);
         $originName = $this->__file($originName);
         try {
-            $ip = (string) I::get($config, self::C_DOWNLOAD_IP, '*');
+            $ip = (string)I::get($config, self::C_DOWNLOAD_IP, '*');
             if ('*' !== $ip) {
                 C::assertTrue(Arrays::in((new Request())->getUserIP(), Strings::toArray($ip)), 'http/1.1 403.6 此 IP 禁止访问');
             }
@@ -622,9 +622,9 @@ class LocalFile extends Base implements FileInterface
                 header('Accept-Ranges:bytes');
                 header('Content-Length:' . $fileSize);
                 header('Content-Disposition: attachment; filename=' . $downloadName);
-                $speed = (int) I::get($config, self::C_DOWNLOAD_SPEED, 0);
+                $speed = (int)I::get($config, self::C_DOWNLOAD_SPEED, 0);
                 $xSendFile = I::get($config, self::C_DOWNLOAD_X_SEND_FILE, false);
-                $xSendFileRoot = (string) I::get($config, self::C_DOWNLOAD_X_SEND_FILE_ROOT, '/protected/');
+                $xSendFileRoot = (string)I::get($config, self::C_DOWNLOAD_X_SEND_FILE_ROOT, '/protected/');
                 if (true === $xSendFile) {
                     $path = rtrim($xSendFileRoot, '/') . '/' . $this->getBasename($originName);
                     header('X-Accel-Redirect: ' . $path); // Nginx、Cherokee 实现了该头

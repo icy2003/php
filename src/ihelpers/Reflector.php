@@ -57,7 +57,7 @@ class Reflector
      */
     public function getCurrentClassMethods($callback = null)
     {
-        $callback = null === $callback ? function () {
+        $callback = null === $callback ? function() {
             return true;
         } : $callback;
         $currentClass = $this->__reflector->getName();

@@ -212,7 +212,7 @@ class Pay
      */
     public function getCallArray()
     {
-        C::assertTrue($this->isSuccess(), (string) I::get($this->_result, 'return_msg'));
+        C::assertTrue($this->isSuccess(), (string)I::get($this->_result, 'return_msg'));
         $array = [];
         if ('APP' === I::get($this->_values, 'trade_type')) {
             $array = [
@@ -244,7 +244,7 @@ class Pay
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
-        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string) I::get($array, 'return_msg'));
+        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string)I::get($array, 'return_msg'));
         $temp = $array;
         $sign = $temp['sign'];
         unset($temp['sign']);
@@ -479,7 +479,7 @@ class Pay
      */
     public function shortUrl()
     {
-        C::assertTrue(null !== ($longUrl = (string) I::get($this->_values, 'long_url')), '缺少 long_url 参数！');
+        C::assertTrue(null !== ($longUrl = (string)I::get($this->_values, 'long_url')), '缺少 long_url 参数！');
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
@@ -504,7 +504,7 @@ class Pay
      */
     public function getQrcodeUrl()
     {
-        C::assertTrue(null !== ($productId = (string) I::get($this->_values, 'product_id')), '缺少 product_id 参数！');
+        C::assertTrue(null !== ($productId = (string)I::get($this->_values, 'product_id')), '缺少 product_id 参数！');
         $values = [
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,

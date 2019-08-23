@@ -28,7 +28,7 @@ class Image
     public function __construct($image)
     {
         $attributes = $this->__parseImage($image);
-        array_map(function ($value, $key) {
+        array_map(function($value, $key) {
             $this->_attributes[$key] = $value;
         }, array_values($attributes), array_keys($attributes));
         $this->_imageIn = $this->_attributes['object'];

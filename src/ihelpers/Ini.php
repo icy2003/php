@@ -86,7 +86,7 @@ class Ini
                 if (Strings::isStartsWith(trim($line), '#')) {
                     continue;
                 }
-                list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {
+                list($name, $value) = Arrays::lists(explode('=', $line), 2, function($row) {
                     return trim($row);
                 });
                 $array[$name] = $value;
@@ -97,10 +97,10 @@ class Ini
             }
         } elseif (self::TYPE_JSON === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $array = Json::decode((string) $content);
+            $array = Json::decode((string)$content);
         } elseif (self::TYPE_XML === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $array = Xml::toArray((string) $content);
+            $array = Xml::toArray((string)$content);
         }
         return $array;
     }
