@@ -69,7 +69,7 @@ class Base64
     {
         $base64 = false;
         $local = new LocalFile();
-        $local->isFile($file) && $base64 = base64_encode($local->getFileContent($file));
+        $local->isFile($file) && $base64 = base64_encode((string) $local->getFileContent($file));
         return $base64;
     }
 
