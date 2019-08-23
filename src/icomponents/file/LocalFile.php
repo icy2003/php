@@ -422,7 +422,7 @@ class LocalFile extends Base implements FileInterface
         if (true === $isLocal) {
             return is_file($this->__file($file));
         } else {
-            return $this->attribute($file, 'isExists');
+            return (bool) $this->attribute($file, 'isExists');
         }
     }
 
