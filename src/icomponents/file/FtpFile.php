@@ -198,10 +198,10 @@ class FtpFile extends Base
         if ($this->isDir($file) && I::hasFlag($flags, FileConstants::RECURSIVE)) {
             $files = $this->getLists($file, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
             foreach ($files as $subFile) {
-                @ftp_chmod($this->_conn, $mode, $subFile);
+                /** @scrutinizer ignore-unhandled */ @ftp_chmod($this->_conn, $mode, $subFile);
             }
         }
-        return (boolean) @ftp_chmod($this->_conn, $mode, $file);
+        return (bool) /** @scrutinizer ignore-unhandled */ @ftp_chmod($this->_conn, $mode, $file);
     }
 
     /**

@@ -9,7 +9,6 @@
 namespace icy2003\php;
 
 use Exception;
-use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\ihelpers\Strings;
 use ReflectionClass;
 
@@ -220,10 +219,6 @@ class I
         if (strncmp($alias, '@', 1)) {
             return $alias;
         }
-        $localFile = new LocalFile();
-        foreach (static::$aliases as $k => $v) {
-            static::$aliases[$k] = $localFile->getRealpath($v);
-        }
 
         $pos = 0;
         while (true) {
@@ -333,21 +328,27 @@ class I
     /**
      * 创建一个对象
      *
-     * @param array $params
-     * - class：表示类名，可使用别名
-     * - 其他：该类的属性，初始化这些属性
+     * @param array|string $params
+     *      - 字符串：该字符串将被作为类名转成数组处理
+     *      - 数组：
+     *          1. class：表示类名
+     *          2. 其他：该类的属性，初始化这些属性或者调用相应的 set 方法
      * @param array $config
      * - 构造函数传参
      *
      * @return object
+     * @throws Exception
      */
-    public static function createObject($params, $config = [])
+    public static function obj($params, $config = [])
     {
+        if (is_string($params)) {
+            $params = ['class' => $params];
+        }
         if (is_array($params) && isset($params['class'])) {
             try {
                 $class = $params['class'];
                 unset($params['class']);
-                $reflection = new ReflectionClass(self::getAlias($class));
+                $reflection = new ReflectionClass($class);
                 $object = $reflection->newInstanceArgs($config);
                 foreach ($params as $name => $value) {
                     self::set($object, $name, $value);
@@ -357,7 +358,7 @@ class I
                 throw new Exception('初始化 ' . $class . ' 失败', $e->getCode(), $e);
             }
         }
-        throw new Exception('必须带 class 以指定一个类');
+        throw new Exception('必须带 class 键来指定一个类');
     }
 
     /**
@@ -406,5 +407,15 @@ class I
             return false;
         }
         return true;
+    }
+
+    /**
+     * 判断当前操作系统是不是 windows
+     *
+     * @return boolean
+     */
+    public static function isWin()
+    {
+        return 'WIN' === strtoupper(substr(PHP_OS, 0, 3));
     }
 }

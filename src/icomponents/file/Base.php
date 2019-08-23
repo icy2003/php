@@ -7,8 +7,10 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 namespace icy2003\php\icomponents\file;
-use icy2003\php\ihelpers\Charset;
+
 use icy2003\php\ihelpers\Arrays;
+use icy2003\php\ihelpers\Charset;
+use icy2003\php\ihelpers\Strings;
 
 /**
  * 文件抽象类
@@ -66,6 +68,9 @@ abstract class Base
      */
     public function getRealpath($path)
     {
+        if (Strings::isStartsWith($path, 'http')) {
+            return $path;
+        }
         $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
         $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
         $absolutes = [];
@@ -173,7 +178,7 @@ abstract class Base
         if (false === $this->isDir($dir)) {
             return true;
         }
-        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH);
+        $files = $this->getLists($dir, FileConstants::COMPLETE_PATH | FileConstants::RECURSIVE);
         foreach ($files as $file) {
             $this->isDir($file) ? $this->deleteDir($file) : $this->deleteFile($file);
         }

@@ -890,4 +890,26 @@ class Arrays
         }
     }
 
+    /**
+     * 对一个数组执行回调并返回新数组
+     *
+     * @param array|mixed $array
+     * @param callback $valueCallback 对值的回调
+     * @param callback|null $keyCallback 对键的回调
+     *
+     * @return array
+     */
+    public static function map($array, $valueCallback, $keyCallback = null)
+    {
+        $return = [];
+        if (is_array($array)) {
+            foreach ($array as $key => $value) {
+                $callValue = I::call($valueCallback, [$value, $key]);
+                $callKey = null === $keyCallback ? $key : I::call($keyCallback, [$value, $key]);
+                $return[$callKey] = $callValue;
+            }
+        }
+        return $return;
+    }
+
 }

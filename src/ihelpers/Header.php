@@ -16,6 +16,26 @@ use icy2003\php\I;
  */
 class Header
 {
+
+    /**
+     * 发送原生 HTTP 头
+     *
+     * - 兼容 Workerman 的 header 头
+     *
+     * @param string $string 头字符串
+     * @param boolean $replace 是否用后面的头替换前面相同类型的头，默认是
+     * @param integer $httpResponseCode 强制指定HTTP响应的值，默认不强制
+     *
+     * @return void
+     */
+    public static function send($string, $replace = true, $httpResponseCode = null)
+    {
+        if (method_exists('\Workerman\Protocols\Http', 'header')) {
+            call_user_func_array('\Workerman\Protocols\Http::header', [$string, $replace, $httpResponseCode]);
+        } else {
+            header($string, $replace, $httpResponseCode);
+        }
+    }
     /**
      * 正常访问
      *
@@ -25,7 +45,7 @@ class Header
      */
     public static function ok()
     {
-        header('HTTP/1.1 200 OK');
+        self::send('HTTP/1.1 200 OK');
     }
 
     /**
@@ -37,7 +57,7 @@ class Header
      */
     public static function notFound()
     {
-        header('HTTP/1.1 404 Not Found');
+        self::send('HTTP/1.1 404 Not Found');
     }
 
     /**
@@ -56,8 +76,8 @@ class Header
         if ($time < 0) {
             throw new \Exception('time 参数不能小于 0 ');
         } else {
-            header('HTTP/1.1 302 Found');
-            header('Refresh: ' . $time . '; ' . $url);
+            self::send('HTTP/1.1 302 Found');
+            self::send('Refresh: ' . $time . '; ' . $url);
         }
         die;
     }
@@ -73,9 +93,8 @@ class Header
      */
     public static function redirectPermanently($url)
     {
-        header('HTTP/1.1 301 Moved Permanently');
-        header('Location: ' . $url);
-        die;
+        self::send('HTTP/1.1 301 Moved Permanently');
+        self::send('Location: ' . $url);
     }
 
     /**
@@ -85,7 +104,7 @@ class Header
      */
     public static function utf8()
     {
-        header('Content-Type: text/html; charset=utf-8');
+        self::send('Content-Type: text/html; charset=utf-8');
     }
 
     /**
@@ -95,7 +114,7 @@ class Header
      */
     public static function json()
     {
-        header('Content-type: application/json');
+        self::send('Content-Type: application/json');
     }
 
     /**
@@ -105,7 +124,7 @@ class Header
      */
     public static function xml()
     {
-        header('Content-type: text/xml');
+        self::send('Content-Type: text/xml');
     }
 
     /**
@@ -118,18 +137,18 @@ class Header
     public static function allowOrigin($urls = '*')
     {
         if ('*' === $urls) {
-            header('Access-Control-Allow-Origin:*');
+            self::send('Access-Control-Allow-Origin:*');
         } else {
             $origin = I::get($_SERVER, 'HTTP_ORIGIN');
             $urls = Strings::toArray($urls);
             if (is_array($urls) && in_array($origin, $urls)) {
-                header('Access-Control-Allow-Origin:' . $origin);
+                self::send('Access-Control-Allow-Origin:' . $origin);
             }
         }
-        header('Access-Control-Max-Age:86400');
-        header('Access-Control-Allow-Credentials:true');
-        header('Access-Control-Allow-Methods:*');
-        header('Access-Control-Allow-Headers:Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With');
+        self::send('Access-Control-Max-Age:86400');
+        self::send('Access-Control-Allow-Credentials:true');
+        self::send('Access-Control-Allow-Methods:*');
+        self::send('Access-Control-Allow-Headers:Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With');
     }
 
     /**
@@ -141,7 +160,7 @@ class Header
      */
     public static function xPoweredBy($string = 'icy2003')
     {
-        header('X-Powered-By: ' . $string);
+        self::send('X-Powered-By: ' . $string);
     }
 
     /**
@@ -151,7 +170,7 @@ class Header
      */
     public static function notModified()
     {
-        header('HTTP/1.1 304 Not Modified');
+        self::send('HTTP/1.1 304 Not Modified');
     }
 
     /**
@@ -161,7 +180,7 @@ class Header
      */
     public static function noCache()
     {
-        header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        self::send('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
+        self::send('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
     }
 }

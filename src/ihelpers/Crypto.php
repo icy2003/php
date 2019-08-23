@@ -452,6 +452,25 @@ class Crypto
     }
 
     /**
+     * 导出证书相关文件
+     *
+     * @param string|null $to 指定导出路径，默认 null，即当前目录
+     *
+     * @return void
+     */
+    public function export($to = null)
+    {
+        null === $to && $to = __DIR__;
+        $local = new LocalFile();
+        $path = rtrim($to, '/') . '/';
+        $local->putFileContent($path . 'publicKey.pem', $this->_pemPublic);
+        $local->putFileContent($path . 'privateKey.pem', $this->_pemPrivate);
+        $local->putFileContent($path . 'privateKey.p12', $this->_p12Private);
+        $local->putFileContent($path . 'cert.pem', $this->_pemCert);
+        $local->putFileContent($path . 'csr.pem', $this->_pemCsr);
+    }
+
+    /**
      * 获取用私钥生成的签名
      *
      * @param string $data 待签名数据

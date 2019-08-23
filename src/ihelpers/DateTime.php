@@ -161,7 +161,7 @@ class DateTime
     {
         null === $time && $time = time();
         $offset = (int) $offset;
-        return mktime((int) date('H', $time), (int) date('i', $time), (int) date('s', $time), (int) date('m', $time), (int) date('d', $time), (int) date('Y', $time) + 1);
+        return mktime((int) date('H', $time), (int) date('i', $time), (int) date('s', $time), (int) date('m', $time), (int) date('d', $time), (int) date('Y', $time) + $offset);
     }
 
     /**

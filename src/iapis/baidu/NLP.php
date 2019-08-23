@@ -9,6 +9,7 @@
 namespace icy2003\php\iapis\baidu;
 
 use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
@@ -64,9 +65,7 @@ class NLP extends Base
      */
     public function lexer()
     {
-        if (Strings::byteLength($this->_options['text']) > 20000) {
-            throw new Exception('文字太长，不允许超过 20000 字节');
-        }
+        C::assertTrue(Strings::byteLength($this->_options['text']) <= 20000, '文字太长，不允许超过 20000 字节');
         $this->requestToken();
         $this->_result = Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v1/lexer', Json::encode(Arrays::some($this->_options, [
             'text',
