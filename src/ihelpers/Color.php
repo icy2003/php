@@ -308,7 +308,7 @@ class Color
                 // 接收十六进制（如：0xFF0000和'FF0000'）和颜色名字
                 $hex = I::get(self::$_names, $color, $color);
                 if ($hex) {
-                    C::assertNotTrue($hex > 0xFFFFFF || $hex < 0 || hexdec($hex) === 0 && $hex !== '000000' && $hex !== '#000000' , '错误的颜色值：' . $color);
+                    C::assertNotTrue($hex > 0xFFFFFF || $hex < 0 || hexdec($hex) === 0 && $hex !== '000000' && $hex !== '#000000', '错误的颜色值：' . $color);
                 }
                 // 如果是字符形式的十六进制数，则先转成十进制再作后续运算
                 if (is_string($hex)) {
@@ -333,7 +333,7 @@ class Color
     {
         $type = $this->_type;
         if (self::TYPE_RGB === $type) {
-            $this->_color = array_map(function ($i) {
+            $this->_color = array_map(function($i) {
                 return (0.5 + $i) | 0;
             }, $this->_color);
         } elseif (self::TYPE_HEX === $type) {
@@ -386,7 +386,7 @@ class Color
     {
         $type = $this->_type;
         if (self::TYPE_CMYK === $type) {
-            $this->_color = array_map(function ($i) {
+            $this->_color = array_map(function($i) {
                 return sprintf('%01.4f', $i);
             }, $this->_color);
             $this->_type = self::TYPE_CMYK;

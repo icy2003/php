@@ -50,7 +50,7 @@ class Timer
     {
         $delta = 0.0;
         if (isset(static::$_timers[$name])) {
-            $delta = microtime(true)-static::$_timers[$name];
+            $delta = microtime(true) - static::$_timers[$name];
             unset(static::$_timers[$name]);
         }
 

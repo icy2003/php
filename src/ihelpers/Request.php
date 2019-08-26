@@ -186,7 +186,7 @@ class Request
      */
     public function isAjax()
     {
-        return 'XMLHttpRequest' === Arrays::first((array) I::get($this->getHeaders(), 'x-requested-with', []));
+        return 'XMLHttpRequest' === Arrays::first((array)I::get($this->getHeaders(), 'x-requested-with', []));
     }
 
     /**
@@ -381,9 +381,9 @@ class Request
             $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
             if (I::get($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim((string) Arrays::first(explode(',', (string) Arrays::first((array) I::get($this->getHeaders(), 'x-forward-host', [])))));
+                $this->__hostInfo = $http . '://' . trim((string)Arrays::first(explode(',', (string)Arrays::first((array)I::get($this->getHeaders(), 'x-forward-host', [])))));
             } elseif (I::get($this->getHeaders(), 'host')) {
-                $this->__hostInfo = $http . '://' . Arrays::first((array) I::get($this->getHeaders(), 'host'));
+                $this->__hostInfo = $http . '://' . Arrays::first((array)I::get($this->getHeaders(), 'host'));
             } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->__hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();

@@ -116,7 +116,7 @@ class Validator
      */
     public static function create()
     {
-        if (!static::$_instance instanceof static ) {
+        if (!static::$_instance instanceof static) {
             static::$_instance = new static();
         }
 

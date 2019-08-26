@@ -34,9 +34,9 @@ class FtpFile extends Base
     {
         C::assertTrue(function_exists('ftp_connect'), '请开启 ftp 扩展');
         C::assertTrue(Arrays::keyExistsAll(['host', 'username', 'password'], $config, $diff), '缺少 ' . implode(',', $diff) . ' 参数');
-        $this->_conn = ftp_connect((string) I::get($config, 'host'), (int) I::get($config, 'port', 21), (int) I::get($config, 'timeout', 90));
+        $this->_conn = ftp_connect((string)I::get($config, 'host'), (int)I::get($config, 'port', 21), (int)I::get($config, 'timeout', 90));
         C::assertTrue(is_resource($this->_conn), '连接失败');
-        C::assertTrue(@ftp_login($this->_conn, (string) I::get($config, 'username'), (string) I::get($config, 'password')), '账号密码错误');
+        C::assertTrue(@ftp_login($this->_conn, (string)I::get($config, 'username'), (string)I::get($config, 'password')), '账号密码错误');
         ftp_pasv($this->_conn, true);
     }
 
@@ -194,7 +194,7 @@ class FtpFile extends Base
                 /** @scrutinizer ignore-unhandled */@ftp_chmod($this->_conn, $mode, $subFile);
             }
         }
-        return (bool) /** @scrutinizer ignore-unhandled */@ftp_chmod($this->_conn, $mode, $file);
+        return (bool)/** @scrutinizer ignore-unhandled */@ftp_chmod($this->_conn, $mode, $file);
     }
 
     /**
@@ -239,7 +239,7 @@ class FtpFile extends Base
      */
     protected function _mkdir($dir, $mode = 0777)
     {
-        $isCreated = (bool) @ftp_mkdir($this->_conn, $dir);
+        $isCreated = (bool)@ftp_mkdir($this->_conn, $dir);
         $this->chmod($dir, $mode, FileConstants::RECURSIVE_DISABLED);
         return $isCreated;
     }
