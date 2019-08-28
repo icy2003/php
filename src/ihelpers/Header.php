@@ -183,4 +183,28 @@ class Header
         self::send('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
         self::send('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
     }
+
+    /**
+     * 设置 X-Frame-Options 选项
+     *
+     * - 部分浏览器可能不支持，@link https://developer.mozilla.org/zh-CN/docs/Web/HTTP/X-Frame-Options
+     *
+     * @param boolean|string $asFrame 取值如下：
+     * - false：X-Frame-Options: deny 表示该页面不允许在 frame 中展示，即便是在相同域名的页面中嵌套也不允许
+     * - true：X-Frame-Options: sameorigin 表示该页面可以在相同域名页面的 frame 中展示
+     * - 字符串：X-Frame-Options: allow-from https://example.com/ 表示该页面可以在指定来源的 frame 中展示
+     *
+     * @return void
+     */
+    public static function frame($asFrame = true)
+    {
+        if (true === $asFrame) {
+            self::send('X-Frame-Options: sameorigin');
+        } elseif (false === $asFrame) {
+            self::send('X-Frame-Options: deny');
+        } else {
+            $asFrame = (string) $asFrame;
+            self::send('X-Frame-Options: allow-from ' . $asFrame);
+        }
+    }
 }
