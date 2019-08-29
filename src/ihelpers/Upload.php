@@ -194,7 +194,7 @@ class Upload
                 $local = new LocalFile();
                 $fileName = $_FILES[$this->__formName]['name'];
                 $fileSize = $local->getFilesize($file);
-                $fileExt = $local->splInfo($file)->getExtension();
+                $fileExt = $local->getExtension($fileName);
                 if ($fileSize > $this->__sizeLimit) {
                     $this->__errorCode = self::ERROR_SIZE_LIMIT;
 
@@ -240,6 +240,7 @@ class Upload
      */
     public function save($savePath, $fileName = null)
     {
+        (new LocalFile())->createDir($savePath);
         $fileName = null === $fileName ? $this->__attributes['fileName'] : $fileName;
         !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
 
