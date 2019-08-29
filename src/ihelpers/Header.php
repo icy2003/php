@@ -207,4 +207,23 @@ class Header
             self::send('X-Frame-Options: allow-from ' . $asFrame);
         }
     }
+
+    /**
+     * 是否禁用 mine 嗅探
+     *
+     * - 部分浏览器不支持，@link https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/X-Content-Type-Options
+     * - 下面两种情况的请求将被阻止：
+     *      1. 请求类型是"style" 但是 MIME 类型不是 "text/css"，
+     *      2. 请求类型是"script" 但是 MIME 类型不是
+     *
+     * @param boolean $disabled 默认禁用
+     *
+     * @return void
+     */
+    public static function mimeSniffing($disabled = true)
+    {
+        if (true === $disabled) {
+            self::send('X-Content-Type-Options: nosniff');
+        }
+    }
 }
