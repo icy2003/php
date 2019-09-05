@@ -7,6 +7,9 @@
  */
 namespace icy2003\php\ihelpers;
 
+use icy2003\php\icomponents\file\LocalFile;
+use icy2003\php\I;
+
 /**
  * 敏感词过滤
  */
