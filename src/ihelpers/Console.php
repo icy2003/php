@@ -190,6 +190,7 @@ class Console
      * 输出提示
      *
      * @param string $string 提示文字
+     * @param array $format 格式化文字数组
      *
      * @return integer|false
      */

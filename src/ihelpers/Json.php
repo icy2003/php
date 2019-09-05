@@ -20,7 +20,7 @@ class Json
      * Json 编码
      *
      * @param mixed $value 数组
-     * @param int $options Json 选项，默认 JSON_UNESCAPED_UNICODE，其他选项说明：
+     * @param integer $options Json 选项，默认 JSON_UNESCAPED_UNICODE，其他选项说明：
      * ```
      * JSON_HEX_QUOT：所有的 " 转换成 \u0022。PHP>=5.3.0
      * JSON_HEX_TAG：所有的 < 和 > 转换成 \u003C 和 \u003E。PHP>=5.3.0

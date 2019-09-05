@@ -912,4 +912,36 @@ class Arrays
         return $return;
     }
 
+    /**
+     * 排队取号
+     *
+     * - 含义：给定只包含数字的索引数组，索引数组的值作为号码从小到大排序，如果中间漏掉某个号码，则返回该号码，否则返回最后一位号码，并且引用返回该队列
+     * - 号码的值从 0 开始
+     * - 例子：[4, 0, 1] 将引用返回数组[4, 0, 1, 2]，函数返回 2
+     *
+     * @param array $array
+     * @param integer $begin 开始的号码，默认为 0
+     *
+     * @return integer
+     */
+    public static function queueNumber(&$array, $begin = 0)
+    {
+        $array2 = $array;
+        sort($array2);
+        $next = $begin;
+        foreach ($array2 as $v) {
+            if ($v > $next) {
+                break;
+            } elseif ($v < $next) {
+                if ($v + 1 > $next) {
+                    $next = $v + 1;
+                }
+            } else {
+                $next++;
+            }
+        }
+        array_push($array, $next);
+        return $next;
+    }
+
 }

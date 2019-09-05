@@ -51,7 +51,7 @@ class Upload
      */
     public static function create($config = [])
     {
-        if (!static::$_instance instanceof static) {
+        if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
             static::$_instance->__formName = I::get($config, 'formName', 'file');
             static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::get($config, 'sizeLimit', 0));
@@ -133,6 +133,11 @@ class Upload
     const ERROR_EXT_LIMIT = -3;
 
     /**
+     * 没有文件字段
+     */
+    const ERROR_NO_FORM_FIELD = -4;
+
+    /**
      * 错误信息列表
      *
      * @var array
@@ -149,6 +154,7 @@ class Upload
         self::ERROR_SAVE_FAILED => '文件保存失败',
         self::ERROR_SIZE_LIMIT => '超出自定义的文件上传大小限制',
         self::ERROR_EXT_LIMIT => '不允许的文件类型',
+        self::ERROR_NO_FORM_FIELD => '没有指定文件表单字段',
     ];
 
     /**
@@ -189,12 +195,16 @@ class Upload
      */
     public function upload()
     {
+        if (false === isset($_FILES[$this->__formName])) {
+            $this->__errorCode = self::ERROR_NO_FORM_FIELD;
+            return $this;
+        }
         if (self::ERROR_SUCCESS === $_FILES[$this->__formName]['error']) {
             if (is_uploaded_file($file = $_FILES[$this->__formName]['tmp_name'])) {
                 $local = new LocalFile();
                 $fileName = $_FILES[$this->__formName]['name'];
                 $fileSize = $local->getFilesize($file);
-                $fileExt = $local->splInfo($file)->getExtension();
+                $fileExt = $local->getExtension($fileName);
                 if ($fileSize > $this->__sizeLimit) {
                     $this->__errorCode = self::ERROR_SIZE_LIMIT;
 
@@ -240,8 +250,11 @@ class Upload
      */
     public function save($savePath, $fileName = null)
     {
-        $fileName = null === $fileName ? $this->__attributes['fileName'] : $fileName;
-        !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
+        if (!empty($this->__attributes)) {
+            (new LocalFile())->createDir($savePath);
+            $fileName = null === $fileName ? $this->__attributes['fileName'] : $fileName;
+            !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
+        }
 
         return $this;
     }

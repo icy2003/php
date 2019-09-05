@@ -183,4 +183,47 @@ class Header
         self::send('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
         self::send('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
     }
+
+    /**
+     * 设置 X-Frame-Options 选项
+     *
+     * - 部分浏览器可能不支持，@link https://developer.mozilla.org/zh-CN/docs/Web/HTTP/X-Frame-Options
+     *
+     * @param boolean|string $asFrame 取值如下：
+     * - false：X-Frame-Options: deny 表示该页面不允许在 frame 中展示，即便是在相同域名的页面中嵌套也不允许
+     * - true：X-Frame-Options: sameorigin 表示该页面可以在相同域名页面的 frame 中展示
+     * - 字符串：X-Frame-Options: allow-from https://example.com/ 表示该页面可以在指定来源的 frame 中展示
+     *
+     * @return void
+     */
+    public static function frame($asFrame = true)
+    {
+        if (true === $asFrame) {
+            self::send('X-Frame-Options: sameorigin');
+        } elseif (false === $asFrame) {
+            self::send('X-Frame-Options: deny');
+        } else {
+            $asFrame = (string) $asFrame;
+            self::send('X-Frame-Options: allow-from ' . $asFrame);
+        }
+    }
+
+    /**
+     * 是否禁用 mine 嗅探
+     *
+     * - 部分浏览器不支持，@link https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/X-Content-Type-Options
+     * - 下面两种情况的请求将被阻止：
+     *      1. 请求类型是"style" 但是 MIME 类型不是 "text/css"，
+     *      2. 请求类型是"script" 但是 MIME 类型不是
+     *
+     * @param boolean $disabled 默认禁用
+     *
+     * @return void
+     */
+    public static function mimeSniffing($disabled = true)
+    {
+        if (true === $disabled) {
+            self::send('X-Content-Type-Options: nosniff');
+        }
+    }
 }

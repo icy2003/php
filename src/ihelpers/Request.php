@@ -9,6 +9,8 @@
  */
 namespace icy2003\php\ihelpers;
 
+use Exception;
+use icy2003\php\C;
 use icy2003\php\I;
 
 /**
@@ -81,7 +83,7 @@ class Request
             } else {
                 foreach ($_SERVER as $name => $value) {
                     if (0 === strncmp($name, 'HTTP_', 5)) {
-                        $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                        $name = str_replace('_', '-', substr($name, 5));
                         $this->__headers[strtolower($name)][] = $value;
                     }
                 }
@@ -91,16 +93,29 @@ class Request
     }
 
     /**
+     * 获取某个头的第一个值
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    public function getHeader($name)
+    {
+        return (string) Arrays::first((array) I::get($this->getHeaders(), $name, []));
+    }
+
+    /**
      * 返回当前的请求方法，可以是：GET、POST、HEAD、PUT、PATCH、DELETE
      *
      * @return string
      */
     public function getMethod()
     {
+        // 出于安全原因，不允许写方法（POST、PATCH、DELETE等）降级为读方法（GET、HEAD、OPTIONS）
         if (isset($_POST[$this->__methodParam]) && !in_array($method = strtoupper($_POST[$this->__methodParam]), ['GET', 'HEAD', 'OPTIONS'])) {
             return $method;
         }
-        if ($method = I::get($this->getHeaders(), 'x-http-method-override')) {
+        if ($method = (string) I::get($this->getHeaders(), 'x-http-method-override')) {
             return strtoupper($method);
         }
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -186,7 +201,28 @@ class Request
      */
     public function isAjax()
     {
-        return 'XMLHttpRequest' === Arrays::first((array)I::get($this->getHeaders(), 'x-requested-with', []));
+        return 'XMLHttpRequest' === $this->getHeader('x-requested-with');
+    }
+
+    /**
+     * 是否是 pjax 请求
+     *
+     * @return boolean
+     */
+    public function isPjax()
+    {
+        return $this->isAjax() && '' !== $this->getHeader('x-pjax');
+    }
+
+    /**
+     * 是否是 flash 请求
+     *
+     * @return boolean
+     */
+    public function isFlash()
+    {
+        $userAgent = $this->getUserAgent();
+        return Strings::isContains($userAgent, 'Shockwave') || Strings::isContains($userAgent, 'Flash');
     }
 
     /**
@@ -381,9 +417,9 @@ class Request
             $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
             if (I::get($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim((string)Arrays::first(explode(',', (string)Arrays::first((array)I::get($this->getHeaders(), 'x-forward-host', [])))));
+                $this->__hostInfo = $http . '://' . trim((string) Arrays::first(explode(',', $this->getHeader('x-forwarded-host'))));
             } elseif (I::get($this->getHeaders(), 'host')) {
-                $this->__hostInfo = $http . '://' . Arrays::first((array)I::get($this->getHeaders(), 'host'));
+                $this->__hostInfo = $http . '://' . $this->getHeader('host');
             } elseif (isset($_SERVER['SERVER_NAME'])) {
                 $this->__hostInfo = $http . '://' . $_SERVER['SERVER_NAME'];
                 $port = $secure ? $this->getSecurePort() : $this->getPort();
@@ -393,6 +429,20 @@ class Request
             }
         }
         return $this->__hostInfo;
+    }
+
+    /**
+     * 设置主机
+     *
+     * @param string|null $value
+     *
+     * @return static
+     */
+    public function setHostInfo($value)
+    {
+        $this->__hostName = $value;
+        $this->__hostInfo = null === $value ? null : rtrim($value, '/');
+        return $this;
     }
 
     /**
@@ -413,6 +463,109 @@ class Request
             $this->__hostName = parse_url($this->getHostInfo(), PHP_URL_HOST);
         }
         return $this->__hostName;
+    }
+
+    /**
+     * base url
+     *
+     * @var string
+     */
+    private $__baseUrl;
+
+    /**
+     * 获取 base 地址
+     *
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        if (null === $this->__baseUrl) {
+            $this->__baseUrl = rtrim(dirname($this->getScriptUrl()), '/\\');
+        }
+        return $this->__baseUrl;
+    }
+
+    /**
+     * 脚本 url
+     *
+     * @var string
+     */
+    private $__scriptUrl;
+
+    /**
+     * 获取脚本地址
+     *
+     * @return string
+     */
+    public function getScriptUrl()
+    {
+        if (null === $this->__scriptUrl) {
+            $scriptFile = $this->getScriptFile();
+            $scriptName = basename($scriptFile);
+            if (isset($_SERVER['SCRIPT_NAME']) && basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
+                $this->__scriptUrl = $_SERVER['SCRIPT_NAME'];
+            } elseif (isset($_SERVER['PHP_SELF']) && basename($_SERVER['PHP_SELF']) === $scriptName) {
+                $this->__scriptUrl = $_SERVER['PHP_SELF'];
+            } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName) {
+                $this->__scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
+            } elseif (isset($_SERVER['PHP_SELF']) && ($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
+                $this->__scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
+            } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
+                $this->__scriptUrl = str_replace([$_SERVER['DOCUMENT_ROOT'], '\\'], ['', '/'], $scriptFile);
+            } else {
+                throw new Exception('无法检测出脚本地址');
+            }
+        }
+        return $this->__scriptUrl;
+    }
+
+    /**
+     * 设置脚本地址
+     *
+     * @param string|null $value
+     *
+     * @return static
+     */
+    public function setScriptUrl($value)
+    {
+        $this->__scriptUrl = null === $value ? null : '/' . trim($value, '/');
+        return $this;
+    }
+
+    /**
+     * 脚本文件
+     *
+     * @var string
+     */
+    private $__scriptFile;
+
+    /**
+     * 获取脚本文件路径
+     *
+     * @return string
+     */
+    public function getScriptFile()
+    {
+        if (null !== $this->__scriptFile) {
+            return $this->__scriptFile;
+        }
+        if (isset($_SERVER['SCRIPT_FILENAME'])) {
+            return $_SERVER['SCRIPT_FILENAME'];
+        }
+        throw new Exception('无法检测出脚本文件路径');
+    }
+
+    /**
+     * 设置脚本文件路径
+     *
+     * @param string $value
+     *
+     * @return static
+     */
+    public function setScriptFile($value)
+    {
+        $this->__scriptFile = $value;
+        return $this;
     }
 
     /**
@@ -478,7 +631,7 @@ class Request
             return true;
         }
         foreach ($this->__secureProtocolHeaders as $header => $values) {
-            if (($headerValue = (string) I::get($this->getHeaders(), $header)) !== null) {
+            if ($headerValue = $this->getHeader($header)) {
                 foreach ($values as $value) {
                     if (strcasecmp($headerValue, $value) === 0) {
                         return true;
@@ -517,7 +670,7 @@ class Request
      */
     public function getReferrer()
     {
-        return Arrays::first((array) I::get($this->getHeaders(), 'referer'));
+        return $this->getHeader('referer');
     }
 
     /**
@@ -527,7 +680,7 @@ class Request
      */
     public function getOrigin()
     {
-        return Arrays::first((array) I::get($this->getHeaders(), 'origin'));
+        return $this->getHeader('origin');
     }
 
     /**
@@ -537,7 +690,7 @@ class Request
      */
     public function getUserAgent()
     {
-        return Arrays::first((array) I::get($this->getHeaders(), 'user-agent'));
+        return $this->getHeader('user-agent');
     }
 
     /**
@@ -549,7 +702,7 @@ class Request
     {
         foreach ($this->__ipHeaders as $ipHeader) {
             if (I::get($this->getHeaders(), $ipHeader)) {
-                return trim(Arrays::first(explode(',', Arrays::first((array) I::get($this->getHeaders(), $ipHeader)))));
+                return trim(Arrays::first(explode(',', $this->getHeader($ipHeader))));
             }
         }
         return $this->getRemoteIP();
@@ -585,7 +738,7 @@ class Request
         if (isset($_SERVER['CONTENT_TYPE'])) {
             return $_SERVER['CONTENT_TYPE'];
         }
-        return Arrays::first((array) I::get($this->getHeaders(), 'content-type'));
+        return $this->getHeader('content-type');
     }
 
 }
