@@ -79,7 +79,7 @@ class Numbers
      */
     public static function toBytes($size)
     {
-        $callback = function($matches) {
+        $callback = function ($matches) {
             $sizeMap = [
                 '' => 0,
                 'b' => 0, // 为了简化正则
@@ -93,7 +93,7 @@ class Numbers
             return $matches[1] * pow(1024, $sizeMap[strtolower($matches[2])]);
         };
 
-        return (int)preg_replace_callback('/(\d*)\s*([a-z]?)b?/i', $callback, $size, 1);
+        return (int) preg_replace_callback('/(\d*)\s*([a-z]?)b?/i', $callback, $size, 1);
     }
 
     /**
@@ -126,7 +126,7 @@ class Numbers
     {
         $bytes1 = self::toBytes($size1);
         $bytes2 = self::toBytes($size2);
-        return ($v = $bytes1 - $bytes2) == 0 ? 0 : intval(($v) / abs($v));
+        return bccomp($bytes1, $bytes2, 0);
     }
 
     /**
@@ -156,7 +156,7 @@ class Numbers
         if ($toBaseInput == '0123456789') {
             $retval = 0;
             for ($i = 1; $i <= $numberLen; $i++) {
-                $retval = bcadd($retval, bcmul((string)array_search($number[$i - 1], $fromBase), bcpow($fromLen, $numberLen - $i)));
+                $retval = bcadd($retval, bcmul((string) array_search($number[$i - 1], $fromBase), bcpow($fromLen, $numberLen - $i)));
             }
 
             return $retval;
