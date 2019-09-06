@@ -32,7 +32,7 @@ class SensitiveWord
      */
     public function add($content)
     {
-        $words = Strings::split($content);
+        $words = is_string($content) ? Strings::split($content) : $content;
         $temp = &$this->_map;
         foreach ($words as $word) {
             if (false === isset($temp[$word])) {
