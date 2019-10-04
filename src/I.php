@@ -75,7 +75,13 @@ class I
                     } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
                         $mixed = $mixed->$key;
                     } else {
-                        return $defaultValue;
+                        try{
+                            $temp = $mixed->$key;
+                            return $temp;
+                        }catch(Exception $e){
+                            return $defaultValue;
+                        }
+
                     }
                 } else {
                     return self::get($mixed, $key, $defaultValue);
