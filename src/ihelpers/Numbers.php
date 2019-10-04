@@ -128,7 +128,7 @@ class Numbers
     {
         $bytes1 = self::toBytes($size1);
         $bytes2 = self::toBytes($size2);
-        return self::isEquals($bytes1, $bytes2, 0);
+        return bccomp($bytes1, $bytes2, 0);
     }
 
     /**
