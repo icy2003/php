@@ -7,8 +7,8 @@
  */
 namespace icy2003\php\ihelpers;
 
-use icy2003\php\icomponents\file\LocalFile;
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 敏感词过滤
@@ -32,7 +32,7 @@ class SensitiveWord
      */
     public function add($content)
     {
-        $words = Strings::split($content);
+        $words = is_string($content) ? Strings::split($content) : $content;
         $temp = &$this->_map;
         foreach ($words as $word) {
             if (false === isset($temp[$word])) {
@@ -71,7 +71,7 @@ class SensitiveWord
      * - 没有敏感词，则返回 false
      *
      * @param string|array $content
-     * @param boolean $findMore
+     * @param boolean $findMore 是否尝试继续监测，比如：AB 是敏感词，是否继续判断 ABC 也是敏感词
      *
      * @return string|boolean
      */
@@ -117,7 +117,7 @@ class SensitiveWord
             if (empty($words)) {
                 return $strings;
             }
-            $string = $this->_isStart($words);
+            $string = $this->_isStart($words, true);
             if (is_string($string)) {
                 $strings[] = $string;
             }
@@ -136,7 +136,7 @@ class SensitiveWord
     public function replace($content, $char = '*')
     {
         $words = $this->find($content);
-        $content = implode('', $words);
+        is_array($content) && $content = implode('', $content);
         $array = [];
         foreach ($words as $word) {
             $array[$word] = Strings::repeat($char, Strings::length($word));

@@ -25,8 +25,8 @@ class Arrays
     /**
      * 以各个元素的某字段值作为键重新指回该元素，此值对于该元素需唯一
      *
-     * @param array  $array
-     * @param string $index 用来作为键的某字段
+     * @param array  $array 元素可以为数组或者对象
+     * @param string $index 用来作为键的某字段，不能为 null
      * @param boolean $isMerge 是否合并相同键的项到数组，默认否（也就是后者覆盖前者）
      *
      * @return array
@@ -37,13 +37,14 @@ class Arrays
     {
         $result = [];
         foreach ($array as $row) {
-            if (!array_key_exists($index, $row)) {
+            $indexValue = I::get($row, $index);
+            if (null === $indexValue) {
                 return [];
             }
             if (false === $isMerge) {
-                $result[$row[$index]] = $row;
+                $result[$indexValue] = $row;
             } else {
-                $result[$row[$index]][] = $row;
+                $result[$indexValue][] = $row;
             }
         }
 
@@ -153,7 +154,7 @@ class Arrays
     public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
-            return (array)array_combine($keys, $values);
+            return (array) array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {
@@ -467,7 +468,7 @@ class Arrays
             } else {
                 $function = $callback;
                 if (false === is_callable($callback)) {
-                    $function = function($row) use ($callback, $isStrict) {
+                    $function = function ($row) use ($callback, $isStrict) {
                         return true === $isStrict ? $row === $callback : $row == $callback;
                     };
                 }
