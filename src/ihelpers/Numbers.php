@@ -19,6 +19,8 @@ class Numbers
     /**
      * 比较两个任意精度的数字
      *
+     * - 修复 bccomp 无法正确比较 0.999999 和 1 的值！！！！
+     *
      * @param string $number1 数字1
      * @param string $number2 数字2
      * @param integer $scale 精确度，默认精确到小数点后 2 位
@@ -27,7 +29,7 @@ class Numbers
      */
     public static function isEquals($number1, $number2, $scale = 2)
     {
-        return 0 === bccomp($number1, $number2, $scale);
+        return 0 === bccomp($number1 - $number2, 0, $scale);
     }
 
     /**
@@ -126,7 +128,7 @@ class Numbers
     {
         $bytes1 = self::toBytes($size1);
         $bytes2 = self::toBytes($size2);
-        return bccomp($bytes1, $bytes2, 0);
+        return self::isEquals($bytes1, $bytes2, 0);
     }
 
     /**
