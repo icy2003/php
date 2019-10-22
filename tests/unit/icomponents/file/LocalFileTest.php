@@ -291,23 +291,19 @@ class LocalFileTest extends \Codeception\Test\Unit
 
     public function testDownloadFile()
     {
-        $remoteFile = 'https://travis-ci.com/icy2003/php.svg';
-        $localFile = '@icy2003/php_runtime/php.svg';
+        $remoteFile = 'https://github.com/icy2003/php/blob/master/tests/_data/php.gif';
+        $localFile = '@icy2003/php_runtime/php.gif';
         $local = new LocalFile();
-        try{
-            $local->downloadFile([$remoteFile, $localFile], true, function ($size, $total) {
-                $this->tester->assertIsInt($size);
-                $this->tester->assertIsInt($total);
-            }, function ($spl) use ($local, $remoteFile, $localFile) {
+        $local->downloadFile([$remoteFile, $localFile], true, function ($size, $total) {
+            $this->tester->assertIsInt($size);
+            $this->tester->assertIsInt($total);
+        }, function ($spl) use ($local, $remoteFile, $localFile) {
+            $this->tester->assertFileExists(I::getAlias($localFile));
+            $local->downloadFile([$remoteFile, $localFile], false, null, function () use ($localFile) {
                 $this->tester->assertFileExists(I::getAlias($localFile));
-                $local->downloadFile([$remoteFile, $localFile], false, null, function () use ($localFile) {
-                    $this->tester->assertFileExists(I::getAlias($localFile));
-                });
-                $local->deleteFile($localFile);
             });
-        }catch(Exception $e){
-
-        }
+            $local->deleteFile($localFile);
+        });
     }
 
     public function testChmod()

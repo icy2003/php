@@ -22,10 +22,11 @@ trait OMAT
      */
     public static function odd($number)
     {
-        $number = ceil($number);
+        $sign = self::sign($number);
+        $number = ceil(self::abs($number));
         if ($number % 2 == 0) {
             $number += 1;
         }
-        return (int) $number;
+        return (int) ($sign * $number);
     }
 }

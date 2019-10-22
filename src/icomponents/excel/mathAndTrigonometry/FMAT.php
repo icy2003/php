@@ -20,13 +20,15 @@ trait FMAT
      *
      * @param integer|double $number 必需。 要计算其阶乘的非负数。 如果 number 不是整数，将被截尾取整
      *
-     * @return integer
+     * @return integer|false
      */
     public static function fact($number)
     {
         $number = (int) floor($number);
         if ($number == 0) {
             return 1;
+        } elseif ($number < 0) {
+            return false;
         }
         $result = 1;
         foreach (Arrays::rangeGenerator(1, $number) as $num) {
@@ -64,10 +66,10 @@ trait FMAT
      * @param double $number 必需。 要舍入的数值
      * @param double $significance 必需。 要舍入到的倍数
      *
-     * @return double
+     * @return double|false
      */
     public static function floor($number, $significance = 1)
     {
-        return (is_numeric($number) && is_numeric($significance)) ? (floor($number / $significance) * $significance) : false;
+        return (is_numeric($number) && is_numeric($significance)) && ($number * $significance > 0) ? (floor($number / $significance) * $significance) : false;
     }
 }

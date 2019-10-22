@@ -29,7 +29,7 @@ trait MMAT
         $n = count($array);
         $sum = 0;
         $prod = 1;
-        for ($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $n - 1; $i++) {
             for ($j = 0; $j < $n; $j++) {
                 $x = ($j + $i) % $n;
                 $y = $j % $n;
@@ -39,7 +39,7 @@ trait MMAT
             $prod = 1;
             for ($j = $n - 1; $j >= 0; $j--) {
                 $x = ($j + $i) % $n;
-                $y = ($n - $j) % $n;
+                $y = ($n - $j - 1) % $n;
                 $prod *= $array[$x][$y];
             }
             $sum -= $prod;
@@ -109,6 +109,8 @@ trait MMAT
     /**
      * 返回两数相除的余数
      *
+     * -  结果的符号与除数相同
+     *
      * @param integer $number 必需。 要计算余数的被除数
      * @param integer $divisor 必需。 除数
      *
@@ -116,21 +118,22 @@ trait MMAT
      */
     public static function mod($number, $divisor)
     {
-        return $number % $divisor;
+        return self::sign($divisor) * self::abs($number % $divisor);
     }
 
     /**
      * 返回舍入到所需倍数的数字
      *
-     * - 相比 Excel 的函数，此函数在符号不同时也能返回
-     *
      * @param double $number 必需。 要舍入的值
      * @param double $multiple 必需。 要舍入到的倍数
      *
-     * @return double
+     * @return double|false
      */
     public static function mround($number, $multiple)
     {
+        if ($number * $multiple < 0) {
+            return false;
+        }
         return round($number / $multiple) * $multiple;
     }
 

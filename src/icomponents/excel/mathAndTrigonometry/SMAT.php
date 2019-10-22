@@ -58,7 +58,7 @@ trait SMAT
         $c = count($coefficients);
         $sum = 0;
         for ($i = 0; $i < $c; $i++) {
-            $sum += $coefficients[$i] * pow($x, $n + ($i - 1) * $m);
+            $sum += $coefficients[$i] * pow($x, $n + $i * $m);
         }
         return $sum;
     }
@@ -142,7 +142,7 @@ trait SMAT
      *
      * @return double
      */
-    public static function sqrti($number)
+    public static function sqrtpi($number)
     {
         return sqrt($number * pi());
     }
@@ -162,7 +162,7 @@ trait SMAT
     /**
      * 可将值相加
      *
-     * @param double $number1 要相加的第一个数字
+     * @param double|array $number1 要相加的第一个数字
      *
      * @return double
      */
@@ -173,41 +173,16 @@ trait SMAT
     }
 
     /**
-     * 可以使用 SUMIF 函数对 范围 中符合指定条件的值求和
-     *
-     * - 注意：为保证安全性，不提供此函数
-     *
-     * @return false
-     */
-    public static function sumif()
-    {
-        return false;
-    }
-
-    /**
-     * 用于计算其满足多个条件的全部参数的总量
-     *
-     * - 注意：为保证安全性，不提供此函数
-     *
-     * @return false
-     */
-    public static function sumifs()
-    {
-        return false;
-    }
-
-    /**
      * 在给定的几组数组中，将数组间对应的元素相乘，并返回乘积之和
      *
      * - 注：office 页面的例子结果应该是 17.58 而不是 21.60
      *
-     * @param array $array1 必需。 其相应元素需要进行相乘并求和的第一个数组参数
+     * @param array $arrays 必需。 其相应元素需要进行相乘并求和的第一个数组参数
      *
      * @return double
      */
-    public static function sumproduct($array1)
+    public static function sumproduct($arrays)
     {
-        $arrays = is_array($array1) ? $array1 : func_get_args();
         $arr = [];
         foreach ($arrays as $array) {
             $count = count($array);
