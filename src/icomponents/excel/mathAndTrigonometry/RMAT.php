@@ -52,7 +52,7 @@ trait RMAT
         $array = [];
         for ($i = 0; $i < $row; $i++) {
             for ($j = 0; $j < $col; $j++) {
-                $array[$i][$j] = mt_rand($min, $max) + ($isInt ? 0 : mt_rand(0, (int) pow(10, 10)) / pow(10, 10));
+                $array[$i][$j] = mt_rand($min, $max - 1) + ($isInt ? 0 : mt_rand(0, (int) pow(10, 10)) / pow(10, 10));
             }
         }
         return $array;

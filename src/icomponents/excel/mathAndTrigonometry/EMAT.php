@@ -16,17 +16,20 @@ trait EMAT
     /**
      * 返回数字向上舍入到的最接近的偶数
      *
+     * - 数值总是向绝对值大的方向舍入
+     *
      * @param double $number 必需。 要舍入的值
      *
      * @return integer
      */
     public static function even($number)
     {
-        $number = ceil($number);
+        $sign = self::sign($number);
+        $number = ceil(self::abs($number));
         if ($number % 2 == 1) {
             $number += 1;
         }
-        return (int) $number;
+        return (int) ($sign * $number);
     }
 
     /**

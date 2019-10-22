@@ -7,10 +7,10 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\yii2\web;
+namespace icy2003\php\iextensions\yii2\web;
 
 use yii\web\UploadedFile as U;
-use icy2003\php\iexts\yii2\helpers\Html;
+use icy2003\php\iextensions\yii2\helpers\Html;
 
 /**
  * UploadedFile 扩展

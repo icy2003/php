@@ -291,8 +291,8 @@ class LocalFileTest extends \Codeception\Test\Unit
 
     public function testDownloadFile()
     {
-        $remoteFile = 'https://travis-ci.com/icy2003/php.svg';
-        $localFile = '@icy2003/php_runtime/php.svg';
+        $remoteFile = 'https://github.com/icy2003/php/blob/master/tests/_data/php.gif';
+        $localFile = '@icy2003/php_runtime/php.gif';
         $local = new LocalFile();
         try{
             $local->downloadFile([$remoteFile, $localFile], true, function ($size, $total) {
@@ -308,6 +308,7 @@ class LocalFileTest extends \Codeception\Test\Unit
         }catch(Exception $e){
 
         }
+
     }
 
     public function testChmod()

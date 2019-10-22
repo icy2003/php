@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\PhpOffice\PhpWord;
+namespace icy2003\php\iextensions\PhpOffice\PhpWord;
 
 use icy2003\php\I;
 use icy2003\php\ihelpers\Html;

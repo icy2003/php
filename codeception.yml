@@ -10,6 +10,6 @@ coverage:
     include:
         - src/*.php
     exclude:
-        - src/iexts/*
+        - src/iextensions/*
         - src/iapis/*
     show_uncovered: false

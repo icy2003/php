@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\yii2\db\mysql;
+namespace icy2003\php\iextensions\yii2\db\mysql;
 
 use yii\db\mysql\Schema as S;
 

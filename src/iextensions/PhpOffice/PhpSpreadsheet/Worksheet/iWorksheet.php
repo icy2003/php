@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\PhpOffice\PhpSpreadsheet\Worksheet;
+namespace icy2003\php\iextensions\PhpOffice\PhpSpreadsheet\Worksheet;
 
 use icy2003\php\I;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
