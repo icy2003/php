@@ -12,7 +12,7 @@ class ezcMailPartParser extends iEzcMailPartParser
         $matches = array();
         preg_match_all("/^([\w-_]*):\s?(.*)/", $line, $matches, PREG_SET_ORDER);
         if (count($matches) > 0) {
-            if (!in_array(strtolower($matches[0][1]), self::$uniqueHeaders)) {
+            if (!in_array(strtolower($matches[0][1]), (array)parent::$uniqueHeaders)) {
                 $arr = $headers[$matches[0][1]];
                 $arr[0][] = str_replace("\t", " ", trim($matches[0][2]));
                 $headers[$matches[0][1]] = $arr;
@@ -22,7 +22,7 @@ class ezcMailPartParser extends iEzcMailPartParser
             $this->lastParsedHeader = $matches[0][1];
         } else if ($this->lastParsedHeader !== null) // take care of folding
         {
-            if (!in_array(strtolower($this->lastParsedHeader), self::$uniqueHeaders)) {
+            if (!in_array(strtolower($this->lastParsedHeader), (array)parent::$uniqueHeaders)) {
                 $arr = $headers[$this->lastParsedHeader];
                 $arr[0][count($arr[0]) - 1] .= str_replace("\t", " ", $line);
                 $headers[$this->lastParsedHeader] = $arr;

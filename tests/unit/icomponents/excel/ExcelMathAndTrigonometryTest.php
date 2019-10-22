@@ -313,7 +313,7 @@ class MathAndTrigonometryTest extends \Codeception\Test\Unit
 
     public function testRandBetween()
     {
-        $this->tester->assertTrue(MathAndTrigonometry::randbetween(5, 19) < 19);
+        $this->tester->assertTrue(MathAndTrigonometry::randbetween(5, 19) <= 19);
         $this->tester->assertTrue(MathAndTrigonometry::randbetween(5, 19) >= 5);
     }
 
