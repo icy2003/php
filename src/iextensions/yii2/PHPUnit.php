@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\yii2;
+namespace icy2003\php\iextensions\yii2;
 
 /**
  * PHPUnit 扩展

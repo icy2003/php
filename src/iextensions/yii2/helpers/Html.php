@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\yii2\helpers;
+namespace icy2003\php\iextensions\yii2\helpers;
 
 use yii\base\InvalidArgumentException;
 use yii\helpers\Html as H;

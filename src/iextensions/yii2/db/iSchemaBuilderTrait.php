@@ -7,9 +7,9 @@
  * @copyright Copyright (c) 2017, icy2003
  */
 
-namespace icy2003\php\iexts\yii2\db;
+namespace icy2003\php\iextensions\yii2\db;
 
-use icy2003\php\iexts\yii2\db\mysql\Schema;
+use icy2003\php\iextensions\yii2\db\mysql\Schema;
 
 /**
  * iSchemaBuilderTrait 扩展

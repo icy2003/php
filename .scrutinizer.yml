@@ -12,7 +12,7 @@ build:
 filter:
     excluded_paths:
         - "tests/*"
-        - "src/iexts/*"
+        - "src/iextensions/*"
     dependency_paths:
         - "vendor/"
 tools:

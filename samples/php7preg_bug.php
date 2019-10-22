@@ -2,7 +2,7 @@
 /**
  * PHP7.0~7.2 正则 bug 示例
  *
- * @see \icy2003\php\iexts\PhpOffice\PhpWord\TemplateProcessor::replaceBlock
+ * @see \icy2003\php\iextensions\PhpOffice\PhpWord\TemplateProcessor::replaceBlock
  *
  * $string 是从某个 Word 里截取出来的，由于数据敏感，因此做了字符替换，但不影响效果
  * 在 PHP7.0~7.2 版本上结果是空，正确结果应该是能匹配到数据的
