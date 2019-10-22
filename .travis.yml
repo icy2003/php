@@ -9,9 +9,10 @@ matrix:
 install:
   - composer install --prefer-dist --optimize-autoloader --quiet
   - if [ $(phpenv version-name) == "7.3.9" ]; then composer require codeception/codeception 3.0.x-dev; fi
+before_script:
+  - if [ $(phpenv version-name) == "7.3.9" ]; then chmod -R 777 ./runtime; fi
 script:
   - if [ $(phpenv version-name) == "7.3.9" ]; then ./vendor/bin/codecept run --coverage-xml coverage.xml; fi
-  - if [ $(phpenv version-name) == "7.3.9" ]; then chmod -R 777 ./runtime; fi
 after_script:
   - if [ $(phpenv version-name) == "7.3.9" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi
   - if [ $(phpenv version-name) == "7.3.9" ]; then php ocular.phar code-coverage:upload --format=php-clover tests/_output/coverage.xml; fi
