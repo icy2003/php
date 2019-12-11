@@ -3,7 +3,6 @@
 namespace icy2003\php\iextensions\zetacomponents;
 
 use ezcMailHeadersHolder;
-use ezcMailPartParser;
 use ezcMailRfc822Parser as GlobalEzcMailRfc822Parser;
 
 class ezcMailRfc822Parser extends GlobalEzcMailRfc822Parser
@@ -43,7 +42,7 @@ class ezcMailRfc822Parser extends GlobalEzcMailRfc822Parser
             if (isset($this->headers['Content-Disposition'])) {
                 $headers['Content-Disposition'] = $this->headers['Content-Disposition'];
             }
-            $this->bodyParser = parent::createPartParserForHeaders($headers);
+            $this->bodyParser = ezcMailPartParser::createPartParserForHeaders($headers);
         } else if ($this->parserState == parent::PARSE_STATE_HEADERS) {
             $this->parseHeader($line, $this->headers);
         } else // we are parsing headers
