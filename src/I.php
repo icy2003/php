@@ -76,8 +76,7 @@ class I
                         $mixed = $mixed->$key;
                     } else {
                         try{
-                            $temp = $mixed->$key;
-                            return $temp;
+                            $mixed = $mixed->$key;
                         }catch(Exception $e){
                             return $defaultValue;
                         }
