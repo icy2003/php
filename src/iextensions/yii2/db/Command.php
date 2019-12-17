@@ -9,12 +9,12 @@
 
 namespace icy2003\php\iextensions\yii2\db;
 
-use yii\db\Command as C;
+use yii\db\Command as DbCommand;
 
 /**
  * Command 扩展
  */
-class Command extends C
+class Command extends DbCommand
 {
     /**
      * 判断表是否存在

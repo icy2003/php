@@ -10,8 +10,9 @@
 namespace icy2003\php\iextensions\yii2\db;
 
 use icy2003\php\iextensions\yii2\db\mysql\Schema;
+use icy2003\php\iextensions\yii2\db\mysql\workerman\Command as WorkermanCommand;
 use icy2003\php\iextensions\yii2\db\PDO;
-use yii\db\Connection as C;
+use yii\db\Connection as DbConnection;
 
 /**
  * Connection 扩展
@@ -22,7 +23,7 @@ use yii\db\Connection as C;
  *     'dsn' => 'imysql:host=127.0.0.1;dbname=test',
  * ]
  */
-class Connection extends C
+class Connection extends DbConnection
 {
 
     /**
@@ -34,6 +35,7 @@ class Connection extends C
     {
         $this->schemaMap['imysql'] = Schema::className();
         $this->commandMap['imysql'] = Command::className();
+        $this->commandMap['workermysql'] = WorkermanCommand::className();
     }
 
     /**
@@ -44,7 +46,7 @@ class Connection extends C
     public function createPdoInstance()
     {
         $driver = $this->getDriverName();
-        if (in_array($driver, ['imysql'])) {
+        if (in_array($driver, ['imysql', 'workermysql'])) {
             $pdoClass = PDO::className();
             return new $pdoClass($this->dsn, $this->username, $this->password, $this->attributes);
         } else {
@@ -65,7 +67,7 @@ class Connection extends C
                 $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->emulatePrepare);
             }
         }
-        if ($this->charset !== null && in_array($this->getDriverName(), ['pgsql', 'mysql', 'mysqli', 'cubrid', 'imysql'], true)) {
+        if ($this->charset !== null && in_array($this->getDriverName(), ['pgsql', 'mysql', 'mysqli', 'cubrid', 'imysql', 'workermysql'], true)) {
             $this->pdo->exec('SET NAMES ' . $this->pdo->quote($this->charset));
         }
         $this->trigger(self::EVENT_AFTER_OPEN);
