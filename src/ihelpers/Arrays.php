@@ -59,7 +59,10 @@ class Arrays
      * - 当 $dimension 为 1 时，理解为从一条数据里拿属性
      *
      * @param array $array
-     * @param array $keys 某几项字段，支持 I::get 的键格式，如果给 null，则返回原数组
+     * @param array $keys 某几项字段，支持 I::get 的键格式，如果是键值对，键会被设置为键
+     *      - [a, b]：查找 a 和 b
+     *      - [a.b, c]：查找 a.b 和 c
+     *      - [a => b]：查找 b 并且设置该项的键为 a
      * @param integer $dimension 维度，只能为 1 或 2，默认 2，表示处理二维数组
      *
      * @return array
@@ -74,21 +77,23 @@ class Arrays
         $result = [];
         if (2 === $dimension) {
             foreach ($array as $k => $row) {
-                foreach ($keys as $key) {
-                    if (array_key_exists($key, $row)) {
-                        $result[$k][$key] = I::get($row, $key);
-                    } else {
-                        $result[$k][$key] = null;
+                foreach ($keys as $k1 => $key) {
+                    $value = I::get($row, $key);
+                    if(is_numeric($k1)){
+                        $result[$k][$key] = $value;
+                    }else{
+                        $result[$k][$k1] = $value;
                     }
                 }
             }
         }
         if (1 === $dimension) {
-            foreach ($array as $k => $row) {
-                if (in_array($k, $keys, true)) {
-                    $result[$k] = $row;
-                } else {
-                    $result[$k] = null;
+            foreach ($keys as $k1 => $key) {
+                $value = I::get($array, $key);
+                if(is_numeric($k1)){
+                    $result[$key] = $value;
+                }else{
+                    $result[$k1] = $value;
                 }
             }
         }
