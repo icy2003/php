@@ -63,7 +63,7 @@ class C
     /**
      * 断言非真，为真则抛错
      *
-     * @param boolean $isTrue
+     * @param boolean $isNotTrue
      * @param string $message
      *
      * @return void
@@ -78,7 +78,7 @@ class C
     /**
      * 断言假，不为假则抛错
      *
-     * @param boolean $isTrue
+     * @param boolean $isFalse
      * @param string $message
      *
      * @return void
@@ -93,7 +93,7 @@ class C
     /**
      * 断言非假，为假则抛错
      *
-     * @param boolean $isTrue
+     * @param boolean $isNotFalse
      * @param string $message
      *
      * @return void

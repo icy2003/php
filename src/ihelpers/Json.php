@@ -48,7 +48,7 @@ class Json
      * @param string $json Json 字符串
      * @param boolean $assoc 是否返回对象，默认否（和原生函数相反）
      *
-     * @return array
+     * @return array|false|null
      */
     public static function decode($json, $assoc = true)
     {
@@ -67,7 +67,7 @@ class Json
         if (!is_string($json)) {
             return false;
         }
-        $array = self::decode($json);
+        $array = json_decode($json, true);
         if (is_array($array)) {
             return true;
         }
