@@ -20,12 +20,8 @@
     "require": {
         "php": ">=5.4",
         "guzzlehttp/guzzle": "^6.3",
-        "codeception/codeception": "3.0.3",
         "symfony/process": "^2.0",
         "zetacomponents/mail": "^1.8"
-    },
-    "require-dev": {
-        "phpdocumentor/phpdocumentor": "dev-master"
     },
     "autoload": {
         "psr-4": {
