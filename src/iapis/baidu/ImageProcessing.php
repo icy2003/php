@@ -50,7 +50,7 @@ class ImageProcessing extends Base
     public function qualityEnchance()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/image-process/v1/image_quality_enhance', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/image-process/v1/image_quality_enhance', Arrays::some($this->_options, [
             'image',
         ]), [
             'access_token' => $this->_token,

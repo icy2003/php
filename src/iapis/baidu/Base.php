@@ -142,7 +142,7 @@ class Base extends Api
     {
         if (null === $this->_token) {
             try {
-                $this->_result = Json::decode(Http::post('https://aip.baidubce.com/oauth/2.0/token', [], [
+                $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/oauth/2.0/token', [], [
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->_apiKey,
                     'client_secret' => $this->_secretKey,

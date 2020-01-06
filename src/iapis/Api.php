@@ -63,7 +63,11 @@ class Api
                 return I::get($this->_result, $key);
             }
         }
-        throw new Exception($this->getError());
+        $error = $this->getError();
+        if(is_array($error)){
+            return $error;
+        }
+        throw new Exception((string) $error);
     }
 
     /**

@@ -67,7 +67,7 @@ class OCR extends Base
     public function generalBasic()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic', Arrays::some($this->_options, [
             'image',
             'language_type',
             'detect_direction',
@@ -95,7 +95,7 @@ class OCR extends Base
     public function accurateBasic()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic', Arrays::some($this->_options, [
             'image',
             'detect_direction',
             'probability',
@@ -121,7 +121,7 @@ class OCR extends Base
     public function general()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/general', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/general', Arrays::some($this->_options, [
             'image',
             'recognize_granularity',
             'language_type',
@@ -151,7 +151,7 @@ class OCR extends Base
     public function accurate()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/accurate', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/accurate', Arrays::some($this->_options, [
             'image',
             'recognize_granularity',
             'detect_direction',
@@ -179,7 +179,7 @@ class OCR extends Base
     public function handwriting()
     {
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting', Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting', Arrays::some($this->_options, [
             'image',
             'recognize_granularity',
             'words_type',
@@ -211,7 +211,7 @@ class OCR extends Base
     ]) {
         $options = Arrays::merge($this->_options, $options);
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/idcard', $options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/idcard', $options, [
             'access_token' => $this->_token,
         ]));
         $this->_toArrayCall = function($result) {
@@ -237,7 +237,7 @@ class OCR extends Base
     {
         $options = $this->_options;
         $this->requestToken();
-        $this->_result = Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/bankcard', $options, [
+        $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/rest/2.0/ocr/v1/bankcard', $options, [
             'access_token' => $this->_token,
         ]));
         $this->_toArrayCall = function($result) {
