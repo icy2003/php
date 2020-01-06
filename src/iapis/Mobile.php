@@ -22,7 +22,7 @@ class Mobile extends Api
      *
      * @param string $number 手机号码
      *
-     * @return void
+     * @return static
      */
     public function fetchAttribution($number)
     {
@@ -39,5 +39,7 @@ class Mobile extends Api
                 'type' => I::get($data, 'type'),
             ];
         }
+
+        return $this;
     }
 }

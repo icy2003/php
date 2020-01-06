@@ -22,7 +22,7 @@ class Ip extends Api
      *
      * @param string $address IP 地址
      *
-     * @return void
+     * @return static
      */
     public function fetchAttribution($address)
     {
@@ -35,5 +35,7 @@ class Ip extends Api
         if (is_string($data)) {
             list($this->_result['city'], $this->_result['type']) = Arrays::lists(explode(' ', $data), 2);
         }
+
+        return $this;
     }
 }

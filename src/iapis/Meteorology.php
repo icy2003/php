@@ -9,14 +9,13 @@ use icy2003\php\ihelpers\Json;
 
 /**
  * 气象（meteorology）接口
- * @link https://blog.csdn.net/weixin_34410662/article/details/93535017
  */
 class Meteorology extends Api
 {
     /**
      * 获取省份代码
      *
-     * @return void
+     * @return static
      */
     public function fetchProvinces()
     {
@@ -24,6 +23,8 @@ class Meteorology extends Api
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, ['code', 'name']);
         };
+
+        return $this;
     }
 
     /**
@@ -31,7 +32,7 @@ class Meteorology extends Api
      *
      * @param string|null $provinceCode 省份代码
      *
-     * @return void
+     * @return static
      */
     public function fetchCitys($provinceCode = null)
     {
@@ -40,6 +41,8 @@ class Meteorology extends Api
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, ['code', 'city', 'province']);
         };
+
+        return $this;
     }
 
     /**
@@ -63,7 +66,7 @@ class Meteorology extends Api
      *
      * @param string $cityId 城市 ID
      *
-     * @return void
+     * @return static
      */
     public function fetchWeather($cityId)
     {
@@ -82,6 +85,8 @@ class Meteorology extends Api
                 'power' => 'wind.power',
             ], 1);
         };
+
+        return $this;
     }
 
     /**
@@ -96,7 +101,7 @@ class Meteorology extends Api
      *
      * @param string $cityId 城市 ID
      *
-     * @return void
+     * @return static
      */
     public function fetchAirQuality($cityId)
     {
@@ -109,6 +114,8 @@ class Meteorology extends Api
                 'text'
             ], 1);
         };
+
+        return $this;
     }
 
     /**
@@ -123,7 +130,7 @@ class Meteorology extends Api
      *
      * @param string $cityId 城市 ID
      *
-     * @return void
+     * @return static
      */
     public function fetchToday($cityId){
         $res = Http::get('http://www.nmc.cn/f/rest/passed/' . $cityId);
@@ -139,5 +146,7 @@ class Meteorology extends Api
                 'windSpeed'
             ], 2);
         };
+
+        return $this;
     }
 }
