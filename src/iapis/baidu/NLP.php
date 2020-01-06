@@ -126,11 +126,10 @@ class NLP extends Base
             throw new Exception('词 2 太长，不允许超过 64 字节');
         }
         $this->requestToken();
-        $res = Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v2/word_emb_sim', Json::encode(Arrays::some($this->_options, [
+        $this->_result = Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v2/word_emb_sim', Json::encode(Arrays::some($this->_options, [
             'word_1',
             'word_2',
-        ]);
-        $this->_result = (array)Json::decode($res), [
+        ])), [
             'access_token' => $this->_token,
             'charset' => 'UTF-8',
         ]));
