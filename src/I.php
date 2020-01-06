@@ -60,7 +60,7 @@ class I
             }
             return $result;
         } elseif (is_array($mixed) || is_object($mixed)) { // 数组和对象
-            if(is_callable($keyString)){
+            if(false === is_string($keyString) && is_callable($keyString)){
                 $mixed = self::call($keyString, [$mixed]);
             }else{
                 $keyArray = explode('.', $keyString);
