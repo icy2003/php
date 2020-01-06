@@ -60,36 +60,40 @@ class I
             }
             return $result;
         } elseif (is_array($mixed) || is_object($mixed)) { // 数组和对象
-            $keyArray = explode('.', $keyString);
-            foreach ($keyArray as $key) {
-                if (is_array($mixed)) {
-                    if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
-                        $mixed = $mixed[$key];
-                    } else {
-                        return $defaultValue;
-                    }
-                } elseif (is_object($mixed)) {
-                    $method = 'get' . ucfirst(Strings::toCamel($key));
-                    if (method_exists($mixed, $method)) {
-                        $mixed = $mixed->$method();
-                    } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
-                        $mixed = $mixed->$key;
-                    } else {
-                        try{
-                            $mixed = $mixed->$key;
-                        }catch(Exception $e){
+            if(is_callable($keyString)){
+                $mixed = self::call($keyString, [$mixed]);
+            }else{
+                $keyArray = explode('.', $keyString);
+                foreach ($keyArray as $key) {
+                    if (is_array($mixed)) {
+                        if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
+                            $mixed = $mixed[$key];
+                        }else {
                             return $defaultValue;
                         }
+                    } elseif (is_object($mixed)) {
+                        $method = 'get' . ucfirst(Strings::toCamel($key));
+                        if (method_exists($mixed, $method)) {
+                            $mixed = $mixed->$method();
+                        } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
+                            $mixed = $mixed->$key;
+                        } else {
+                            try {
+                                $mixed = $mixed->$key;
+                            } catch (Exception $e) {
+                                return $defaultValue;
+                            }
 
+                        }
+                    } else {
+                        return self::get($mixed, $key, $defaultValue);
                     }
-                } else {
-                    return self::get($mixed, $key, $defaultValue);
                 }
             }
             return $mixed;
         } elseif (is_string($mixed) || is_numeric($mixed)) { // 字符串或数字
-            $pos = (int)$keyString;
-            $length = null === $defaultValue ? 1 : (int)$defaultValue;
+            $pos = (int) $keyString;
+            $length = null === $defaultValue ? 1 : (int) $defaultValue;
             return Strings::sub($mixed, $pos, $length);
         } elseif (null === $mixed) { // null
             return $defaultValue;
