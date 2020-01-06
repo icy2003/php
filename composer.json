@@ -14,9 +14,6 @@
             "email": "2317216477@qq.com"
         }
     ],
-    "scripts":{
-        "sysinfo" : "icy2003\\php\\Y::sysinfo"
-    },
     "require": {
         "php": ">=5.4",
         "guzzlehttp/guzzle": "^6.3",
