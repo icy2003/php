@@ -514,13 +514,13 @@ class Console
     /**
      * 执行一个命令并输出结果
      *
-     * @param string $command
+     * @param string|array $command
      *
      * @return string|false
      */
     public static function exec($command)
     {
-        $process = new Process($command);
+        $process = new Process(Strings::toArray($command, ' '));
         $process->run();
         if (false === $process->isSuccessful()) {
             return false;
