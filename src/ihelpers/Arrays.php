@@ -79,9 +79,9 @@ class Arrays
             foreach ($array as $k => $row) {
                 foreach ($keys as $k1 => $key) {
                     $value = I::get($row, $key);
-                    if(is_numeric($k1)){
+                    if (is_numeric($k1)) {
                         $result[$k][$key] = $value;
-                    }else{
+                    } else {
                         $result[$k][$k1] = $value;
                     }
                 }
@@ -90,9 +90,9 @@ class Arrays
         if (1 === $dimension) {
             foreach ($keys as $k1 => $key) {
                 $value = I::get($array, $key);
-                if(is_numeric($k1)){
+                if (is_numeric($k1)) {
                     $result[$key] = $value;
-                }else{
+                } else {
                     $result[$k1] = $value;
                 }
             }
@@ -948,6 +948,24 @@ class Arrays
         }
         array_push($array, $next);
         return $next;
+    }
+
+    /**
+     * 将一维数组的每项用分隔符拆分，得到两部分分别设置为新数组的键和值
+     *
+     * @param string $delimiter 分隔符
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function explode($delimiter, $array)
+    {
+        $return = [];
+        foreach ($array as $row) {
+            list($k, $v) = Arrays::lists(explode($delimiter, $row), 2);
+            $return[$k] = $v;
+        }
+        return $return;
     }
 
 }
