@@ -25,12 +25,11 @@ class VideoResource extends Api
      */
     public function fetchSearchFirst($firsts, $page = 0, $pageSize = 20)
     {
-        $res = Http::get('http://api.jinsapi.com/yingshi/search', [
+        $this->_result = (array)Json::get(Http::get('http://api.jinsapi.com/yingshi/search', [
             'keys' => Strings::toPinyinFirst($firsts),
             'page' => $page,
             'pageSize' => $pageSize,
-        ]);
-        $this->_result = Json::get($res, 'data', []);
+        ]), 'data', []);
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'id' => 'd_id',
@@ -54,12 +53,11 @@ class VideoResource extends Api
      */
     public function fetchSearch($keywords, $page = 0, $pageSize = 20)
     {
-        $res = Http::post('http://api.jinsapi.com/yingshi/searchForHanZi', [
+        $this->_result = (array)Json::get(Http::post('http://api.jinsapi.com/yingshi/searchForHanZi', [
             'keys' => $keywords,
             'page' => $page,
             'pageSize' => $pageSize,
-        ]);
-        $this->_result = Json::get($res, 'data', []);
+        ]), 'data', []);
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'id' => 'd_id',
@@ -81,10 +79,9 @@ class VideoResource extends Api
      */
     public function fetchById($id)
     {
-        $res = Http::get('http://api.jinsapi.com/yingshi/getVodById', [
+        $this->_result = (array)Json::get(Http::get('http://api.jinsapi.com/yingshi/getVodById', [
             'd_id' => $id,
-        ]);
-        $this->_result = Json::get($res, 'data', []);
+        ]), 'data', []);
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'id' => 'd_id',

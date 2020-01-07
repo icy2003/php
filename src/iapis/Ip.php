@@ -26,12 +26,11 @@ class Ip extends Api
      */
     public function fetchAttribution($address)
     {
-        $res = Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
+        $data = Json::get(Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
             'query' => $address,
             'resource_id' => '6006',
             'oe' => 'utf8',
-        ]);
-        $data = Json::get($res, 'data.0.location', false);
+        ]), 'data.0.location', false);
         if (is_string($data)) {
             list($this->_result['city'], $this->_result['type']) = Arrays::lists(explode(' ', $data), 2);
         }

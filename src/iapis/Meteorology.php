@@ -36,8 +36,7 @@ class Meteorology extends Api
      */
     public function fetchCitys($provinceCode = null)
     {
-        $res = Http::get('http://www.nmc.cn/f/rest/province/' . $provinceCode);
-        $this->_result = Json::decode($res);
+        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/province/' . $provinceCode));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, ['code', 'city', 'province']);
         };
@@ -70,8 +69,7 @@ class Meteorology extends Api
      */
     public function fetchWeather($cityId)
     {
-        $res = Http::get('http://www.nmc.cn/f/rest/real/' . $cityId);
-        $this->_result = Json::decode($res);
+        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/real/' . $cityId));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'publish_time',
@@ -105,8 +103,7 @@ class Meteorology extends Api
      */
     public function fetchAirQuality($cityId)
     {
-        $res = Http::get('http://www.nmc.cn/f/rest/aqi/' . $cityId);
-        $this->_result = Json::decode($res);
+        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/aqi/' . $cityId));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'forecasttime',
@@ -133,8 +130,7 @@ class Meteorology extends Api
      * @return static
      */
     public function fetchToday($cityId){
-        $res = Http::get('http://www.nmc.cn/f/rest/passed/' . $cityId);
-        $this->_result = Json::decode($res);
+        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/passed/' . $cityId));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns($array, [
                 'time',
