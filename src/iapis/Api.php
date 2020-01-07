@@ -8,6 +8,7 @@
  */
 namespace icy2003\php\iapis;
 
+use Exception;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
@@ -18,51 +19,103 @@ use icy2003\php\ihelpers\Json;
  */
 class Api
 {
+
     /**
-     * 查询 ip 归属地
+     * API 返回原始数组
      *
-     * @param string $ip IP 地址
-     *
-     * @return array|false
+     * @var array
      */
-    public static function ip($ip)
+    protected $_result = [];
+
+    /**
+     * 成功判断
+     *
+     * @return boolean
+     */
+    public function isSuccess()
     {
-        $res = Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
-            'query' => $ip,
-            'resource_id' => '6006',
-            'oe' => 'utf8',
-        ]);
-        $data = Json::get($res, 'data.0.location', false);
-        if (is_string($data)) {
-            $array = [];
-            list($array['city'], $array['type']) = Arrays::lists(explode(' ', $data), 2);
-            return $array;
-        }
-        return false;
+        return true;
     }
 
     /**
-     * 查询手机归属地
+     * 返回错误信息
      *
-     * @param string $mobile
-     *
-     * @return array|false
+     * @return array|string
      */
-    public static function mobile($mobile)
+    public function getError()
     {
-        $res = Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
-            'resource_name' => 'guishudi',
-            'query' => $mobile,
-            'oe' => 'utf8',
-        ]);
-        $data = Json::get($res, 'data.0', false);
-        if (is_array($data)) {
-            return [
-                'city' => I::get($data, 'city'),
-                'province' => I::get($data, 'prov'),
-                'type' => I::get($data, 'type'),
-            ];
+        return [];
+    }
+
+    /**
+     * 获取结果
+     *
+     * @param string $key 如果有此参数，表示取某个属性
+     *
+     * @return mixed
+     */
+    public function getResult($key = null)
+    {
+        if ($this->isSuccess()) {
+            if (null === $key) {
+                return $this->_result;
+            } else {
+                return I::get($this->_result, $key);
+            }
         }
-        return false;
+        $error = $this->getError();
+        if (is_array($error)) {
+            return $error;
+        }
+        throw new Exception((string)$error);
+    }
+
+    /**
+     * toArray 时调用的函数
+     *
+     * @var callback
+     */
+    protected $_toArrayCall;
+
+    /**
+     * 智能返回有效数据
+     *
+     * - 如果数据缺失，请使用 getResult() 获取原始数据
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return (array)I::call($this->_toArrayCall, [$this->getResult()]);
+    }
+
+    /**
+     * 选项列表
+     *
+     * @var array
+     */
+    protected $_options = [];
+
+    /**
+     * 设置选项
+     *
+     * @param array $options
+     *
+     * @return static
+     */
+    public function setOptions($options)
+    {
+        $this->_options = Arrays::merge($this->_options, $options);
+        return $this;
+    }
+
+    /**
+     * toString 魔术方法
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return Json::encode($this->_result);
     }
 }

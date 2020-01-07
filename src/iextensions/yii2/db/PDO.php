@@ -9,6 +9,8 @@
 
 namespace icy2003\php\iextensions\yii2\db;
 
+use icy2003\php\ihelpers\Strings;
+
 /**
  * POD 扩展
  *
@@ -37,6 +39,6 @@ class PDO extends \PDO
      */
     public function __construct($dsn, $username, $password, $attributes)
     {
-        return parent::__construct(substr($dsn, 1), $username, $password, $attributes);
+        return parent::__construct('mysql' . Strings::partAfter($dsn, 'mysql'), $username, $password, $attributes);
     }
 }

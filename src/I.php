@@ -60,31 +60,34 @@ class I
             }
             return $result;
         } elseif (is_array($mixed) || is_object($mixed)) { // 数组和对象
-            $keyArray = explode('.', $keyString);
-            foreach ($keyArray as $key) {
-                if (is_array($mixed)) {
-                    if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
-                        $mixed = $mixed[$key];
-                    } else {
-                        return $defaultValue;
-                    }
-                } elseif (is_object($mixed)) {
-                    $method = 'get' . ucfirst(Strings::toCamel($key));
-                    if (method_exists($mixed, $method)) {
-                        $mixed = $mixed->$method();
-                    } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
-                        $mixed = $mixed->$key;
-                    } else {
-                        try{
-                            $temp = $mixed->$key;
-                            return $temp;
-                        }catch(Exception $e){
+            if (false === is_string($keyString) && is_callable($keyString)) {
+                $mixed = self::call($keyString, [$mixed]);
+            } else {
+                $keyArray = explode('.', $keyString);
+                foreach ($keyArray as $key) {
+                    if (is_array($mixed)) {
+                        if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
+                            $mixed = $mixed[$key];
+                        } else {
                             return $defaultValue;
                         }
+                    } elseif (is_object($mixed)) {
+                        $method = 'get' . ucfirst(Strings::toCamel($key));
+                        if (method_exists($mixed, $method)) {
+                            $mixed = $mixed->$method();
+                        } elseif (property_exists($mixed, $key) && null !== $mixed->$key) {
+                            $mixed = $mixed->$key;
+                        } else {
+                            try {
+                                $mixed = $mixed->$key;
+                            } catch (Exception $e) {
+                                return $defaultValue;
+                            }
 
+                        }
+                    } else {
+                        return self::get($mixed, $key, $defaultValue);
                     }
-                } else {
-                    return self::get($mixed, $key, $defaultValue);
                 }
             }
             return $mixed;

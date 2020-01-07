@@ -79,7 +79,7 @@ trait SMAT
         $k = 1;
         for ($i = 0; $i < $row; $i++) {
             for ($j = 0; $j < $col; $j++) {
-                $array[$i][$j] = $start + ($k++ - 1) * $step;
+                $array[$i][$j] = $start + ($k++ -1) * $step;
             }
         }
         return $array;
@@ -191,7 +191,7 @@ trait SMAT
                 array_push($arr[$i], $array[$i]);
             }
         }
-        return array_sum(array_map(function ($rows) {
+        return array_sum(array_map(function($rows) {
             return array_product($rows);
         }, $arr));
     }
@@ -206,7 +206,7 @@ trait SMAT
     public static function sumsq($number1)
     {
         $numbers = is_array($number1) ? $number1 : func_get_args();
-        return array_sum(array_map(function ($num) {
+        return array_sum(array_map(function($num) {
             return $num * $num;
         }, $numbers));
     }

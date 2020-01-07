@@ -47,7 +47,7 @@ class Url
     /**
      * 创建 URL 的 query 字符串
      *
-     * @param string $queryArray
+     * @param array $queryArray
      *
      * @return string
      */
@@ -70,12 +70,12 @@ class Url
     public static function to($url, $scheme = false)
     {
         if (I::isYii2()) {
-            return I::call(['\yii\helpers\Url', 'to'], [$url, $scheme]);
+            return (string)I::call(['\yii\helpers\Url', 'to'], [$url, $scheme]);
         }
         $request = new Request();
         if (is_array($url)) {
             $params = $url;
-            $anchor = (string) I::get($url, '#', '');
+            $anchor = (string)I::get($url, '#', '');
             unset($params['#']);
             $route = trim($params[0], '/');
             unset($params[0]);
@@ -94,7 +94,7 @@ class Url
             }
             return $url;
         } else {
-            $url = I::getAlias($url);
+            $url = (string)I::getAlias($url);
             if (false === $scheme) {
                 return $url;
             }

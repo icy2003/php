@@ -33,6 +33,6 @@ class Unicode
      */
     public static function decode($string)
     {
-        return implode('', Json::decode('["' . $string . '"]'));
+        return implode('', (array)Json::decode('["' . $string . '"]'));
     }
 }

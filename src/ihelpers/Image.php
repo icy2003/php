@@ -152,7 +152,7 @@ class Image
             $zoomWidth *= $this->_attributes['width'];
             $zoomHeight *= $this->_attributes['height'];
         } else {
-            $zoom = (int) $zoom;
+            $zoom = (int)$zoom;
             $zoomWidth = $zoom * $this->_attributes['width'];
             $zoomHeight = $zoom * $this->_attributes['height'];
         }
@@ -240,8 +240,8 @@ class Image
             imagecopy($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $this->_attributes['width'], $this->_attributes['height']);
             $posX = min($pos[0], $this->_attributes['width'] - $size[0]);
             $posY = min($pos[1], $this->_attributes['height'] - $size[1]);
-            imagecopyresized($this->_imageOut, $markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
-            imagedestroy($markAttrs['object']);
+            imagecopyresized($this->_imageOut, /** @scrutinizer ignore-type */ $markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
+            imagedestroy(/** @scrutinizer ignore-type */ $markAttrs['object']);
         }
 
         return $this;

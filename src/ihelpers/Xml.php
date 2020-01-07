@@ -45,7 +45,7 @@ class Xml
         }
         $isDisabled = libxml_disable_entity_loader(true);
         $xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $array = Json::decode(Json::encode($xml), true);
+        $array = (array)Json::decode(Json::encode($xml), true);
         libxml_disable_entity_loader($isDisabled);
         return $array;
     }

@@ -51,7 +51,7 @@ class Upload
      */
     public static function create($config = [])
     {
-        if (!static::$_instance instanceof static ) {
+        if (!static::$_instance instanceof static) {
             static::$_instance = new static();
             static::$_instance->__formName = I::get($config, 'formName', 'file');
             static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::get($config, 'sizeLimit', 0));

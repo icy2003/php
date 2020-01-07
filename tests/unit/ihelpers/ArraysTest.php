@@ -69,7 +69,7 @@ class ArraysTest extends \Codeception\Test\Unit
             ['id' => 1, 'name' => 'tom', 'type' => 'cat'],
             ['id', 'name'],
             1
-        ), ['id' => 1, 'name' => 'tom', 'type' => null]);
+        ), ['id' => 1, 'name' => 'tom']);
         $this->tester->assertEquals(Arrays::columns(['a', 'b']), ['a', 'b']);
         $this->tester->assertEquals(Arrays::columns(
             [

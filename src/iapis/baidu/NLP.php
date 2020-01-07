@@ -67,7 +67,7 @@ class NLP extends Base
     {
         C::assertTrue(Strings::byteLength($this->_options['text']) <= 20000, '文字太长，不允许超过 20000 字节');
         $this->requestToken();
-        $this->_result = Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v1/lexer', Json::encode(Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v1/lexer', Json::encode(Arrays::some($this->_options, [
             'text',
         ])), [
             'access_token' => $this->_token,
@@ -95,7 +95,7 @@ class NLP extends Base
             throw new Exception('文字太长，不允许超过 256 字节');
         }
         $this->requestToken();
-        $this->_result = Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v1/depparser', Json::encode(Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v1/depparser', Json::encode(Arrays::some($this->_options, [
             'text',
             'mode',
         ])), [
@@ -126,7 +126,7 @@ class NLP extends Base
             throw new Exception('词 2 太长，不允许超过 64 字节');
         }
         $this->requestToken();
-        $this->_result = Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v2/word_emb_sim', Json::encode(Arrays::some($this->_options, [
+        $this->_result = (array)Json::decode(Http::body('https://aip.baidubce.com/rpc/2.0/nlp/v2/word_emb_sim', Json::encode(Arrays::some($this->_options, [
             'word_1',
             'word_2',
         ])), [

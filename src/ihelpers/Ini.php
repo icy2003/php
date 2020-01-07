@@ -109,7 +109,7 @@ class Ini
                     $group = null;
                     continue;
                 }
-                list($name, $value) = Arrays::lists(explode('=', $line), 2, function ($row) {
+                list($name, $value) = Arrays::lists(explode('=', $line), 2, function($row) {
                     return trim($row);
                 });
                 $array[$name] = $value;
@@ -120,15 +120,15 @@ class Ini
                 if (null === $group) {
                     $return = Arrays::merge($return, $array);
                 } else {
-                    $return[$group] = Arrays::merge((array) I::get($return, $group, []), $array);
+                    $return[$group] = Arrays::merge((array)I::get($return, $group, []), $array);
                 }
             }
         } elseif (self::TYPE_JSON === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $return = Json::decode((string) $content);
+            $return = (array)Json::decode((string)$content);
         } elseif (self::TYPE_XML === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $return = Xml::toArray((string) $content);
+            $return = Xml::toArray((string)$content);
         }
         return $return;
     }

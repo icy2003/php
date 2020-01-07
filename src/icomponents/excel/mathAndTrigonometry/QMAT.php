@@ -23,6 +23,6 @@ trait QMAT
      */
     public static function quotient($numberator, $denominator)
     {
-        return (int) ($numberator / $denominator);
+        return (int)($numberator / $denominator);
     }
 }

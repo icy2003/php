@@ -36,7 +36,7 @@ class Tree
         while (true) {
             $temp = [];
             foreach ($pidArray as $pid) {
-                $rows = I::get($array2, $pid, []);
+                $rows = (array)I::get($array2, $pid, []);
                 if (empty($rows)) {
                     continue;
                 }

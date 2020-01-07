@@ -11,16 +11,16 @@ namespace icy2003\php\iapis\baidu;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use icy2003\php\I;
+use icy2003\php\iapis\Api;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
 use icy2003\php\ihelpers\Base64;
 use icy2003\php\icomponents\file\LocalFile;
-use icy2003\php\ihelpers\Arrays;
 
 /**
  * 百度 API 基类
  */
-class Base
+class Base extends Api
 {
     /**
      * API KEY
@@ -113,13 +113,6 @@ class Base
     }
 
     /**
-     * API 返回原始数组
-     *
-     * @var array
-     */
-    protected $_result;
-
-    /**
      * access_token
      *
      * @var string
@@ -149,7 +142,7 @@ class Base
     {
         if (null === $this->_token) {
             try {
-                $this->_result = Json::decode(Http::post('https://aip.baidubce.com/oauth/2.0/token', [], [
+                $this->_result = (array)Json::decode(Http::post('https://aip.baidubce.com/oauth/2.0/token', [], [
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->_apiKey,
                     'client_secret' => $this->_secretKey,
@@ -189,74 +182,6 @@ class Base
      * access_token 键
      */
     const RESULT_TOKEN = 'access_token';
-
-    /**
-     * 获取结果
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function getResult($key = null)
-    {
-        if ($this->isSuccess()) {
-            if (null === $key) {
-                return $this->_result;
-            } else {
-                return I::get($this->_result, $key);
-            }
-        }
-        throw new Exception($this->getError());
-    }
-
-    /**
-     * toArray 时调用的函数
-     *
-     * @var callback
-     */
-    protected $_toArrayCall;
-
-    /**
-     * 智能返回有效数据
-     *
-     * - 如果数据缺失，请使用 getResult() 获取原始数据
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return (array)I::call($this->_toArrayCall, [$this->getResult()]);
-    }
-
-    /**
-     * 选项列表
-     *
-     * @var array
-     */
-    protected $_options = [];
-
-    /**
-     * 设置选项
-     *
-     * @param array $options
-     *
-     * @return static
-     */
-    public function setOptions($options)
-    {
-        $this->_options = Arrays::merge($this->_options, $options);
-        return $this;
-    }
-
-    /**
-     * toString 魔术方法
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return Json::encode($this->_result);
-    }
 
     /**
      * 加载一个图片

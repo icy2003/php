@@ -95,7 +95,7 @@ trait MMAT
             $arr = [];
             for ($r = 0; $r < $row1; $r++) {
                 for ($c = 0; $c < $col2; $c++) {
-                    $arr[$r][$c] = array_sum(array_map(function ($a1, $a2) {
+                    $arr[$r][$c] = array_sum(array_map(function($a1, $a2) {
                         return $a1 * $a2;
                     }, $array1[$r], Arrays::column($array2, $c)));
                 }
@@ -147,7 +147,7 @@ trait MMAT
     public static function multinomial($number1)
     {
         $numbers = is_array($number1) ? $number1 : func_get_args();
-        return self::fact(array_sum($numbers)) / array_product(array_map(function ($num) {
+        return self::fact(array_sum($numbers)) / array_product(array_map(function($num) {
             return self::fact($num);
         }, $numbers));
     }

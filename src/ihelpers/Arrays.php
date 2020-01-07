@@ -59,7 +59,10 @@ class Arrays
      * - 当 $dimension 为 1 时，理解为从一条数据里拿属性
      *
      * @param array $array
-     * @param array $keys 某几项字段，支持 I::get 的键格式，如果给 null，则返回原数组
+     * @param array $keys 某几项字段，支持 I::get 的键格式，如果是键值对，键会被设置为键
+     *      - [a, b]：查找 a 和 b
+     *      - [a.b, c]：查找 a.b 和 c
+     *      - [a => b]：查找 b 并且设置该项的键为 a
      * @param integer $dimension 维度，只能为 1 或 2，默认 2，表示处理二维数组
      *
      * @return array
@@ -74,21 +77,23 @@ class Arrays
         $result = [];
         if (2 === $dimension) {
             foreach ($array as $k => $row) {
-                foreach ($keys as $key) {
-                    if (array_key_exists($key, $row)) {
-                        $result[$k][$key] = I::get($row, $key);
+                foreach ($keys as $k1 => $key) {
+                    $value = I::get($row, $key);
+                    if (is_numeric($k1)) {
+                        $result[$k][$key] = $value;
                     } else {
-                        $result[$k][$key] = null;
+                        $result[$k][$k1] = $value;
                     }
                 }
             }
         }
         if (1 === $dimension) {
-            foreach ($array as $k => $row) {
-                if (in_array($k, $keys, true)) {
-                    $result[$k] = $row;
+            foreach ($keys as $k1 => $key) {
+                $value = I::get($array, $key);
+                if (is_numeric($k1)) {
+                    $result[$key] = $value;
                 } else {
-                    $result[$k] = null;
+                    $result[$k1] = $value;
                 }
             }
         }
@@ -154,7 +159,7 @@ class Arrays
     public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
-            return (array) array_combine($keys, $values);
+            return (array)array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {
@@ -468,7 +473,7 @@ class Arrays
             } else {
                 $function = $callback;
                 if (false === is_callable($callback)) {
-                    $function = function ($row) use ($callback, $isStrict) {
+                    $function = function($row) use ($callback, $isStrict) {
                         return true === $isStrict ? $row === $callback : $row == $callback;
                     };
                 }
@@ -886,7 +891,7 @@ class Arrays
             return in_array($value, $array, $isStrict);
         } else {
             $value = Json::decode(strtolower(Json::encode($value)));
-            $array = Json::decode(strtolower(Json::encode($array)));
+            $array = (array)Json::decode(strtolower(Json::encode($array)));
             return in_array($value, $array, $isStrict);
         }
     }
@@ -943,6 +948,24 @@ class Arrays
         }
         array_push($array, $next);
         return $next;
+    }
+
+    /**
+     * 将一维数组的每项用分隔符拆分，得到两部分分别设置为新数组的键和值
+     *
+     * @param string $delimiter 分隔符
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function explode($delimiter, $array)
+    {
+        $return = [];
+        foreach ($array as $row) {
+            list($k, $v) = Arrays::lists(explode($delimiter, $row), 2);
+            $return[$k] = $v;
+        }
+        return $return;
     }
 
 }

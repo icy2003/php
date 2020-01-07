@@ -101,7 +101,7 @@ class Request
      */
     public function getHeader($name)
     {
-        return (string) Arrays::first((array) I::get($this->getHeaders(), $name, []));
+        return (string)Arrays::first((array)I::get($this->getHeaders(), $name, []));
     }
 
     /**
@@ -115,7 +115,7 @@ class Request
         if (isset($_POST[$this->__methodParam]) && !in_array($method = strtoupper($_POST[$this->__methodParam]), ['GET', 'HEAD', 'OPTIONS'])) {
             return $method;
         }
-        if ($method = (string) I::get($this->getHeaders(), 'x-http-method-override')) {
+        if ($method = (string)I::get($this->getHeaders(), 'x-http-method-override')) {
             return strtoupper($method);
         }
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -283,7 +283,7 @@ class Request
                     $contentType = substr($contentType, 0, $pos);
                 }
                 if ('application/json' == $contentType) {
-                    $this->__bodyParams = Json::decode($this->getRawBody());
+                    $this->__bodyParams = (array)Json::decode($this->getRawBody());
                 } elseif ('POST' === $this->getMethod()) {
                     $this->__bodyParams = $_POST;
                 } else {
@@ -417,7 +417,7 @@ class Request
             $secure = $this->isSecureConnection();
             $http = $secure ? 'https' : 'http';
             if (I::get($this->getHeaders(), 'x-forwarded-host')) {
-                $this->__hostInfo = $http . '://' . trim((string) Arrays::first(explode(',', $this->getHeader('x-forwarded-host'))));
+                $this->__hostInfo = $http . '://' . trim((string)Arrays::first(explode(',', $this->getHeader('x-forwarded-host'))));
             } elseif (I::get($this->getHeaders(), 'host')) {
                 $this->__hostInfo = $http . '://' . $this->getHeader('host');
             } elseif (isset($_SERVER['SERVER_NAME'])) {
@@ -617,7 +617,7 @@ class Request
      */
     public function getQueryString()
     {
-        return (string) I::get($_SERVER, 'QUERY_STRING', '');
+        return (string)I::get($_SERVER, 'QUERY_STRING', '');
     }
 
     /**
@@ -650,7 +650,7 @@ class Request
      */
     public function getServerName()
     {
-        return (string) I::get($_SERVER, 'SERVER_NAME');
+        return (string)I::get($_SERVER, 'SERVER_NAME');
     }
 
     /**
@@ -660,7 +660,7 @@ class Request
      */
     public function getServerPort()
     {
-        return (int) I::get($_SERVER, 'SERVER_PORT');
+        return (int)I::get($_SERVER, 'SERVER_PORT');
     }
 
     /**
@@ -715,7 +715,7 @@ class Request
      */
     public function getRemoteIP()
     {
-        return (string) I::get($_SERVER, 'REMOTE_ADDR');
+        return (string)I::get($_SERVER, 'REMOTE_ADDR');
     }
 
     /**
@@ -725,7 +725,7 @@ class Request
      */
     public function getRemoteHost()
     {
-        return (string) I::get($_SERVER, 'REMOTE_HOST');
+        return (string)I::get($_SERVER, 'REMOTE_HOST');
     }
 
     /**
