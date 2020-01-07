@@ -152,7 +152,7 @@ class Image
             $zoomWidth *= $this->_attributes['width'];
             $zoomHeight *= $this->_attributes['height'];
         } else {
-            $zoom = (int) $zoom;
+            $zoom = (int)$zoom;
             $zoomWidth = $zoom * $this->_attributes['width'];
             $zoomHeight = $zoom * $this->_attributes['height'];
         }

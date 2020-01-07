@@ -24,7 +24,7 @@ trait FMAT
      */
     public static function fact($number)
     {
-        $number = (int) floor($number);
+        $number = (int)floor($number);
         if ($number == 0) {
             return 1;
         } elseif ($number < 0) {
@@ -54,7 +54,7 @@ trait FMAT
         }
         $result = 1;
         $isEven = $number % 2 == 0;
-        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, (int) $number, 2) as $num) {
+        foreach (Arrays::rangeGenerator($isEven ? 2 : 1, (int)$number, 2) as $num) {
             $result *= $num;
         }
         return $result;

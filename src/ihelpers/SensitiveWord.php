@@ -169,8 +169,4 @@ class SensitiveWord
         $local->putFileContent($file, <<<EOT
 <?php
 
-return {$array};
-
-EOT);
-    }
-}
+return {$array}

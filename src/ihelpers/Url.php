@@ -75,7 +75,7 @@ class Url
         $request = new Request();
         if (is_array($url)) {
             $params = $url;
-            $anchor = (string) I::get($url, '#', '');
+            $anchor = (string)I::get($url, '#', '');
             unset($params['#']);
             $route = trim($params[0], '/');
             unset($params[0]);

@@ -60,15 +60,15 @@ class I
             }
             return $result;
         } elseif (is_array($mixed) || is_object($mixed)) { // 数组和对象
-            if(false === is_string($keyString) && is_callable($keyString)){
+            if (false === is_string($keyString) && is_callable($keyString)) {
                 $mixed = self::call($keyString, [$mixed]);
-            }else{
+            } else {
                 $keyArray = explode('.', $keyString);
                 foreach ($keyArray as $key) {
                     if (is_array($mixed)) {
                         if (array_key_exists($key, $mixed) && null !== $mixed[$key]) {
                             $mixed = $mixed[$key];
-                        }else {
+                        } else {
                             return $defaultValue;
                         }
                     } elseif (is_object($mixed)) {
@@ -92,8 +92,8 @@ class I
             }
             return $mixed;
         } elseif (is_string($mixed) || is_numeric($mixed)) { // 字符串或数字
-            $pos = (int) $keyString;
-            $length = null === $defaultValue ? 1 : (int) $defaultValue;
+            $pos = (int)$keyString;
+            $length = null === $defaultValue ? 1 : (int)$defaultValue;
             return Strings::sub($mixed, $pos, $length);
         } elseif (null === $mixed) { // null
             return $defaultValue;

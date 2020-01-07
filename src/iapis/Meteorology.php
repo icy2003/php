@@ -20,7 +20,7 @@ class Meteorology extends Api
     public function fetchProvinces()
     {
         $this->fetchCitys();
-        $this->_toArrayCall = function ($array) {
+        $this->_toArrayCall = function($array) {
             return Arrays::columns($array, ['code', 'name']);
         };
 
