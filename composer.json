@@ -4,6 +4,7 @@
     "type": "library",
     "keywords": [
         "php",
+        "api",
         "tool"
     ],
     "minimum-stability": "dev",
@@ -11,16 +12,23 @@
     "authors": [
         {
             "name": "icy2003",
-            "email": "2317216477@qq.com"
+            "email": "2317216477@qq.com",
+            "homepage": "https://www.icy2003.com"
         }
     ],
     "require": {
         "php": ">=5.4",
         "guzzlehttp/guzzle": "^6.3",
-        "symfony/process": "v5.0.2"
+        "symfony/process": "~5.0"
+    },
+    "support":{
+        "email":"2317216477@qq.com",
+        "issues":"https://github.com/icy2003/php/issues",
+        "wiki":"https://github.com/icy2003/php/wiki"
     },
     "suggest": {
-        "zetacomponents/mail": "该库可以解析邮件协议。icy2003/php 针对其 1.8.4 进行了部分问题的修复。"
+        "codeception/codeception": "安装 ~3.0 以测试",
+        "zetacomponents/mail": "该库可以解析邮件协议。icy2003/php 针对其 ~1.8 进行了部分问题的修复。"
     },
     "autoload": {
         "psr-4": {

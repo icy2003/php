@@ -26,19 +26,12 @@
 
 ## 地址
 
--  [github](https://github.com/icy2003/php)
--  [packagist](https://packagist.org/packages/icy2003/php)
+- [github](https://github.com/icy2003/php)
+- [packagist](https://packagist.org/packages/icy2003/php)
+- [wiki](https://github.com/icy2003/php/wiki)
 
 ## 安装
 
-composer 安装，目前为开发版
-
 ```cmd
-composer require icy2003/php dev-master
+composer require icy2003/php ~1.0
 ```
-
-## 补充说明和未来计划
-
-1. 目前不打算实现 db，推荐使用 yii2
-2. 目前不打算实现二维码，请自行找库或者调用别家 API
-3. 计划编写完整的测试用例
