@@ -891,7 +891,7 @@ class Arrays
             return in_array($value, $array, $isStrict);
         } else {
             $value = Json::decode(strtolower(Json::encode($value)));
-            $array = Json::decode(strtolower(Json::encode($array)));
+            $array = (array)Json::decode(strtolower(Json::encode($array)));
             return in_array($value, $array, $isStrict);
         }
     }
