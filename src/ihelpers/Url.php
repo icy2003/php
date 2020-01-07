@@ -70,7 +70,7 @@ class Url
     public static function to($url, $scheme = false)
     {
         if (I::isYii2()) {
-            return I::call(['\yii\helpers\Url', 'to'], [$url, $scheme]);
+            return (string)I::call(['\yii\helpers\Url', 'to'], [$url, $scheme]);
         }
         $request = new Request();
         if (is_array($url)) {
@@ -94,7 +94,7 @@ class Url
             }
             return $url;
         } else {
-            $url = I::getAlias($url);
+            $url = (string)I::getAlias($url);
             if (false === $scheme) {
                 return $url;
             }

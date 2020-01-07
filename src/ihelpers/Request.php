@@ -283,7 +283,7 @@ class Request
                     $contentType = substr($contentType, 0, $pos);
                 }
                 if ('application/json' == $contentType) {
-                    $this->__bodyParams = Json::decode($this->getRawBody());
+                    $this->__bodyParams = (array)Json::decode($this->getRawBody());
                 } elseif ('POST' === $this->getMethod()) {
                     $this->__bodyParams = $_POST;
                 } else {
