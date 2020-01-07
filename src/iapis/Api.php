@@ -64,10 +64,10 @@ class Api
             }
         }
         $error = $this->getError();
-        if(is_array($error)){
+        if (is_array($error)) {
             return $error;
         }
-        throw new Exception((string) $error);
+        throw new Exception((string)$error);
     }
 
     /**

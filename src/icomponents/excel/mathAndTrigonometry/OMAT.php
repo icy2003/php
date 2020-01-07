@@ -27,6 +27,6 @@ trait OMAT
         if ($number % 2 == 0) {
             $number += 1;
         }
-        return (int) ($sign * $number);
+        return (int)($sign * $number);
     }
 }

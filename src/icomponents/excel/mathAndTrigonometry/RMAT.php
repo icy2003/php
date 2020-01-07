@@ -32,7 +32,7 @@ trait RMAT
      */
     public static function rand()
     {
-        return mt_rand(0, (int) self::power(10, 10)) / self::power(10, 10);
+        return mt_rand(0, (int)self::power(10, 10)) / self::power(10, 10);
     }
 
     /**
@@ -48,11 +48,11 @@ trait RMAT
      */
     public static function randarray($row = 1, $col = 1, $min = 0, $max = null, $isInt = false)
     {
-        null === $max && $max = (int) pow(10, 10);
+        null === $max && $max = (int)pow(10, 10);
         $array = [];
         for ($i = 0; $i < $row; $i++) {
             for ($j = 0; $j < $col; $j++) {
-                $array[$i][$j] = mt_rand($min, $max - 1) + ($isInt ? 0 : mt_rand(0, (int) pow(10, 10)) / pow(10, 10));
+                $array[$i][$j] = mt_rand($min, $max - 1) + ($isInt ? 0 : mt_rand(0, (int)pow(10, 10)) / pow(10, 10));
             }
         }
         return $array;

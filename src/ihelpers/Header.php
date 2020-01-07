@@ -203,7 +203,7 @@ class Header
         } elseif (false === $asFrame) {
             self::send('X-Frame-Options: deny');
         } else {
-            $asFrame = (string) $asFrame;
+            $asFrame = (string)$asFrame;
             self::send('X-Frame-Options: allow-from ' . $asFrame);
         }
     }

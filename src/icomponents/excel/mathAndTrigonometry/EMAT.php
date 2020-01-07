@@ -29,7 +29,7 @@ trait EMAT
         if ($number % 2 == 1) {
             $number += 1;
         }
-        return (int) ($sign * $number);
+        return (int)($sign * $number);
     }
 
     /**
