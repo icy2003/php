@@ -125,7 +125,7 @@ class Ini
             }
         } elseif (self::TYPE_JSON === $this->_type) {
             $content = $local->getFileContent($this->_file);
-            $return = Json::decode((string) $content);
+            $return = (array)Json::decode((string) $content);
         } elseif (self::TYPE_XML === $this->_type) {
             $content = $local->getFileContent($this->_file);
             $return = Xml::toArray((string) $content);

@@ -94,7 +94,7 @@ class VideoResource extends Api
                 'year' => 'd_year',
                 'description' => 'd_content',
                 'episodes' => function ($array) {
-                    $episodes = explode('#', I::get($array, 'd_playurl'));
+                    $episodes = explode('#', (string)I::get($array, 'd_playurl'));
                     return Arrays::explode('$', $episodes);
                 },
             ], 1);

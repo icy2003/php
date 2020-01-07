@@ -47,7 +47,7 @@ class Url
     /**
      * 创建 URL 的 query 字符串
      *
-     * @param string $queryArray
+     * @param array $queryArray
      *
      * @return string
      */
