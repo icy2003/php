@@ -155,7 +155,7 @@ class Markdown
      */
     public static function ol($array)
     {
-        return implode(PHP_EOL, array_map(function ($row) {
+        return implode(PHP_EOL, array_map(function($row) {
             static $i = 1;
             return ($i++) . '. ' . self::__text($row);
         }, $array));
@@ -210,8 +210,8 @@ class Markdown
             $title = array_shift($array);
             $rows = $array;
         }
-        $lineFunc = function ($arr) {
-            return '|' . implode('|', array_map(function ($line) {
+        $lineFunc = function($arr) {
+            return '|' . implode('|', array_map(function($line) {
                 return ' ' . self::__text($line) . ' ';
             }, $arr)) . '|';
         };

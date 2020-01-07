@@ -159,7 +159,7 @@ class Arrays
     public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
-            return (array) array_combine($keys, $values);
+            return (array)array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {
@@ -473,7 +473,7 @@ class Arrays
             } else {
                 $function = $callback;
                 if (false === is_callable($callback)) {
-                    $function = function ($row) use ($callback, $isStrict) {
+                    $function = function($row) use ($callback, $isStrict) {
                         return true === $isStrict ? $row === $callback : $row == $callback;
                     };
                 }
