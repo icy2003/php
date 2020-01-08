@@ -104,7 +104,7 @@ class Arrays
     /**
      * 返回二维（或者更高）数组中指定键的一列的所有值
      *
-     * - array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的
+     * - array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的，并且在不传入 $index 时，键将原样保持
      * - 如果需要取某几项，使用 Arrays::columns
      * - 简单理解就是：从数据库里查出来几条数据，只要其中某个属性的所有值
      * - USE_CUSTOM
@@ -122,13 +122,17 @@ class Arrays
     public static function column($array, $column, $index = null)
     {
         if (function_exists('array_column') && false === I::ini('USE_CUSTOM')) {
-            return array_column($array, $column, $index);
+            $result = array_column($array, $column, $index);
+            if(null === $index){
+                $result = self::combine(array_keys($array), $result);
+            }
+            return $result;
         } else {
             $result = [];
-            foreach ($array as $row) {
+            foreach ($array as $key => $row) {
                 $data = I::get($row, $column);
                 if (null === $index) {
-                    $result[] = $data;
+                    $result[$key] = $data;
                 } else {
                     $result[$row[$index]] = $data;
                 }
