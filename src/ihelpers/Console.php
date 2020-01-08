@@ -8,6 +8,8 @@
  */
 namespace icy2003\php\ihelpers;
 
+use Exception;
+
 /**
  * 控制台类
  *
@@ -519,7 +521,12 @@ class Console
     public static function exec($command)
     {
         if (class_exists('\Symfony\Component\Process\Process')) {
-            $process = new \Symfony\Component\Process\Process($command);
+            try{
+                $process = new \Symfony\Component\Process\Process($command);
+            }catch(Exception $e){
+                $process = new \Symfony\Component\Process\Process(Strings::toArray($command, ' '));
+            }
+
             $process->run();
             if (false === $process->isSuccessful()) {
                 return false;
