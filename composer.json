@@ -18,8 +18,7 @@
     ],
     "require": {
         "php": ">=5.4",
-        "guzzlehttp/guzzle": "^6.3",
-        "symfony/process": "~2.0"
+        "guzzlehttp/guzzle": "^6.3"
     },
     "support":{
         "email":"2317216477@qq.com",
@@ -28,6 +27,8 @@
     },
     "suggest": {
         "codeception/codeception": "安装 ~3.0 以测试",
+        "phpdocumentor/phpdocumentor": "安装 2.9.x-dev 以生成文档",
+        "symfony/process":"如果安装了 `codeception/codeception ~3.0`，可以不用这个，否则建议安装 2.8.x-dev",
         "zetacomponents/mail": "该库可以解析邮件协议。icy2003/php 针对其 ~1.8 进行了部分问题的修复。"
     },
     "autoload": {
