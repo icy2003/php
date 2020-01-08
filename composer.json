@@ -19,7 +19,7 @@
     "require": {
         "php": ">=5.4",
         "guzzlehttp/guzzle": "^6.3",
-        "symfony/process": "~5.0"
+        "symfony/process": "~2.0"
     },
     "support":{
         "email":"2317216477@qq.com",
@@ -33,6 +33,12 @@
     "autoload": {
         "psr-4": {
             "icy2003\\php\\": "src/"
+        }
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
         }
     }
 }
