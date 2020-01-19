@@ -67,7 +67,7 @@ class Api
         if (is_array($error)) {
             return $error;
         }
-        throw new Exception((string)$error);
+        throw new Exception((string) $error);
     }
 
     /**
@@ -86,7 +86,7 @@ class Api
      */
     public function toArray()
     {
-        return (array)I::call($this->_toArrayCall, [$this->getResult()]);
+        return (array) I::call($this->_toArrayCall, [$this->getResult()]);
     }
 
     /**
@@ -97,7 +97,7 @@ class Api
     protected $_options = [];
 
     /**
-     * 设置选项
+     * 设置多个选项
      *
      * @param array $options
      *
@@ -107,6 +107,32 @@ class Api
     {
         $this->_options = Arrays::merge($this->_options, $options);
         return $this;
+    }
+
+    /**
+     * 设置单个选项
+     *
+     * @param string $option
+     * @param mixed $value
+     *
+     * @return static
+     */
+    public function setOption($option, $value)
+    {
+        $this->_options[$option] = $value;
+        return $this;
+    }
+
+    /**
+     * 从 $_options 筛选某些字段
+     *
+     * @param array $keys
+     *
+     * @return array
+     */
+    public function filterOptions($keys)
+    {
+        return Arrays::some($this->_options, $keys);
     }
 
     /**

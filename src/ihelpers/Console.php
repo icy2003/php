@@ -8,7 +8,7 @@
  */
 namespace icy2003\php\ihelpers;
 
-use Symfony\Component\Process\Process;
+use Exception;
 
 /**
  * 控制台类
@@ -150,7 +150,7 @@ class Console
      */
     public static function stdin()
     {
-        return rtrim((string)fgets(\STDIN), PHP_EOL);
+        return rtrim((string) fgets(\STDIN), PHP_EOL);
     }
 
     /**
@@ -181,7 +181,7 @@ class Console
 
         $input = self::stdin();
         if ('' === $input) {
-            return (string)$defaultValue;
+            return (string) $defaultValue;
         }
         return $input;
     }
@@ -242,7 +242,7 @@ class Console
      */
     public static function moveCursorUp($rows = 1)
     {
-        echo '\033[' . (int)$rows . 'A';
+        echo '\033[' . (int) $rows . 'A';
     }
 
     /**
@@ -256,7 +256,7 @@ class Console
      */
     public static function moveCursorDown($rows = 1)
     {
-        echo '\033[' . (int)$rows . 'B';
+        echo '\033[' . (int) $rows . 'B';
     }
 
     /**
@@ -270,7 +270,7 @@ class Console
      */
     public static function moveCursorForward($steps = 1)
     {
-        echo '\033[' . (int)$steps . 'C';
+        echo '\033[' . (int) $steps . 'C';
     }
 
     /**
@@ -284,7 +284,7 @@ class Console
      */
     public static function moveCursorBackward($steps = 1)
     {
-        echo '\033[' . (int)$steps . 'D';
+        echo '\033[' . (int) $steps . 'D';
     }
 
     /**
@@ -296,7 +296,7 @@ class Console
      */
     public static function moveCursorNextLine($lines = 1)
     {
-        echo '\033[' . (int)$lines . 'E';
+        echo '\033[' . (int) $lines . 'E';
     }
 
     /**
@@ -308,7 +308,7 @@ class Console
      */
     public static function moveCursorPrevLine($lines = 1)
     {
-        echo '\033[' . (int)$lines . 'F';
+        echo '\033[' . (int) $lines . 'F';
     }
 
     /**
@@ -322,9 +322,9 @@ class Console
     public static function moveCursorTo($column, $row = null)
     {
         if ($row === null) {
-            echo '\033[' . (int)$column . 'G';
+            echo '\033[' . (int) $column . 'G';
         } else {
-            echo '\033[' . (int)$row . ';' . (int)$column . 'H';
+            echo '\033[' . (int) $row . ';' . (int) $column . 'H';
         }
     }
 
@@ -339,7 +339,7 @@ class Console
      */
     public static function scrollUp($lines = 1)
     {
-        echo '\033[' . (int)$lines . 'S';
+        echo '\033[' . (int) $lines . 'S';
     }
 
     /**
@@ -353,7 +353,7 @@ class Console
      */
     public static function scrollDown($lines = 1)
     {
-        echo '\033[' . (int)$lines . 'T';
+        echo '\033[' . (int) $lines . 'T';
     }
 
     /**
@@ -520,11 +520,20 @@ class Console
      */
     public static function exec($command)
     {
-        $process = new Process(Strings::toArray($command, ' '));
-        $process->run();
-        if (false === $process->isSuccessful()) {
-            return false;
+        if (class_exists('\Symfony\Component\Process\Process')) {
+            try{
+                $process = new \Symfony\Component\Process\Process($command);
+            }catch(Exception $e){
+                $process = new \Symfony\Component\Process\Process(Strings::toArray($command, ' '));
+            }
+
+            $process->run();
+            if (false === $process->isSuccessful()) {
+                return false;
+            }
+            return $process->getOutput();
+        }else{
+            return exec($command);
         }
-        return $process->getOutput();
     }
 }
