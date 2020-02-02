@@ -136,7 +136,7 @@ class I
     /**
      * 触发回调
      *
-     * @param callback $callback 回调函数
+     * @param callback|true $callback 回调函数，true 是为了简化某些表达式
      * @param array $params 回调参数
      * @return mixed
      */
@@ -144,6 +144,7 @@ class I
     {
         $result = false;
         is_callable($callback) && $result = call_user_func_array($callback, $params);
+        true === $callback && $result = true;
         return $result;
     }
 
