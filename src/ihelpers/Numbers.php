@@ -18,8 +18,6 @@ use icy2003\php\icomponents\excel\Excel;
 class Numbers
 {
 
-    use Excel;
-
     /**
      * 比较两个任意精度的数字
      *
