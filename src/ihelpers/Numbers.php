@@ -10,12 +10,16 @@ namespace icy2003\php\ihelpers;
 
 use icy2003\php\C;
 use icy2003\php\I;
+use icy2003\php\icomponents\excel\Excel;
 
 /**
  * 数字处理
  */
 class Numbers
 {
+
+    use Excel;
+
     /**
      * 比较两个任意精度的数字
      *
@@ -81,7 +85,7 @@ class Numbers
      */
     public static function toBytes($size)
     {
-        $callback = function($matches) {
+        $callback = function ($matches) {
             $sizeMap = [
                 '' => 0,
                 'b' => 0, // 为了简化正则
@@ -95,7 +99,7 @@ class Numbers
             return $matches[1] * pow(1024, $sizeMap[strtolower($matches[2])]);
         };
 
-        return (int)preg_replace_callback('/(\d*)\s*([a-z]?)b?/i', $callback, $size, 1);
+        return (int) preg_replace_callback('/(\d*)\s*([a-z]?)b?/i', $callback, $size, 1);
     }
 
     /**
@@ -158,7 +162,7 @@ class Numbers
         if ($toBaseInput == '0123456789') {
             $retval = 0;
             for ($i = 1; $i <= $numberLen; $i++) {
-                $retval = bcadd($retval, bcmul((string)array_search($number[$i - 1], $fromBase), bcpow($fromLen, $numberLen - $i)));
+                $retval = bcadd($retval, bcmul((string) array_search($number[$i - 1], $fromBase), bcpow($fromLen, $numberLen - $i)));
             }
 
             return $retval;
@@ -251,5 +255,49 @@ class Numbers
             '千' => '仟',
             '元' => '圆',
         ]);
+    }
+
+    /**
+     * 判断是否为奇数
+     *
+     * @param double $number
+     *
+     * @return boolean
+     */
+    public static function isOdd($number)
+    {
+        return $number % 2 === 1;
+    }
+
+    /**
+     * 判断是否为偶数
+     *
+     * @param double $number
+     *
+     * @return boolean
+     */
+    public static function isEven($number)
+    {
+        return $number % 2 === 0;
+    }
+
+    /**
+     * 判断是否为质数
+     *
+     * @param double $number
+     *
+     * @return boolean
+     */
+    public static function isPrime($number)
+    {
+        if ($number <= 1) {
+            return false;
+        }
+        for ($i = 2; $i <= Excel::sqrt($number); $i++) {
+            if ($number % $i === 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
