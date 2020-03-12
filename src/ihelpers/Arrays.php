@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class Arrays
  *
@@ -102,14 +103,32 @@ class Arrays
     }
 
     /**
+     * Arrays::columns 第三参数取值 1
+     * @ignore 
+     */
+    public static function columns1($array, $keys = null)
+    {
+        return self::columns($array, $keys, 1);
+    }
+
+    /**
+     * Arrays::columns 第三参数取值 2
+     * @ignore 
+     */
+    public static function columns2($array, $keys = null)
+    {
+        return self::columns($array, $keys, 2);
+    }
+
+    /**
      * 返回二维（或者更高）数组中指定键的一列的所有值
+     * 
+     * @see http://php.net/array_column
      *
-     * - array_column 要求 PHP >= 5.5，这个是兼容 5.5 以下的，并且在不传入 $index 时，键将原样保持
+     * - 在不传入 $index 时，键将原样保持，这里已经和 array_column 功能不一致了
      * - 如果需要取某几项，使用 Arrays::columns
      * - 简单理解就是：从数据库里查出来几条数据，只要其中某个属性的所有值
-     * - USE_CUSTOM
      *
-     * @see http://php.net/array_column
      *
      * @param array $array
      * @param string $column 需要被取出来的字段
@@ -121,25 +140,17 @@ class Arrays
      */
     public static function column($array, $column, $index = null)
     {
-        if (function_exists('array_column') && false === I::ini('USE_CUSTOM')) {
-            $result = array_column($array, $column, $index);
-            if(null === $index){
-                $result = self::combine(array_keys($array), $result);
+        $result = [];
+        foreach ($array as $key => $row) {
+            $data = I::get($row, $column);
+            if (null === $index) {
+                $result[$key] = $data;
+            } else {
+                $result[$row[$index]] = $data;
             }
-            return $result;
-        } else {
-            $result = [];
-            foreach ($array as $key => $row) {
-                $data = I::get($row, $column);
-                if (null === $index) {
-                    $result[$key] = $data;
-                } else {
-                    $result[$row[$index]] = $data;
-                }
-            }
-
-            return $result;
         }
+
+        return $result;
     }
 
     /**
@@ -163,7 +174,7 @@ class Arrays
     public static function combine($keys, $values)
     {
         if (count($keys) == count($values)) {
-            return (array)array_combine($keys, $values);
+            return (array) array_combine($keys, $values);
         }
         $array = [];
         foreach ($keys as $index => $key) {
@@ -477,7 +488,7 @@ class Arrays
             } else {
                 $function = $callback;
                 if (false === is_callable($callback)) {
-                    $function = function($row) use ($callback, $isStrict) {
+                    $function = function ($row) use ($callback, $isStrict) {
                         return true === $isStrict ? $row === $callback : $row == $callback;
                     };
                 }
@@ -486,7 +497,6 @@ class Arrays
                         $count++;
                     }
                 }
-
             }
         }
         return $count;
@@ -895,7 +905,7 @@ class Arrays
             return in_array($value, $array, $isStrict);
         } else {
             $value = Json::decode(strtolower(Json::encode($value)));
-            $array = (array)Json::decode(strtolower(Json::encode($array)));
+            $array = (array) Json::decode(strtolower(Json::encode($array)));
             return in_array($value, $array, $isStrict);
         }
     }
@@ -971,5 +981,4 @@ class Arrays
         }
         return $return;
     }
-
 }
