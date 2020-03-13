@@ -54,11 +54,13 @@ class Arrays
 
     /**
      * 选取数组中指定键的某几列
-     *
+     * 
+     * ```
      * - 简单理解就是：从数据库里查出来几条数据，只拿其中的几个属性
      * - 当 $dimension 为 2 时，理解为从几条数据里拿属性
      * - 当 $dimension 为 1 时，理解为从一条数据里拿属性
-     *
+     * ```
+     * 
      * @param array $array
      * @param array $keys 某几项字段，支持 I::get 的键格式，如果是键值对，键会被设置为键
      *      - [a, b]：查找 a 和 b
@@ -124,11 +126,12 @@ class Arrays
      * 返回二维（或者更高）数组中指定键的一列的所有值
      * 
      * @see http://php.net/array_column
-     *
+     * 
+     * ```
      * - 在不传入 $index 时，键将原样保持，这里已经和 array_column 功能不一致了
      * - 如果需要取某几项，使用 Arrays::columns
      * - 简单理解就是：从数据库里查出来几条数据，只要其中某个属性的所有值
-     *
+     * ```
      *
      * @param array $array
      * @param string $column 需要被取出来的字段
@@ -155,7 +158,8 @@ class Arrays
 
     /**
      * 创建一个数组，用一个数组的值作为其键名，另一个数组的值作为其值
-     *
+     * 
+     * ```
      * - array_combine：两个数组元素个数不一致将报错
      * - 在两个数组元素个数不一致时，以键为准:
      *      1.键比值多，值都被填充为 null
@@ -186,9 +190,11 @@ class Arrays
     /**
      * 递归地合并多个数组
      *
+     * ```
      * - array_merge_recursive：如果有相同的键，后者会覆盖前者
      * - 此函数会合并两个相同键的值到一个数组里
-     *
+     * ```
+     * 
      * @see http://php.net/array_merge_recursive
      *
      * @param array $a 数组1

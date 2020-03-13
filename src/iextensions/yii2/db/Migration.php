@@ -51,7 +51,7 @@ class Migration extends DbMigration
     public function createTable($table, $columns, $options = [])
     {
         if (false === $this->tableExists($table)) {
-            if (in_array($this->db->getDriverName(), ['mysql', 'imysql'])) {
+            if ('imysql' === $this->db->getDriverName()) {
                 if (is_array($options)) {
                     $tableOptions = [
                         sprintf('CHARACTER SET %s', I::get($options, 'character', 'utf8')),
