@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class Schema
  *
@@ -9,12 +10,12 @@
 
 namespace icy2003\php\iextensions\yii2\db\mysql;
 
-use yii\db\mysql\Schema as S;
+use yii\db\mysql\Schema as MysqlSchema;
 
 /**
  * Schema 扩展
  */
-class Schema extends S
+class Schema extends MysqlSchema
 {
     /**
      * mediumtext 类型
