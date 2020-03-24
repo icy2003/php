@@ -27,10 +27,7 @@ class Image
      */
     public function __construct($image)
     {
-        $attributes = $this->__parseImage($image);
-        array_map(function($value, $key) {
-            $this->_attributes[$key] = $value;
-        }, array_values($attributes), array_keys($attributes));
+        $this->_attributes = $this->__parseImage($image);
         $this->_imageIn = $this->_attributes['object'];
     }
 
@@ -90,6 +87,7 @@ class Image
                 throw new Exception("不支持的图片类型");
         }
         return [
+            'file' => $image,
             'width' => $width,
             'height' => $height,
             'mime' => $mime,
@@ -133,6 +131,7 @@ class Image
         if ($index >= 0) {
             $color = imagecolorsforindex($this->_imageIn, $index);
         }
+        null === $this->_imageOut && $this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height']);
         $index = imagecolorallocate($this->_imageOut, $color['red'], $color['green'], $color['blue']);
         imagefill($this->_imageOut, 0, 0, $index);
         imagecolortransparent($this->_imageOut, $index);
@@ -152,12 +151,11 @@ class Image
             $zoomWidth *= $this->_attributes['width'];
             $zoomHeight *= $this->_attributes['height'];
         } else {
-            $zoom = (int)$zoom;
+            $zoom = (int) $zoom;
             $zoomWidth = $zoom * $this->_attributes['width'];
             $zoomHeight = $zoom * $this->_attributes['height'];
         }
-        if ($out = imagecreatetruecolor($zoomWidth, $zoomHeight)) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($zoomWidth, $zoomHeight)) {
             $this->__setTransparency();
             imagecopyresampled($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $zoomWidth, $zoomHeight, $this->_attributes['width'], $this->_attributes['height']);
         }
@@ -180,8 +178,7 @@ class Image
         $height = min($this->_attributes['height'], $cut[1]);
         $x = min($this->_attributes['width'], $pos[0]);
         $y = min($this->_attributes['height'], $pos[1]);
-        if ($out = imagecreatetruecolor($width, $height)) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($width, $height)) {
             $this->__setTransparency();
             imagecopy($this->_imageOut, $this->_imageIn, 0, 0, $x, $y, $this->_attributes['width'], $this->_attributes['height']);
         }
@@ -202,8 +199,7 @@ class Image
      */
     public function markText($text, $pos = [0, 0], $fontColor = 'black', $fontSize = 12, $fontPath = 'simkai')
     {
-        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             $this->__setTransparency();
             $text = Charset::toUtf($text);
             $temp = imagettfbbox($fontSize, 0, $fontPath, $text);
@@ -232,16 +228,15 @@ class Image
      */
     public function markPicture($image, $pos = [0, 0], $size = null)
     {
-        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             $this->__setTransparency();
             $markAttrs = $this->__parseImage($image);
             null === $size && $size = [$markAttrs['width'], $markAttrs['height']];
             imagecopy($this->_imageOut, $this->_imageIn, 0, 0, 0, 0, $this->_attributes['width'], $this->_attributes['height']);
             $posX = min($pos[0], $this->_attributes['width'] - $size[0]);
             $posY = min($pos[1], $this->_attributes['height'] - $size[1]);
-            imagecopyresized($this->_imageOut, /** @scrutinizer ignore-type */ $markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
-            imagedestroy(/** @scrutinizer ignore-type */ $markAttrs['object']);
+            imagecopyresized($this->_imageOut, /** @scrutinizer ignore-type */$markAttrs['object'], $posX, $posY, 0, 0, $size[0], $size[1], $markAttrs['width'], $markAttrs['height']);
+            imagedestroy(/** @scrutinizer ignore-type */$markAttrs['object']);
         }
 
         return $this;
@@ -254,8 +249,7 @@ class Image
      */
     public function turnY()
     {
-        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             for ($x = 0; $x < $this->_attributes['width']; $x++) {
                 imagecopy($this->_imageOut, $this->_imageIn, $this->_attributes['width'] - $x - 1, 0, $x, 0, 1, $this->_attributes['height']);
             }
@@ -271,8 +265,7 @@ class Image
      */
     public function turnX()
     {
-        if ($out = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
-            $this->_imageOut = $out;
+        if ($this->_imageOut = imagecreatetruecolor($this->_attributes['width'], $this->_attributes['height'])) {
             for ($y = 0; $y < $this->_attributes['height']; $y++) {
                 imagecopy($this->_imageOut, $this->_imageIn, 0, $this->_attributes['height'] - $y - 1, 0, $y, $this->_attributes['width'], 1);
             }
@@ -282,7 +275,35 @@ class Image
     }
 
     /**
-     * 保存图片到某个路径下
+     * 逆时针旋转图片
+     *
+     * @param integer $degrees 角度
+     *
+     * @return static
+     */
+    public function rotate($degrees = -90)
+    {
+        $this->_imageOut = imagerotate($this->_attributes['object'], $degrees, 0);
+        $this->__setTransparency();
+
+        return $this;
+    }
+
+    /**
+     * 获取 (x, y) 坐标处的颜色值
+     *
+     * @param integer $x
+     * @param integer $y
+     *
+     * @return \icy2003\php\ihelpers\Color Color 类对象
+     */
+    public function getColor($x, $y){
+        $rgb = imagecolorat($this->_attributes['object'], $x, $y);
+        return new Color([($rgb >> 16) & 0xFF, ($rgb >> 8) & 0xFF, $rgb & 0xFF], Color::TYPE_RGB);
+    }
+
+    /**
+     * 保存图片到某个路径下，文件名自动生成
      *
      * @param string $path 目标路径
      *
@@ -290,8 +311,19 @@ class Image
      */
     public function saveTo($path = './')
     {
+        $this->save($path . date('YmdHis') . '.' . $this->_attributes['ext']);
+    }
+
+    /**
+     * 保存到文件，如果不给文件名，则保存回原文件
+     *
+     * @return void
+     */
+    public function save($file = null)
+    {
+        null === $file && $file = $this->_attributes['file'];
+        $this->_attributes['out'] = $file;
         $method = $this->_attributes['method'];
-        $this->_attributes['out'] = $path . date('YmdHis') . '.' . $this->_attributes['ext'];
         $method($this->_imageOut, $this->_attributes['out']);
     }
 

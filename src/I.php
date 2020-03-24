@@ -80,6 +80,9 @@ class I
                         } else {
                             try {
                                 $mixed = $mixed->$key;
+                                if (null === $mixed) {
+                                    return $defaultValue;
+                                }
                             } catch (Exception $e) {
                                 return $defaultValue;
                             }
@@ -92,8 +95,8 @@ class I
             }
             return $mixed;
         } elseif (is_string($mixed) || is_numeric($mixed)) { // 字符串或数字
-            $pos = (int)$keyString;
-            $length = null === $defaultValue ? 1 : (int)$defaultValue;
+            $pos = (int) $keyString;
+            $length = null === $defaultValue ? 1 : (int) $defaultValue;
             return Strings::sub($mixed, $pos, $length);
         } elseif (null === $mixed) { // null
             return $defaultValue;

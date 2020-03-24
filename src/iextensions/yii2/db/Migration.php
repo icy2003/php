@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class Migration
  *
@@ -10,12 +11,12 @@
 namespace icy2003\php\iextensions\yii2\db;
 
 use icy2003\php\I;
-use yii\db\Migration as M;
+use yii\db\Migration as DbMigration;
 
 /**
  * Migration 扩展
  */
-class Migration extends M
+class Migration extends DbMigration
 {
     use iSchemaBuilderTrait;
 
