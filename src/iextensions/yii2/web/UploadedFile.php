@@ -24,7 +24,7 @@ class UploadedFile extends U
      * @param string $attribute
      * @param mixed $formName
      *
-     * @return void
+     * @return \yii\web\UploadedFile
      */
     public static function getInstance($model, $attribute, $formName = null)
     {
