@@ -80,6 +80,9 @@ class I
                         } else {
                             try {
                                 $mixed = $mixed->$key;
+                                if (null === $mixed) {
+                                    return $defaultValue;
+                                }
                             } catch (Exception $e) {
                                 return $defaultValue;
                             }
@@ -92,8 +95,8 @@ class I
             }
             return $mixed;
         } elseif (is_string($mixed) || is_numeric($mixed)) { // 字符串或数字
-            $pos = (int)$keyString;
-            $length = null === $defaultValue ? 1 : (int)$defaultValue;
+            $pos = (int) $keyString;
+            $length = null === $defaultValue ? 1 : (int) $defaultValue;
             return Strings::sub($mixed, $pos, $length);
         } elseif (null === $mixed) { // null
             return $defaultValue;
@@ -136,7 +139,7 @@ class I
     /**
      * 触发回调
      *
-     * @param callback|true $callback 回调函数，true 是为了简化某些表达式
+     * @param callback $callback 回调函数
      * @param array $params 回调参数
      * @return mixed
      */
@@ -144,7 +147,6 @@ class I
     {
         $result = false;
         is_callable($callback) && $result = call_user_func_array($callback, $params);
-        true === $callback && $result = true;
         return $result;
     }
 
