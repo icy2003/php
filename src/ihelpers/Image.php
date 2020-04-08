@@ -399,21 +399,46 @@ class Image
     }
 
     /**
-     * 生成随机图片
+     * 猫咪图片
+     */
+    const RESOURCE_CAT = 'http://placekitten.com';
+
+    /**
+     * 图片
+     */
+    const RESOURCE_DEFAULT = 'https://picsum.photos';
+
+    /**
+     * 文字图片
+     */
+    const RESOURCE_PLAINTEXT = 'https://fakeimg.pl';
+
+    /**
+     * 生成随机图片并返回图片路径
      *
-     * @param string $dir 生成目录
-     * @param integer $width 图片宽
-     * @param integer $height 图片高
-     * @param string $category 图片分类
+     * @param string $dir 目标目录
+     * @param array $options 选项
+     *  - width：图片宽，默认 120
+     *  - height：图片高，默认 120
+     *  - resource：图片服务
+     *      -- self::RESOURCE_DEFAULT 默认
+     *      -- self::RESOURCE_PLAINTEXT 纯文字：text 文字内容
+     *      -- self::RESOURCE_CAT 猫咪
      *
      * @return string
      */
-    public static function randomTo($dir, $width = 288, $height = 288, $category = null)
+    public static function randomTo($dir, $options = [])
     {
-
-        $url = 'http://placeimg.com/' . $width . '/' . $height;
-        if (in_array($category, ['animals', 'architecture', 'nature', 'people', 'tech'])) {
-            $url .= '/' . $category;
+        $options['resource'] = I::get($options, 'resource', self::RESOURCE_DEFAULT);
+        $options['width'] = I::get($options, 'width', 120);
+        $options['height'] = I::get($options, 'height', 120);
+        $url = $options['resource'];
+        if (self::RESOURCE_PLAINTEXT == $options['resource']) {
+            $url .= '/' . $options['width'] . 'x' . $options['height'];
+            $url .= '/?text=' . I::get($options, 'text');
+            $url .= '&font=noto';
+        } else {
+            $url .= '/' . $options['width'] . '/' . $options['height'];
         }
         $fileName = $dir . '/' . md5(microtime(true)) . '.png';
         (new LocalFile())->downloadFile([$url, $fileName]);
