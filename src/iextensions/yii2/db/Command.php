@@ -9,6 +9,7 @@
 
 namespace icy2003\php\iextensions\yii2\db;
 
+use icy2003\php\ihelpers\Arrays;
 use yii\db\Command as DbCommand;
 
 /**
@@ -27,5 +28,19 @@ class Command extends DbCommand
     {
         $tables = $this->db->getSchema()->getTableNames();
         return in_array($this->db->tablePrefix . $table, $tables);
+    }
+
+    /**
+     * 批量添加数据
+     *
+     * @param string $table
+     * @param array $rows 键值对二维数组
+     *
+     * @return integer
+     */
+    public function inserts($table, $rows)
+    {
+        $columns = array_keys(Arrays::first($rows));
+        return $this->batchInsert($table, $columns, $rows);
     }
 }
