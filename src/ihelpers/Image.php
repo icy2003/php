@@ -11,6 +11,7 @@ namespace icy2003\php\ihelpers;
 use Exception;
 use icy2003\php\C;
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 图片处理类
@@ -297,7 +298,8 @@ class Image
      *
      * @return \icy2003\php\ihelpers\Color Color 类对象
      */
-    public function getColor($x, $y){
+    public function getColor($x, $y)
+    {
         $rgb = imagecolorat($this->_attributes['object'], $x, $y);
         return new Color([($rgb >> 16) & 0xFF, ($rgb >> 8) & 0xFF, $rgb & 0xFF], Color::TYPE_RGB);
     }
@@ -394,6 +396,28 @@ class Image
             imagepng($image);
             imagedestroy($image);
         }
+    }
+
+    /**
+     * 生成随机图片
+     *
+     * @param string $dir 生成目录
+     * @param integer $width 图片宽
+     * @param integer $height 图片高
+     * @param string $category 图片分类
+     *
+     * @return string
+     */
+    public static function randomTo($dir, $width = 288, $height = 288, $category = null)
+    {
+
+        $url = 'http://placeimg.com/' . $width . '/' . $height;
+        if (in_array($category, ['animals', 'architecture', 'nature', 'people', 'tech'])) {
+            $url .= '/' . $category;
+        }
+        $fileName = $dir . '/' . md5(microtime(true)) . '.png';
+        (new LocalFile())->downloadFile([$url, $fileName]);
+        return $fileName;
     }
 
     /**
