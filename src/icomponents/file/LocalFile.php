@@ -547,6 +547,7 @@ class LocalFile extends Base implements FileInterface
     {
         set_time_limit(0);
         list($fromFile, $toFile) = $this->fileMap($fileMap);
+        $this->createDir($this->getDirname($toFile));
         $toSpl = $this->spl($toFile, 'wb');
         if ($this->isFile($toFile) && false === $overwrite) {
             $this->close($toFile);
