@@ -433,10 +433,22 @@ class Image
         $options['width'] = I::get($options, 'width', 120);
         $options['height'] = I::get($options, 'height', 120);
         $url = $options['resource'];
-        if (self::RESOURCE_PLAINTEXT == $options['resource']) {
+        if (self::RESOURCE_PLAINTEXT === $options['resource']) {
             $url .= '/' . $options['width'] . 'x' . $options['height'];
             $url .= '/?text=' . I::get($options, 'text');
             $url .= '&font=noto';
+        } else if (self::RESOURCE_DEFAULT === $options['resource']) {
+            $url .= '/' . $options['width'] . '/' . $options['height'];
+            $query = [];
+            if (isset($options['grayscale'])) {
+                $query['grayscale'] = 1;
+            }
+            if (isset($options['blur'])) {
+                $query['blur'] = 1;
+            }
+            if (isset($options['random'])) {
+                $query['random'] = 1;
+            }
         } else {
             $url .= '/' . $options['width'] . '/' . $options['height'];
         }

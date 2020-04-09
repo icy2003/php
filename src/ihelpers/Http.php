@@ -12,7 +12,6 @@ namespace icy2003\php\ihelpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use icy2003\php\I;
-use icy2003\php\icomponents\file\LocalFile;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -31,9 +30,10 @@ class Http
      */
     public static function get($url, $get = [], $options = [])
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('GET', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
         ]);
         return $response->getBody()->getContents();
     }
@@ -51,13 +51,14 @@ class Http
      */
     public static function getAsync($url, $get = [], $options = [], $success = null, $error = null)
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('GET', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
         ]);
-        $promise->then(function(ResponseInterface $res) use ($success) {
+        $promise->then(function (ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function(RequestException $err) use ($error) {
+        }, function (RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
@@ -74,9 +75,10 @@ class Http
      */
     public static function post($url, $post = [], $get = [], $options = [])
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
             'form_params' => $post,
         ]);
         return $response->getBody()->getContents();
@@ -96,14 +98,15 @@ class Http
      */
     public static function postAsync($url, $post = [], $get = [], $options = [], $success = null, $error = null)
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
             'form_params' => $post,
         ]);
-        $promise->then(function(ResponseInterface $res) use ($success) {
+        $promise->then(function (ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function(RequestException $err) use ($error) {
+        }, function (RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
@@ -120,9 +123,10 @@ class Http
      */
     public static function body($url, $body = '', $get = [], $options = [])
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
             'body' => $body,
         ]);
         return $response->getBody()->getContents();
@@ -142,39 +146,29 @@ class Http
      */
     public static function bodyAsync($url, $body = '', $get = [], $options = [], $success = null, $error = null)
     {
+        [$url, $query] = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
-            'query' => $get,
+            'query' => Arrays::merge($query, $get),
             'body' => $body,
         ]);
-        $promise->then(function(ResponseInterface $res) use ($success) {
+        $promise->then(function (ResponseInterface $res) use ($success) {
             $success && $success($res->getBody()->getContents(), $res);
-        }, function(RequestException $err) use ($error) {
+        }, function (RequestException $err) use ($error) {
             $error && $error($err);
         });
     }
 
     /**
-     * 下载文件
+     * 解析 URL
      *
-     * - $file 是字符串，则会从远程文件下载到当前目录的同名文件
-     * - $file 是数组，必须为两元素数组，如果元素二是路径，则下载到对应路径，如果元素二是文件，则下载为指定文件
-     * - 支持中文
+     * @param string $url
      *
-     * @param string|array $file
-     *
-     * @return boolean
+     * @return array
      */
-    public function download($file)
+    private static function __parseUrl($url)
     {
-        list($from, $to) = (new LocalFile())->fileMap($file);
-        try {
-            (new Http())->get($from, [], [
-                'save_to' => I::getAlias($to),
-            ]);
-            return true;
-        } catch (RequestException $e) {
-            return false;
-        }
+        $parts = parse_url($url);
+        return [$parts['scheme'] . '://' . $parts['host'] . $parts['path'], Arrays::explode('=', explode('&', $parts['query']))];
     }
 }
