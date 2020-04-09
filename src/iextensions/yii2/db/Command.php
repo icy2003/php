@@ -41,6 +41,6 @@ class Command extends DbCommand
     public function inserts($table, $rows)
     {
         $columns = array_keys(Arrays::first($rows));
-        return $this->batchInsert($table, $columns, $rows);
+        return $this->batchInsert($table, $columns, $rows)->execute();
     }
 }
