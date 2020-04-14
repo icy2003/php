@@ -169,6 +169,10 @@ class Http
     private static function __parseUrl($url)
     {
         $parts = parse_url($url);
-        return [$parts['scheme'] . '://' . $parts['host'] . $parts['path'], Arrays::explode('=', explode('&', $parts['query']))];
+        if (isset($parts['query'])) {
+            return [$parts['scheme'] . '://' . $parts['host'] . $parts['path'], Arrays::explode('=', explode('&', $parts['query']))];
+        } else {
+            return [$parts['scheme'] . '://' . $parts['host'] . $parts['path'], []];
+        }
     }
 }
