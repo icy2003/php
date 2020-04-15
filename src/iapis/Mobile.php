@@ -26,18 +26,18 @@ class Mobile extends Api
      */
     public function fetchAttribution($number)
     {
-        $data = Json::get(Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
+        $this->_result = Json::get(Http::get('https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php', [
             'resource_name' => 'guishudi',
             'query' => $number,
             'oe' => 'utf8',
         ]), 'data.0', []);
-        if (!empty($data)) {
-            $this->_result = [
-                'city' => I::get($data, 'city'),
-                'province' => I::get($data, 'prov'),
-                'type' => I::get($data, 'type'),
+        $this->_toArrayCall = function ($array) {
+            return [
+                'city' => I::get($array, 'city'),
+                'province' => I::get($array, 'prov'),
+                'type' => I::get($array, 'type'),
             ];
-        }
+        };
 
         return $this;
     }

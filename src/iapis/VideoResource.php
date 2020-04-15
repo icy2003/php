@@ -25,18 +25,18 @@ class VideoResource extends Api
      */
     public function fetchSearchFirst($firsts, $page = 0, $pageSize = 20)
     {
-        $this->_result = (array)Json::get(Http::get('http://api.jinsapi.com/yingshi/search', [
+        $this->_result = (array) Json::get(Http::get('http://api.jinsapi.com/yingshi/search', [
             'keys' => Strings::toPinyinFirst($firsts),
             'page' => $page,
             'pageSize' => $pageSize,
         ]), 'data', []);
         $this->_toArrayCall = function ($array) {
-            return Arrays::columns($array, [
+            return Arrays::columns2($array, [
                 'id' => 'd_id',
                 'name' => 'd_name',
                 'picture' => 'd_pic',
                 'tag' => 'd_remarks',
-            ], 2);
+            ]);
         };
 
         return $this;
@@ -53,18 +53,18 @@ class VideoResource extends Api
      */
     public function fetchSearch($keywords, $page = 0, $pageSize = 20)
     {
-        $this->_result = (array)Json::get(Http::post('http://api.jinsapi.com/yingshi/searchForHanZi', [
+        $this->_result = (array) Json::get(Http::post('http://api.jinsapi.com/yingshi/searchForHanZi', [
             'keys' => $keywords,
             'page' => $page,
             'pageSize' => $pageSize,
         ]), 'data', []);
         $this->_toArrayCall = function ($array) {
-            return Arrays::columns($array, [
+            return Arrays::columns2($array, [
                 'id' => 'd_id',
                 'name' => 'd_name',
                 'picture' => 'd_pic',
                 'tag' => 'd_remarks',
-            ], 2);
+            ]);
         };
 
         return $this;
@@ -79,11 +79,11 @@ class VideoResource extends Api
      */
     public function fetchById($id)
     {
-        $this->_result = (array)Json::get(Http::get('http://api.jinsapi.com/yingshi/getVodById', [
+        $this->_result = (array) Json::get(Http::get('http://api.jinsapi.com/yingshi/getVodById', [
             'd_id' => $id,
         ]), 'data', []);
         $this->_toArrayCall = function ($array) {
-            return Arrays::columns($array, [
+            return Arrays::columns1($array, [
                 'id' => 'd_id',
                 'name' => 'd_name',
                 'picture' => 'd_pic',
@@ -93,11 +93,11 @@ class VideoResource extends Api
                 'lang' => 'd_lang',
                 'year' => 'd_year',
                 'description' => 'd_content',
-                'episodes' => function($array) {
-                    $episodes = explode('#', (string)I::get($array, 'd_playurl'));
+                'episodes' => function ($array) {
+                    $episodes = explode('#', (string) I::get($array, 'd_playurl'));
                     return Arrays::explode('$', $episodes);
                 },
-            ], 1);
+            ]);
         };
 
         return $this;
