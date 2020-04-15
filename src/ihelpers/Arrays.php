@@ -555,7 +555,7 @@ class Arrays
      * 获取指定某些键的项
      *
      * @param array $array
-     * @param array|string $keys 数组或都好字符串
+     * @param array|string $keys 数组或逗号字符串
      *
      * @return array
      *
