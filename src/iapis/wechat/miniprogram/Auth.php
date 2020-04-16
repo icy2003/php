@@ -2,6 +2,7 @@
 
 namespace icy2003\php\iapis\wechat\miniprogram;
 
+use icy2003\php\I;
 use icy2003\php\iapis\Api;
 use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
@@ -18,7 +19,7 @@ class Auth extends Api
 
     public function isSuccess()
     {
-        if (0 === $this->_result['errcode']) {
+        if (0 === I::get($this->_result, 'errcode', 0)) {
             return true;
         }
         return false;
@@ -27,8 +28,8 @@ class Auth extends Api
     public function getError()
     {
         return [
-            'errcode' => $this->_result['errcode'],
-            'errmsg' => $this->_result['errmsg'],
+            'errcode' => I::get($this->_result, 'errcode', 0),
+            'errmsg' => I::get($this->_result, 'errmsg', ''),
         ];
     }
 
@@ -52,6 +53,7 @@ class Auth extends Api
         $this->_result = Json::decode(Http::get('https://api.weixin.qq.com/sns/jscode2session', $this->filterOptions([
             'appid', 'secret', 'js_code', 'grant_type',
         ])));
+        // 这个接口返回没有 errcode
         $this->_toArrayCall = function ($array) {
             return Arrays::columns1($array, ['openid', 'session_key', 'unionid']);
         };
