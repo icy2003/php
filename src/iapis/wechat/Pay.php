@@ -213,9 +213,9 @@ class Pay extends Api
      */
     public function getCallArray()
     {
-        C::assertTrue($this->isSuccess(), (string)I::get($this->_result, 'return_msg'));
+        C::assertTrue($this->isSuccess(), (string) I::get($this->_result, 'return_msg'));
         $array = [];
-        if ('APP' === I::get($this->_options, 'trade_type')) {
+        if (self::TRADE_TYPE_APP === I::get($this->_options, 'trade_type')) {
             $array = [
                 'appid' => $this->_appId,
                 'partnerid' => $this->_mchId,
@@ -226,10 +226,20 @@ class Pay extends Api
             ];
             $array['sign'] = $this->getSign($array);
         }
-        if ('MWEB' === I::get($this->_options, 'trade_type')) {
+        if (self::TRADE_TYPE_H5 === I::get($this->_options, 'trade_type')) {
             $array = [
                 'mweb_url' => I::get($this->_result, 'mweb_url'),
             ];
+        }
+        if (self::TRADE_TYPE_JSAPI == I::get($this->_options, 'trade_type')) {
+            $array = [
+                'appId' => $this->_appId,
+                'nonceStr' => Strings::random(),
+                'package' => 'prepay_id=' . I::get($this->_result, 'prepay_id'),
+                'signType' => I::get($this->_options, 'sign_type', 'MD5'),
+                'timeStamp' => (string) time(),
+            ];
+            $array['paySign'] = $this->getSign($array);
         }
         return $array;
     }
@@ -245,7 +255,7 @@ class Pay extends Api
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
-        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string)I::get($array, 'return_msg'));
+        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string) I::get($array, 'return_msg'));
         $temp = $array;
         $sign = $temp['sign'];
         unset($temp['sign']);
@@ -480,7 +490,7 @@ class Pay extends Api
      */
     public function shortUrl()
     {
-        C::assertTrue(null !== ($longUrl = (string)I::get($this->_options, 'long_url')), '缺少 long_url 参数！');
+        C::assertTrue(null !== ($longUrl = (string) I::get($this->_options, 'long_url')), '缺少 long_url 参数！');
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
@@ -505,7 +515,7 @@ class Pay extends Api
      */
     public function getQrcodeUrl()
     {
-        C::assertTrue(null !== ($productId = (string)I::get($this->_options, 'product_id')), '缺少 product_id 参数！');
+        C::assertTrue(null !== ($productId = (string) I::get($this->_options, 'product_id')), '缺少 product_id 参数！');
         $values = [
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
