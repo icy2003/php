@@ -231,4 +231,17 @@ class DateTime
     {
         return strtotime($time) - strtotime(date('Y-m-d'));
     }
+
+    /**
+     * 秒转时间
+     *
+     * @param integer $seconds
+     * @param string $format
+     *
+     * @return string
+     */
+    public function fromSeconds($seconds, $format = 'H:i:s')
+    {
+        return date($format, strtotime(date('Y-m-d')) + $seconds);
+    }
 }
