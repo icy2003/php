@@ -24,6 +24,8 @@ use icy2003\php\ihelpers\Xml;
  * Pay 支付
  *
  * - 参看[微信支付开发文档](https://pay.weixin.qq.com/wiki/doc/api/index.html)
+ * - 由于涉及参数过多，为了保持方法的整洁，请结合文档和本类的 set 方法添加参数，如遇到必要参数没设置的情况，会抛错。
+ * - 可用方法名对应微信文档里 API 路由，例如[统一下单](https://api.mch.weixin.qq.com/pay/unifiedorder)，对应方法名为 unifiedOrder
  */
 class Pay extends Api
 {
@@ -120,22 +122,22 @@ class Pay extends Api
      *
      * @return static
      */
-    public function pay()
+    public function unifiedOrder()
     {
         if (null === ($body = I::get($this->_options, 'body'))) {
-            throw new Exception('缺少统一支付接口必填参数：body');
+            throw new Exception('请使用 setBody() 设置商品描述 body');
         }
         if (null === ($outTradeNo = I::get($this->_options, 'out_trade_no'))) {
-            throw new Exception('缺少统一支付接口必填参数：out_trade_no');
+            throw new Exception('请使用 setOutTradeNo() 设置订单号 out_trade_no');
         }
         if (null === ($totalFee = I::get($this->_options, 'total_fee'))) {
-            throw new Exception('缺少统一支付接口必填参数：total_fee');
+            throw new Exception('请使用 setTotalFee() 设置商品金额 total_fee');
         }
         if (null === ($notifyUrl = I::get($this->_options, 'notify_url'))) {
-            throw new Exception('缺少统一支付接口必填参数：notify_url');
+            throw new Exception('请使用 setNotifyUrl() 设置通知地址 notify_url');
         }
         if (null === ($tradeType = I::get($this->_options, 'trade_type'))) {
-            throw new Exception('缺少统一支付接口必填参数：trade_type');
+            throw new Exception('请使用 setTradeType() 设置交易类型 trade_type');
         }
         $values = array_filter([
             'appid' => $this->_appId,
@@ -161,19 +163,19 @@ class Pay extends Api
 
         if ('NATIVE' === $tradeType) {
             if (null === ($productId = I::get($this->_options, 'product_id'))) {
-                throw new Exception('缺少统一支付接口必填参数：product_id');
+                throw new Exception('请使用 setProductId() 设置商品描述 product_id');
             } else {
                 $values['product_id'] = $productId;
             }
         } elseif ('JSAPI' === $tradeType) {
             if (null === ($openId = I::get($this->_options, 'openid'))) {
-                throw new Exception('缺少统一支付接口必填参数：openid');
+                throw new Exception('请使用 setOpenId() 设置 OpenID openid');
             } else {
                 $values['openid'] = $openId;
             }
         } elseif ('MWEB' === $tradeType) {
             if (null === ($sceneInfo = I::get($this->_options, 'scene_info'))) {
-                throw new Exception('缺少统一支付接口必填参数：scene_info');
+                throw new Exception('请使用 setSceneInfo() 设置场景信息 scene_info');
             } else {
                 $values['scene_info'] = $sceneInfo;
             }
@@ -182,16 +184,6 @@ class Pay extends Api
         $responseXml = Http::body('https://api.mch.weixin.qq.com/pay/unifiedorder', Xml::fromArray($values));
         $this->_result = Xml::toArray($responseXml);
         return $this;
-    }
-
-    /**
-     * 返回刚刚调用过的微信接口的结果
-     *
-     * @return array
-     */
-    public function getRes()
-    {
-        return $this->_result;
     }
 
     /**
@@ -325,7 +317,7 @@ class Pay extends Api
     public function closeOrder()
     {
         if (null === ($outTradeNo = I::get($this->_options, 'out_trade_no'))) {
-            throw new Exception('缺少必填参数：out_trade_no');
+            throw new Exception('请使用 setOutTradeNo() 设置订单号 out_trade_no');
         }
         $values = [
             'appid' => $this->_appId,
@@ -347,13 +339,19 @@ class Pay extends Api
     public function refund()
     {
         if (null === $this->_certPath) {
-            throw new Exception('请使用 setCertPath 提供证书路径');
+            throw new Exception('请使用 setCertPath() 提供证书路径，下载的证书名为：apiclient_cert.pem');
         }
         if (null === $this->_certKeyPath) {
-            throw new Exception('请使用 setCertKeyPath 提供证书密钥路径');
+            throw new Exception('请使用 setCertKeyPath() 提供证书密钥路径，下载的密钥名为：apiclient_key.pem');
         }
         $this->setOutRefundNo();
+        if (null === I::get($this->_options, 'out_refund_no')) {
+            throw new Exception('请使用 setOutRefundNo() 设置退款单号 out_refund_no，若不填，则和 out_trade_no 一致');
+        }
         $this->setRefundFee();
+        if (null === I::get($this->_options, 'refund_fee')) {
+            throw new Exception('请使用 setRefundFee() 设置退款金额 refund_fee，若不填，则和 total_fee 一致');
+        }
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
@@ -416,7 +414,7 @@ class Pay extends Api
     public function downloadBill()
     {
         if (null === ($billDate = I::get($this->_options, 'bill_date'))) {
-            throw new Exception('缺少 bill_date 参数！');
+            throw new Exception('请使用 setBillDate() 设置对账单日期 bill_date，格式：20140603');
         }
         $values = array_filter([
             'appid' => $this->_appId,
@@ -439,17 +437,17 @@ class Pay extends Api
      */
     public function downloadFundFlow()
     {
-        if (null === ($accoutType = I::get($this->_options, 'account_type'))) {
-            throw new Exception('缺少 account_type 参数！');
-        }
-        if (null === ($billDate = I::get($this->_options, 'bill_date'))) {
-            throw new Exception('缺少 bill_date 参数！');
-        }
         if (null === $this->_certPath) {
-            throw new Exception('请使用 setCertPath 提供证书路径');
+            throw new Exception('请使用 setCertPath() 提供证书路径，下载的证书名为：apiclient_cert.pem');
         }
         if (null === $this->_certKeyPath) {
-            throw new Exception('请使用 setCertKeyPath 提供证书密钥路径');
+            throw new Exception('请使用 setCertKeyPath() 提供证书密钥路径，下载的密钥名为：apiclient_key.pem');
+        }
+        if (null === ($accoutType = I::get($this->_options, 'account_type'))) {
+            throw new Exception('请使用 setAccountType() 设置资金账户类型 account_type');
+        }
+        if (null === ($billDate = I::get($this->_options, 'bill_date'))) {
+            throw new Exception('请使用 setBillDate() 设置资金账单日期 bill_date');
         }
         $values = array_filter([
             'appid' => $this->_appId,
