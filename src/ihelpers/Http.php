@@ -30,7 +30,7 @@ class Http
      */
     public static function get($url, $get = [], $options = [])
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('GET', $url, [
             'query' => Arrays::merge($query, $get),
@@ -51,7 +51,7 @@ class Http
      */
     public static function getAsync($url, $get = [], $options = [], $success = null, $error = null)
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('GET', $url, [
             'query' => Arrays::merge($query, $get),
@@ -75,7 +75,7 @@ class Http
      */
     public static function post($url, $post = [], $get = [], $options = [])
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
             'query' => Arrays::merge($query, $get),
@@ -98,7 +98,7 @@ class Http
      */
     public static function postAsync($url, $post = [], $get = [], $options = [], $success = null, $error = null)
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
             'query' => Arrays::merge($query, $get),
@@ -123,7 +123,7 @@ class Http
      */
     public static function body($url, $body = '', $get = [], $options = [])
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $response = $client->request('POST', $url, [
             'query' => Arrays::merge($query, $get),
@@ -146,7 +146,7 @@ class Http
      */
     public static function bodyAsync($url, $body = '', $get = [], $options = [], $success = null, $error = null)
     {
-        [$url, $query] = self::__parseUrl($url);
+        list($url, $query) = self::__parseUrl($url);
         $client = new Client(Arrays::merge(['verify' => false], $options));
         $promise = $client->requestAsync('POST', $url, [
             'query' => Arrays::merge($query, $get),
