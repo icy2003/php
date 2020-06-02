@@ -2,6 +2,7 @@
 
 namespace icy2003\php\iapis;
 
+use icy2003\php\I;
 use icy2003\php\iapis\Api;
 use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
@@ -20,7 +21,7 @@ class Meteorology extends Api
     public function fetchProvinces()
     {
         $this->fetchCities('');
-        $this->_toArrayCall = function($array) {
+        $this->_toArrayCall = function ($array) {
             return Arrays::columns2($array, ['code', 'name']);
         };
 
@@ -36,7 +37,7 @@ class Meteorology extends Api
      */
     public function fetchCities($provinceCode)
     {
-        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/province/' . $provinceCode));
+        $this->_result = (array) Json::decode(Http::get('http://www.nmc.cn/f/rest/province/' . $provinceCode));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns2($array, ['code', 'city', 'province']);
         };
@@ -69,7 +70,9 @@ class Meteorology extends Api
      */
     public function fetchWeather($cityId)
     {
-        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/real/' . $cityId));
+        $this->_result = (array) Json::get(Http::get('http://www.nmc.cn/rest/weather', [
+            'stationid' => $cityId,
+        ]), 'data.real');
         $this->_toArrayCall = function ($array) {
             return Arrays::columns1($array, [
                 'publish_time',
@@ -77,7 +80,7 @@ class Meteorology extends Api
                 'feelst' => 'weather.feelst',
                 'humidity' => 'weather.humidity',
                 'info' => 'weather.info',
-                'rain'=>'weather.rain',
+                'rain' => 'weather.rain',
                 'temperature' => 'weather.temperature',
                 'direct' => 'wind.direct',
                 'power' => 'wind.power',
@@ -103,12 +106,12 @@ class Meteorology extends Api
      */
     public function fetchAirQuality($cityId)
     {
-        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/aqi/' . $cityId));
+        $this->_result = (array) Json::decode(Http::get('http://www.nmc.cn/f/rest/aqi/' . $cityId));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns1($array, [
                 'forecasttime',
                 'aq',
-                'text'
+                'text',
             ]);
         };
 
@@ -129,17 +132,41 @@ class Meteorology extends Api
      *
      * @return static
      */
-    public function fetchToday($cityId){
-        $this->_result = (array)Json::decode(Http::get('http://www.nmc.cn/f/rest/passed/' . $cityId));
+    public function fetch24Hours($cityId)
+    {
+        $this->_result = (array) Json::decode(Http::get('http://www.nmc.cn/f/rest/passed/' . $cityId));
         $this->_toArrayCall = function ($array) {
             return Arrays::columns2($array, [
                 'time',
                 'humidity',
                 'pressure',
-                'rain'=>'rain1h',
+                'rain' => 'rain1h',
                 'temperature',
                 'windDirection',
-                'windSpeed'
+                'windSpeed',
+            ]);
+        };
+
+        return $this;
+    }
+
+    /**
+     * 获取 7 天天气
+     *
+     * @param string $cityId 城市 ID
+     *
+     * @return static
+     */
+    public function fetch7Days($cityId)
+    {
+        $this->_result = (array) Json::decode(Http::get('http://www.nmc.cn/rest/weather', [
+            'stationid' => $cityId,
+        ]));
+        $this->_toArrayCall = function ($array) {
+            return Arrays::columns2(I::get($array,'data.predict.detail'), [
+                'date',
+                'day',
+                'night'
             ]);
         };
 
