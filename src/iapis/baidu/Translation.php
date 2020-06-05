@@ -2,7 +2,9 @@
 
 namespace icy2003\php\iapis\baidu;
 
+use icy2003\php\I;
 use icy2003\php\iapis\Api;
+use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
 use icy2003\php\ihelpers\Strings;
@@ -79,6 +81,10 @@ class Translation extends Api
             'salt' => $salt,
             'sign' => md5($this->_appid . $text . $salt . $this->_secretKey),
         ]));
+        $this->_toArrayCall = function ($array) {
+            $trans = I::get($array, 'trans_result', []);
+            return Arrays::column($trans, 'dst');
+        };
 
         return $this;
     }
