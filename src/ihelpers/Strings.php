@@ -112,7 +112,7 @@ class Strings
      */
     public static function toCamel($string)
     {
-        return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function($matches) {
+        return lcfirst(preg_replace_callback('/_+([a-z0-9_\x7f-\xff])/', function ($matches) {
             return ucfirst($matches[1]);
         }, strtolower($string)));
     }
@@ -143,7 +143,7 @@ class Strings
      */
     public static function isStartsWith($string, $search)
     {
-        return (string)$search !== "" && mb_strpos($string, $search) === 0;
+        return (string) $search !== "" && mb_strpos($string, $search) === 0;
     }
 
     /**
@@ -158,7 +158,7 @@ class Strings
      */
     public static function isEndsWith($string, $search)
     {
-        return (string)$search !== "" && mb_substr($string, -static::length($search)) === $search;
+        return (string) $search !== "" && mb_substr($string, -static::length($search)) === $search;
     }
 
     /**
@@ -174,7 +174,7 @@ class Strings
      */
     public static function isContains($string, $search, &$pos = null)
     {
-        return (string)$search !== "" && ($pos = mb_strpos($string, $search)) !== false;
+        return (string) $search !== "" && ($pos = mb_strpos($string, $search)) !== false;
     }
 
     /**
@@ -193,7 +193,7 @@ class Strings
         if (self::isContains($string, $search, $pos)) {
             return mb_substr($string, 0, $pos);
         }
-        return "";
+        return '';
     }
 
     /**
@@ -212,7 +212,25 @@ class Strings
         if (self::isContains($string, $search, $pos)) {
             return mb_substr($string, $pos + self::length($search), self::length($string) - 1);
         }
-        return "";
+        return '';
+    }
+
+    /**
+     * 在字符串中找子串的中间部分，需指定前半部分和后半部分
+     *
+     * @param string $string
+     * @param string $beforeString
+     * @param string $afterString
+     *
+     * @return string
+     */
+    public static function partBetween($string, $beforeString, $afterString)
+    {
+        if (self::isContains($string, $beforeString, $p1) && self::isContains($string, $afterString, $p2)) {
+            $len1 = $p1 + self::length($beforeString);
+            return mb_substr($string, $len1, $p2 - $len1);
+        }
+        return '';
     }
 
     /**
@@ -240,7 +258,7 @@ class Strings
      */
     public static function split($string)
     {
-        return (array)preg_split('/(?<!^)(?!$)/u', $string);
+        return (array) preg_split('/(?<!^)(?!$)/u', $string);
     }
 
     /**
@@ -295,7 +313,7 @@ class Strings
      */
     public static function toNumber($string)
     {
-        return (double)$string;
+        return (double) $string;
     }
 
     /**
@@ -539,7 +557,7 @@ class Strings
         } elseif (false === $returnArray) {
             return implode('', $result);
         } else {
-            return implode((string)$returnArray, $result);
+            return implode((string) $returnArray, $result);
         }
     }
 
@@ -553,8 +571,8 @@ class Strings
      */
     public static function toPinyinFirst($text, $returnArray = false)
     {
-        $array = (array)self::toPinyin($text, true);
-        $result = array_map(function($row) {
+        $array = (array) self::toPinyin($text, true);
+        $result = array_map(function ($row) {
             return self::sub($row, 0, 1);
         }, $array);
         if (true === $returnArray) {
@@ -562,7 +580,7 @@ class Strings
         } elseif (false === $returnArray) {
             return implode('', $result);
         } else {
-            return implode((string)$returnArray, $result);
+            return implode((string) $returnArray, $result);
         }
     }
 
