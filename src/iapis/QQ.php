@@ -41,9 +41,12 @@ class QQ extends Api
     /**
      * 获取 QQ 的昵称和头像地址
      *
+     * @param array $config 可设置头像规格，默认 3
+     * - 1~5 分别表示 `40*40`, `40*40`, `100*100`, `140*140`, `640*640`
+     *
      * @return static
      */
-    public function fetchInfo()
+    public function fetchInfo($config = ['spec'=>3])
     {
         $result = Http::get('http://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg', [
             'uins' => $this->_qq,
@@ -51,7 +54,7 @@ class QQ extends Api
         if (Strings::isContains($result, 'portraitCallBack')) {
             $json = Json::decode(Strings::partBetween($result, 'portraitCallBack(', ')'));
             $this->_result['nickname'] = Charset::toUtf(I::get($json, $this->_qq . '.6'), 'GBK');
-            $this->_result['portrait'] = I::get($json, $this->_qq . '.0');
+            $this->_result['portrait'] = 'https://q2.qlogo.cn/headimg_dl?dst_uin='.$this->_qq.'&spec='. I::get($config, 'spec', 3);
         }
 
         return $this;
