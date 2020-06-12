@@ -149,7 +149,7 @@ class Arrays
             if (null === $index) {
                 $result[$key] = $data;
             } else {
-                $result[$row[$index]] = $data;
+                $result[I::get($row, $index)] = $data;
             }
         }
 
