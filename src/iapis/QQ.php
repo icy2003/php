@@ -54,8 +54,8 @@ class QQ extends Api
         if (Strings::isContains($result, 'portraitCallBack')) {
             $json = Json::decode(Strings::partBetween($result, 'portraitCallBack(', ')'));
             $this->_result['nickname'] = Charset::toUtf(I::get($json, $this->_qq . '.6'), 'GBK');
-            $this->_result['portrait'] = 'https://q2.qlogo.cn/headimg_dl?dst_uin='.$this->_qq.'&spec='. I::get($config, 'spec', 3);
         }
+        $this->_result['portrait'] = 'https://q2.qlogo.cn/headimg_dl?dst_uin='.$this->_qq.'&spec='. I::get($config, 'spec', 3);
 
         return $this;
     }
