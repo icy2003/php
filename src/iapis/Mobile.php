@@ -33,8 +33,8 @@ class Mobile extends Api
         ]), 'data.0', []);
         $this->_toArrayCall = function ($array) {
             return [
-                'city' => I::get($array, 'city'),
                 'province' => I::get($array, 'prov'),
+                'city' => I::get($array, 'city'),
                 'type' => I::get($array, 'type'),
             ];
         };
