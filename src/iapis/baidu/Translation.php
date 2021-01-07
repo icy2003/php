@@ -88,4 +88,27 @@ class Translation extends Api
 
         return $this;
     }
+
+    /**
+     * @ignore
+     *
+     * @return boolean
+     */
+    public function isSuccess()
+    {
+        if ($this->_result['error_code'] == 52000) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @ignore
+     *
+     * @return string
+     */
+    public function getError()
+    {
+        return I::get($this->_errorMap, $this->_result['error_code'], $this->_result['error_msg']);
+    }
 }
