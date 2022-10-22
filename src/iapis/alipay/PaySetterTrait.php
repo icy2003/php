@@ -35,18 +35,9 @@ trait PaySetterTrait
      *
      * @var array
      */
-    protected $_values = [
+    protected $_options = [
         'biz_content' => [],
     ];
-
-    /**
-     * 接收的结果
-     *
-     * - 每执行一个接口都会修改此值
-     *
-     * @var array|string
-     */
-    protected $_result;
 
     /**
      * 支付类型
@@ -79,7 +70,7 @@ trait PaySetterTrait
      */
     public function setFormat($format)
     {
-        $this->_values['format'] = $format;
+        $this->_options['format'] = $format;
         return $this;
     }
 
@@ -92,7 +83,7 @@ trait PaySetterTrait
      */
     public function setReturnUrl($returnUrl)
     {
-        $this->_values['return_url'] = $returnUrl;
+        $this->_options['return_url'] = $returnUrl;
         return $this;
     }
 
@@ -105,7 +96,7 @@ trait PaySetterTrait
      */
     public function setCharset($charset)
     {
-        $this->_values['charset'] = $charset;
+        $this->_options['charset'] = $charset;
         return $this;
     }
 
@@ -121,7 +112,7 @@ trait PaySetterTrait
      */
     public function setSignType($signType)
     {
-        $this->_values['sign_type'] = $signType;
+        $this->_options['sign_type'] = $signType;
         return $this;
     }
 
@@ -134,7 +125,7 @@ trait PaySetterTrait
      */
     public function setTimestamp($timestamp)
     {
-        $this->_values['timestamp'] = $timestamp;
+        $this->_options['timestamp'] = $timestamp;
         return $this;
     }
 
@@ -147,7 +138,7 @@ trait PaySetterTrait
      */
     public function setNotifyUrl($notifyUrl)
     {
-        $this->_values['notify_url'] = $notifyUrl;
+        $this->_options['notify_url'] = $notifyUrl;
         return $this;
     }
 
@@ -162,7 +153,7 @@ trait PaySetterTrait
      */
     public function setAppAuthToken($appAuthToken)
     {
-        $this->_values['app_auth_token'] = $appAuthToken;
+        $this->_options['app_auth_token'] = $appAuthToken;
         return $this;
     }
 
@@ -176,7 +167,7 @@ trait PaySetterTrait
      */
     public function setBizContent($key, $value)
     {
-        $this->_values['biz_content'][$key] = $value;
+        $this->_options['biz_content'][$key] = $value;
         return $this;
     }
 
@@ -327,7 +318,7 @@ trait PaySetterTrait
      */
     public function setBizContentExtendParams($key, $value)
     {
-        $array = (array)I::get($this->_values, 'biz_content.extend_params', []);
+        $array = (array)I::get($this->_options, 'biz_content.extend_params', []);
         $array[$key] = $value;
         return $this->setBizContent('extend_params', $array);
     }
@@ -477,7 +468,7 @@ trait PaySetterTrait
      */
     public function setBizContentExtUserInfo($key, $value)
     {
-        $array = (array)I::get($this->_values, 'biz_content.ext_user_info', []);
+        $array = (array)I::get($this->_options, 'biz_content.ext_user_info', []);
         $array[$key] = $value;
         return $this->setBizContent('ext_user_info', $array);
     }

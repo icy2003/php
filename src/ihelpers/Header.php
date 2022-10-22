@@ -36,6 +36,7 @@ class Header
             header($string, $replace, $httpResponseCode);
         }
     }
+
     /**
      * 正常访问
      *
@@ -43,21 +44,24 @@ class Header
      *
      * @return void
      */
-    public static function ok()
+    public static function ok($info = 'OK')
     {
-        self::send('HTTP/1.1 200 OK');
+        self::send('HTTP/1.1 200 ' . $info);
     }
 
     /**
-     * 页面不存在
+     * 永久跳转
      *
-     * HTTP 返回 404
+     * HTTP 返回 301
+     *
+     * @param string $url 永久跳转的地址
      *
      * @return void
      */
-    public static function notFound()
+    public static function redirectPermanently($url, $info = 'Moved Permanently')
     {
-        self::send('HTTP/1.1 404 Not Found');
+        self::send('HTTP/1.1 301 ' . $info);
+        self::send('Location: ' . $url);
     }
 
     /**
@@ -70,31 +74,57 @@ class Header
      *
      * @return void
      */
-    public static function redirect($url = null, $time = 0)
+    public static function redirect($url = null, $time = 0, $info = 'Found')
     {
         null === $url && $url = '';
         if ($time < 0) {
             throw new \Exception('time 参数不能小于 0 ');
         } else {
-            self::send('HTTP/1.1 302 Found');
+            self::send('HTTP/1.1 302 ' . $info);
             self::send('Refresh: ' . $time . '; ' . $url);
         }
-        die;
     }
 
     /**
-     * 永久跳转
-     *
-     * HTTP 返回 301
-     *
-     * @param string $url 永久跳转的地址
+     * 告诉浏览器文档内容没有发生改变
      *
      * @return void
      */
-    public static function redirectPermanently($url)
+    public static function notModified($info = 'Not Modified')
     {
-        self::send('HTTP/1.1 301 Moved Permanently');
-        self::send('Location: ' . $url);
+        self::send('HTTP/1.1 304 ' . $info);
+    }
+
+    /**
+     * 禁止访问
+     *
+     * @return void
+     */
+    public static function forbidden($info = 'Forbidden')
+    {
+        self::send('HTTP/1.1 403 ' . $info);
+    }
+
+    /**
+     * 页面不存在
+     *
+     * HTTP 返回 404
+     *
+     * @return void
+     */
+    public static function notFound($info = 'Not Found')
+    {
+        self::send('HTTP/1.1 404 ' . $info);
+    }
+
+    /**
+     * 服务器错误
+     *
+     * @return void
+     */
+    public static function serverError($info = 'Internal Server Error')
+    {
+        self::send('HTTP/1.1 500 ' . $info);
     }
 
     /**
@@ -164,16 +194,6 @@ class Header
     }
 
     /**
-     * 告诉浏览器文档内容没有发生改变
-     *
-     * @return void
-     */
-    public static function notModified()
-    {
-        self::send('HTTP/1.1 304 Not Modified');
-    }
-
-    /**
      * 禁用缓存
      *
      * @return void
@@ -203,7 +223,7 @@ class Header
         } elseif (false === $asFrame) {
             self::send('X-Frame-Options: deny');
         } else {
-            $asFrame = (string)$asFrame;
+            $asFrame = (string) $asFrame;
             self::send('X-Frame-Options: allow-from ' . $asFrame);
         }
     }

@@ -78,22 +78,6 @@ trait PaySetterTrait
     }
 
     /**
-     * 发送的数据
-     *
-     * @var array
-     */
-    protected $_values = [];
-
-    /**
-     * 接收的结果
-     *
-     * - 每执行一个接口都会修改此值
-     *
-     * @var array
-     */
-    protected $_result = [];
-
-    /**
      * 设置设备号
      *
      * - 终端设备号(门店号或收银设备ID)，默认请传'WEB'
@@ -104,7 +88,7 @@ trait PaySetterTrait
      */
     public function setDeviceInfo($deviceInfo)
     {
-        $this->_values['device_info'] = $deviceInfo;
+        $this->_options['device_info'] = $deviceInfo;
         return $this;
     }
 
@@ -119,7 +103,7 @@ trait PaySetterTrait
      */
     public function setSignType($signType = 'MD5')
     {
-        $this->_values['sign_type'] = $signType;
+        $this->_options['sign_type'] = $signType;
         return $this;
     }
 
@@ -134,7 +118,7 @@ trait PaySetterTrait
      */
     public function setBody($body)
     {
-        $this->_values['body'] = $body;
+        $this->_options['body'] = $body;
         return $this;
     }
 
@@ -150,7 +134,7 @@ trait PaySetterTrait
      */
     public function setDetail($detail)
     {
-        $this->_values['detail'] = $detail;
+        $this->_options['detail'] = $detail;
         return $this;
     }
 
@@ -165,7 +149,7 @@ trait PaySetterTrait
      */
     public function setAttach($attach)
     {
-        $this->_values['attach'] = $attach;
+        $this->_options['attach'] = $attach;
         return $this;
     }
 
@@ -181,7 +165,7 @@ trait PaySetterTrait
      */
     public function setOutTradeNo($outTradeNo)
     {
-        $this->_values['out_trade_no'] = $outTradeNo;
+        $this->_options['out_trade_no'] = $outTradeNo;
         return $this;
     }
 
@@ -197,7 +181,7 @@ trait PaySetterTrait
      */
     public function setFeeType($feeType = 'CNY')
     {
-        $this->_values['fee_type'] = $feeType;
+        $this->_options['fee_type'] = $feeType;
         return $this;
     }
 
@@ -213,7 +197,7 @@ trait PaySetterTrait
      */
     public function setTotalFee($totalFee)
     {
-        $this->_values['total_fee'] = $totalFee;
+        $this->_options['total_fee'] = $totalFee;
         return $this;
     }
 
@@ -229,7 +213,7 @@ trait PaySetterTrait
      */
     public function setTimeStart($timeStart)
     {
-        $this->_values['time_start'] = $timeStart;
+        $this->_options['time_start'] = $timeStart;
         return $this;
     }
 
@@ -247,7 +231,7 @@ trait PaySetterTrait
      */
     public function setTimeExpire($timeExpire)
     {
-        $this->_values['time_expire'] = $timeExpire;
+        $this->_options['time_expire'] = $timeExpire;
         return $this;
     }
 
@@ -263,7 +247,7 @@ trait PaySetterTrait
      */
     public function setGoodsTag($goodsTag)
     {
-        $this->_values['goods_tag'] = $goodsTag;
+        $this->_options['goods_tag'] = $goodsTag;
         return $this;
     }
 
@@ -278,7 +262,7 @@ trait PaySetterTrait
      */
     public function setNotifyUrl($notifyUrl)
     {
-        $this->_values['notify_url'] = $notifyUrl;
+        $this->_options['notify_url'] = $notifyUrl;
         return $this;
     }
 
@@ -293,7 +277,7 @@ trait PaySetterTrait
      */
     public function setLimitPay($limitPay)
     {
-        $this->_values['limit_pay'] = $limitPay;
+        $this->_options['limit_pay'] = $limitPay;
         return $this;
     }
 
@@ -309,7 +293,7 @@ trait PaySetterTrait
      */
     public function setReceipt($receipt)
     {
-        $this->_values['receipt'] = $receipt;
+        $this->_options['receipt'] = $receipt;
         return $this;
     }
 
@@ -329,7 +313,7 @@ trait PaySetterTrait
      */
     public function setTradeType($tradeType)
     {
-        $this->_values['trade_type'] = $tradeType;
+        $this->_options['trade_type'] = $tradeType;
         return $this;
     }
 
@@ -344,7 +328,7 @@ trait PaySetterTrait
      */
     public function setProductId($productId)
     {
-        $this->_values['product_id'] = $productId;
+        $this->_options['product_id'] = $productId;
         return $this;
     }
 
@@ -361,7 +345,7 @@ trait PaySetterTrait
      */
     public function setOpenId($openId)
     {
-        $this->_values['openid'] = $openId;
+        $this->_options['openid'] = $openId;
         return $this;
     }
 
@@ -389,7 +373,7 @@ trait PaySetterTrait
      */
     public function setSceneInfo($sceneInfo)
     {
-        $this->_values['scene_info'] = Json::encode($sceneInfo);
+        $this->_options['scene_info'] = Json::encode($sceneInfo);
         return $this;
     }
 
@@ -404,7 +388,7 @@ trait PaySetterTrait
      */
     public function setTransactionId($transactionId)
     {
-        $this->_values['transaction_id'] = $transactionId;
+        $this->_options['transaction_id'] = $transactionId;
         return $this;
     }
 
@@ -420,7 +404,7 @@ trait PaySetterTrait
      */
     public function setOutRefundNo($outRefundNo = null)
     {
-        $this->_values['out_refund_no'] = null === $outRefundNo ? I::get($this->_values, 'out_trade_no') : $outRefundNo;
+        $this->_options['out_refund_no'] = null === $outRefundNo ? I::get($this->_options, 'out_trade_no') : $outRefundNo;
         return $this;
     }
 
@@ -437,7 +421,7 @@ trait PaySetterTrait
      */
     public function setRefundFee($refundFee = null)
     {
-        $this->_values['refund_fee'] = null === $refundFee ? I::get($this->_values, 'total_fee') : $refundFee;
+        $this->_options['refund_fee'] = null === $refundFee ? I::get($this->_options, 'total_fee') : $refundFee;
         return $this;
     }
 
@@ -454,7 +438,7 @@ trait PaySetterTrait
      */
     public function setRefundFeeType($refundFeeType = 'CNY')
     {
-        $this->_values['refund_fee_type'] = $refundFeeType;
+        $this->_options['refund_fee_type'] = $refundFeeType;
         return $this;
     }
 
@@ -470,7 +454,7 @@ trait PaySetterTrait
      */
     public function setRefundDesc($refundDesc)
     {
-        $this->_values['refund_desc'] = $refundDesc;
+        $this->_options['refund_desc'] = $refundDesc;
         return $this;
     }
 
@@ -487,7 +471,7 @@ trait PaySetterTrait
      */
     public function setRefundAccount($refundAccount)
     {
-        $this->_values['refund_account'] = $refundAccount;
+        $this->_options['refund_account'] = $refundAccount;
         return $this;
     }
 
@@ -502,7 +486,7 @@ trait PaySetterTrait
      */
     public function setOffset($offset)
     {
-        $this->_values['offset'] = $offset;
+        $this->_options['offset'] = $offset;
         return $this;
     }
 
@@ -517,7 +501,7 @@ trait PaySetterTrait
      */
     public function setRefundId($refundId)
     {
-        $this->_values['refund_id'] = $refundId;
+        $this->_options['refund_id'] = $refundId;
         return $this;
     }
 
@@ -532,7 +516,7 @@ trait PaySetterTrait
      */
     public function setBillDate($billDate)
     {
-        $this->_values['bill_date'] = $billDate;
+        $this->_options['bill_date'] = $billDate;
         return $this;
     }
 
@@ -550,7 +534,7 @@ trait PaySetterTrait
      */
     public function setBillType($billType = 'ALL')
     {
-        $this->_values['bill_type'] = $billType;
+        $this->_options['bill_type'] = $billType;
         return $this;
     }
 
@@ -565,7 +549,7 @@ trait PaySetterTrait
      */
     public function setTarType($tarType = 'GZIP')
     {
-        $this->_values['tar_type'] = $tarType;
+        $this->_options['tar_type'] = $tarType;
         return $this;
     }
 
@@ -583,7 +567,7 @@ trait PaySetterTrait
      */
     public function setAccountType($accountType)
     {
-        $this->_values['account_type'] = $accountType;
+        $this->_options['account_type'] = $accountType;
         return $this;
     }
 
@@ -598,7 +582,7 @@ trait PaySetterTrait
      */
     public function setLongUrl($longUrl)
     {
-        $this->_values['long_url'] = $longUrl;
+        $this->_options['long_url'] = $longUrl;
         return $this;
     }
 
@@ -613,7 +597,7 @@ trait PaySetterTrait
      */
     public function setPrepayId($prepayId)
     {
-        $this->_values['prepay_id'] = $prepayId;
+        $this->_options['prepay_id'] = $prepayId;
         return $this;
     }
 
@@ -628,7 +612,7 @@ trait PaySetterTrait
      */
     public function setBeginTime($beginTime)
     {
-        $this->_values['begin_time'] = $beginTime;
+        $this->_options['begin_time'] = $beginTime;
         return $this;
     }
 
@@ -643,7 +627,7 @@ trait PaySetterTrait
      */
     public function setEndTime($endTime)
     {
-        $this->_values['end_time'] = $endTime;
+        $this->_options['end_time'] = $endTime;
         return $this;
     }
 
@@ -658,7 +642,7 @@ trait PaySetterTrait
      */
     public function setLimit($limit = 200)
     {
-        $this->_values['limit'] = $limit;
+        $this->_options['limit'] = $limit;
         return $this;
     }
 }

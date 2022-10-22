@@ -11,11 +11,10 @@ namespace icy2003\php\iapis;
 use Exception;
 use icy2003\php\I;
 use icy2003\php\ihelpers\Arrays;
-use icy2003\php\ihelpers\Http;
 use icy2003\php\ihelpers\Json;
 
 /**
- * 搜集的 API 接口
+ * API 接口
  */
 class Api
 {
@@ -86,7 +85,11 @@ class Api
      */
     public function toArray()
     {
-        return (array) I::call($this->_toArrayCall, [$this->getResult()]);
+        $result = $this->getResult();
+        if (null === $this->_toArrayCall) {
+            return $result;
+        }
+        return (array) I::call($this->_toArrayCall, [$result]);
     }
 
     /**

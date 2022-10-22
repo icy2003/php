@@ -86,4 +86,21 @@ class Migration extends DbMigration
         }
         return $this->db->createCommand()->tableExists($table);
     }
+
+    /**
+     * 删除一个表
+     *
+     * 在 migration 中如果表已经不在了，那也认为删除成功
+     *
+     * @param string $table
+     *
+     * @return boolean
+     */
+    public function dropTable($table)
+    {
+        if (true === $this->tableExists($table)) {
+            return parent::dropTable($table);
+        }
+        return true;
+    }
 }

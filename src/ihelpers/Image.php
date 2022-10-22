@@ -11,6 +11,7 @@ namespace icy2003\php\ihelpers;
 use Exception;
 use icy2003\php\C;
 use icy2003\php\I;
+use icy2003\php\icomponents\file\LocalFile;
 
 /**
  * 图片处理类
@@ -297,7 +298,8 @@ class Image
      *
      * @return \icy2003\php\ihelpers\Color Color 类对象
      */
-    public function getColor($x, $y){
+    public function getColor($x, $y)
+    {
         $rgb = imagecolorat($this->_attributes['object'], $x, $y);
         return new Color([($rgb >> 16) & 0xFF, ($rgb >> 8) & 0xFF, $rgb & 0xFF], Color::TYPE_RGB);
     }
@@ -394,6 +396,65 @@ class Image
             imagepng($image);
             imagedestroy($image);
         }
+    }
+
+    /**
+     * 猫咪图片
+     */
+    const RESOURCE_CAT = 'http://placekitten.com';
+
+    /**
+     * 图片
+     */
+    const RESOURCE_DEFAULT = 'https://picsum.photos';
+
+    /**
+     * 文字图片
+     */
+    const RESOURCE_PLAINTEXT = 'https://fakeimg.pl';
+
+    /**
+     * 生成随机图片并返回图片路径
+     *
+     * @param string $dir 目标目录
+     * @param array $options 选项
+     *  - width：图片宽，默认 120
+     *  - height：图片高，默认 120
+     *  - resource：图片服务
+     *      -- self::RESOURCE_DEFAULT 默认
+     *      -- self::RESOURCE_PLAINTEXT 纯文字：text 文字内容
+     *      -- self::RESOURCE_CAT 猫咪
+     *
+     * @return string
+     */
+    public static function randomTo($dir, $options = [])
+    {
+        $options['resource'] = I::get($options, 'resource', self::RESOURCE_DEFAULT);
+        $options['width'] = I::get($options, 'width', 120);
+        $options['height'] = I::get($options, 'height', 120);
+        $url = $options['resource'];
+        if (self::RESOURCE_PLAINTEXT === $options['resource']) {
+            $url .= '/' . $options['width'] . 'x' . $options['height'];
+            $url .= '/?text=' . I::get($options, 'text');
+            $url .= '&font=noto';
+        } else if (self::RESOURCE_DEFAULT === $options['resource']) {
+            $url .= '/' . $options['width'] . '/' . $options['height'];
+            $query = [];
+            if (isset($options['grayscale'])) {
+                $query['grayscale'] = 1;
+            }
+            if (isset($options['blur'])) {
+                $query['blur'] = 1;
+            }
+            if (isset($options['random'])) {
+                $query['random'] = 1;
+            }
+        } else {
+            $url .= '/' . $options['width'] . '/' . $options['height'];
+        }
+        $fileName = $dir . '/' . md5(microtime(true)) . '.png';
+        (new LocalFile())->downloadFile([$url, $fileName]);
+        return $fileName;
     }
 
     /**

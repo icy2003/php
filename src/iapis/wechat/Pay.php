@@ -11,6 +11,7 @@ namespace icy2003\php\iapis\wechat;
 use Exception;
 use icy2003\php\C;
 use icy2003\php\I;
+use icy2003\php\iapis\Api;
 use icy2003\php\ihelpers\Arrays;
 use icy2003\php\ihelpers\Header;
 use icy2003\php\ihelpers\Http;
@@ -23,8 +24,10 @@ use icy2003\php\ihelpers\Xml;
  * Pay 支付
  *
  * - 参看[微信支付开发文档](https://pay.weixin.qq.com/wiki/doc/api/index.html)
+ * - 由于涉及参数过多，为了保持方法的整洁，请结合文档和本类的 set 方法添加参数，如遇到必要参数没设置的情况，会抛错。
+ * - 可用方法名对应微信文档里 API 路由，例如[统一下单](https://api.mch.weixin.qq.com/pay/unifiedorder)，对应方法名为 unifiedOrder
  */
-class Pay
+class Pay extends Api
 {
 
     use PaySetterTrait;
@@ -119,60 +122,60 @@ class Pay
      *
      * @return static
      */
-    public function pay()
+    public function unifiedOrder()
     {
-        if (null === ($body = I::get($this->_values, 'body'))) {
-            throw new Exception('缺少统一支付接口必填参数：body');
+        if (null === ($body = I::get($this->_options, 'body'))) {
+            throw new Exception('请使用 setBody() 设置商品描述 body');
         }
-        if (null === ($outTradeNo = I::get($this->_values, 'out_trade_no'))) {
-            throw new Exception('缺少统一支付接口必填参数：out_trade_no');
+        if (null === ($outTradeNo = I::get($this->_options, 'out_trade_no'))) {
+            throw new Exception('请使用 setOutTradeNo() 设置订单号 out_trade_no');
         }
-        if (null === ($totalFee = I::get($this->_values, 'total_fee'))) {
-            throw new Exception('缺少统一支付接口必填参数：total_fee');
+        if (null === ($totalFee = I::get($this->_options, 'total_fee'))) {
+            throw new Exception('请使用 setTotalFee() 设置商品金额 total_fee');
         }
-        if (null === ($notifyUrl = I::get($this->_values, 'notify_url'))) {
-            throw new Exception('缺少统一支付接口必填参数：notify_url');
+        if (null === ($notifyUrl = I::get($this->_options, 'notify_url'))) {
+            throw new Exception('请使用 setNotifyUrl() 设置通知地址 notify_url');
         }
-        if (null === ($tradeType = I::get($this->_values, 'trade_type'))) {
-            throw new Exception('缺少统一支付接口必填参数：trade_type');
+        if (null === ($tradeType = I::get($this->_options, 'trade_type'))) {
+            throw new Exception('请使用 setTradeType() 设置交易类型 trade_type');
         }
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
-            'device_info' => I::get($this->_values, 'device_info'),
+            'device_info' => I::get($this->_options, 'device_info'),
             'nonce_str' => Strings::random(),
-            'sign_type' => I::get($this->_values, 'sign_type'),
+            'sign_type' => I::get($this->_options, 'sign_type'),
             'body' => $body,
-            'detail' => I::get($this->_values, 'detail'),
-            'attach' => I::get($this->_values, 'attach'),
+            'detail' => I::get($this->_options, 'detail'),
+            'attach' => I::get($this->_options, 'attach'),
             'out_trade_no' => $outTradeNo,
-            'fee_type' => I::get($this->_values, 'fee_type'),
+            'fee_type' => I::get($this->_options, 'fee_type'),
             'total_fee' => $totalFee,
             'spbill_create_ip' => $this->getIp(),
-            'time_start' => I::get($this->_values, 'time_start'),
-            'time_expire' => I::get($this->_values, 'time_expire'),
-            'goods_tag' => I::get($this->_values, 'goods_tag'),
+            'time_start' => I::get($this->_options, 'time_start'),
+            'time_expire' => I::get($this->_options, 'time_expire'),
+            'goods_tag' => I::get($this->_options, 'goods_tag'),
             'notify_url' => $notifyUrl,
             'trade_type' => $tradeType,
-            'limit_pay' => I::get($this->_values, 'limit_pay'),
-            'receipt' => I::get($this->_values, 'receipt'),
+            'limit_pay' => I::get($this->_options, 'limit_pay'),
+            'receipt' => I::get($this->_options, 'receipt'),
         ]);
 
         if ('NATIVE' === $tradeType) {
-            if (null === ($productId = I::get($this->_values, 'product_id'))) {
-                throw new Exception('缺少统一支付接口必填参数：product_id');
+            if (null === ($productId = I::get($this->_options, 'product_id'))) {
+                throw new Exception('请使用 setProductId() 设置商品描述 product_id');
             } else {
                 $values['product_id'] = $productId;
             }
         } elseif ('JSAPI' === $tradeType) {
-            if (null === ($openId = I::get($this->_values, 'openid'))) {
-                throw new Exception('缺少统一支付接口必填参数：openid');
+            if (null === ($openId = I::get($this->_options, 'openid'))) {
+                throw new Exception('请使用 setOpenId() 设置 OpenID openid');
             } else {
                 $values['openid'] = $openId;
             }
         } elseif ('MWEB' === $tradeType) {
-            if (null === ($sceneInfo = I::get($this->_values, 'scene_info'))) {
-                throw new Exception('缺少统一支付接口必填参数：scene_info');
+            if (null === ($sceneInfo = I::get($this->_options, 'scene_info'))) {
+                throw new Exception('请使用 setSceneInfo() 设置场景信息 scene_info');
             } else {
                 $values['scene_info'] = $sceneInfo;
             }
@@ -181,16 +184,6 @@ class Pay
         $responseXml = Http::body('https://api.mch.weixin.qq.com/pay/unifiedorder', Xml::fromArray($values));
         $this->_result = Xml::toArray($responseXml);
         return $this;
-    }
-
-    /**
-     * 返回刚刚调用过的微信接口的结果
-     *
-     * @return array
-     */
-    public function getRes()
-    {
-        return $this->_result;
     }
 
     /**
@@ -212,9 +205,9 @@ class Pay
      */
     public function getCallArray()
     {
-        C::assertTrue($this->isSuccess(), (string)I::get($this->_result, 'return_msg'));
+        C::assertTrue($this->isSuccess(), (string) I::get($this->_result, 'return_msg'));
         $array = [];
-        if ('APP' === I::get($this->_values, 'trade_type')) {
+        if (self::TRADE_TYPE_APP === I::get($this->_options, 'trade_type')) {
             $array = [
                 'appid' => $this->_appId,
                 'partnerid' => $this->_mchId,
@@ -225,10 +218,20 @@ class Pay
             ];
             $array['sign'] = $this->getSign($array);
         }
-        if ('MWEB' === I::get($this->_values, 'trade_type')) {
+        if (self::TRADE_TYPE_H5 === I::get($this->_options, 'trade_type')) {
             $array = [
                 'mweb_url' => I::get($this->_result, 'mweb_url'),
             ];
+        }
+        if (self::TRADE_TYPE_JSAPI == I::get($this->_options, 'trade_type')) {
+            $array = [
+                'appId' => $this->_appId,
+                'nonceStr' => Strings::random(),
+                'package' => 'prepay_id=' . I::get($this->_result, 'prepay_id'),
+                'signType' => I::get($this->_options, 'sign_type', 'MD5'),
+                'timeStamp' => (string) time(),
+            ];
+            $array['paySign'] = $this->getSign($array);
         }
         return $array;
     }
@@ -244,7 +247,7 @@ class Pay
     {
         $xml = (new Request())->getRawBody();
         $array = Xml::toArray($xml);
-        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string)I::get($array, 'return_msg'));
+        C::assertTrue('SUCCESS' === I::get($array, 'return_code') && 'SUCCESS' === I::get($array, 'result_code'), (string) I::get($array, 'return_msg'));
         $temp = $array;
         $sign = $temp['sign'];
         unset($temp['sign']);
@@ -294,8 +297,8 @@ class Pay
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
-            'transaction_id' => I::get($this->_values, 'transaction_id'),
-            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
+            'transaction_id' => I::get($this->_options, 'transaction_id'),
+            'out_trade_no' => I::get($this->_options, 'out_trade_no'),
         ]);
         if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no'], $values)) {
             throw new Exception('transaction_id 和 out_trade_no 必须二选一');
@@ -313,8 +316,8 @@ class Pay
      */
     public function closeOrder()
     {
-        if (null === ($outTradeNo = I::get($this->_values, 'out_trade_no'))) {
-            throw new Exception('缺少必填参数：out_trade_no');
+        if (null === ($outTradeNo = I::get($this->_options, 'out_trade_no'))) {
+            throw new Exception('请使用 setOutTradeNo() 设置订单号 out_trade_no');
         }
         $values = [
             'appid' => $this->_appId,
@@ -336,27 +339,33 @@ class Pay
     public function refund()
     {
         if (null === $this->_certPath) {
-            throw new Exception('请使用 setCertPath 提供证书路径');
+            throw new Exception('请使用 setCertPath() 提供证书路径，下载的证书名为：apiclient_cert.pem');
         }
         if (null === $this->_certKeyPath) {
-            throw new Exception('请使用 setCertKeyPath 提供证书密钥路径');
+            throw new Exception('请使用 setCertKeyPath() 提供证书密钥路径，下载的密钥名为：apiclient_key.pem');
         }
         $this->setOutRefundNo();
+        if (null === I::get($this->_options, 'out_refund_no')) {
+            throw new Exception('请使用 setOutRefundNo() 设置退款单号 out_refund_no，若不填，则和 out_trade_no 一致');
+        }
         $this->setRefundFee();
+        if (null === I::get($this->_options, 'refund_fee')) {
+            throw new Exception('请使用 setRefundFee() 设置退款金额 refund_fee，若不填，则和 total_fee 一致');
+        }
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
-            'sign_type' => I::get($this->_values, 'sign_type'),
-            'transaction_id' => I::get($this->_values, 'transaction_id'),
-            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
-            'out_refund_no' => I::get($this->_values, 'out_refund_no'),
-            'total_fee' => I::get($this->_values, 'total_fee'),
-            'refund_fee' => I::get($this->_values, 'refund_fee'),
-            'refund_fee_type' => I::get($this->_values, 'refund_fee_type'),
-            'refund_desc' => I::get($this->_values, 'refund_desc'),
-            'refund_account' => I::get($this->_values, 'refund_account'),
-            'notify_url' => I::get($this->_values, 'notify_url'),
+            'sign_type' => I::get($this->_options, 'sign_type'),
+            'transaction_id' => I::get($this->_options, 'transaction_id'),
+            'out_trade_no' => I::get($this->_options, 'out_trade_no'),
+            'out_refund_no' => I::get($this->_options, 'out_refund_no'),
+            'total_fee' => I::get($this->_options, 'total_fee'),
+            'refund_fee' => I::get($this->_options, 'refund_fee'),
+            'refund_fee_type' => I::get($this->_options, 'refund_fee_type'),
+            'refund_desc' => I::get($this->_options, 'refund_desc'),
+            'refund_account' => I::get($this->_options, 'refund_account'),
+            'notify_url' => I::get($this->_options, 'notify_url'),
         ]);
         if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no'], $values)) {
             throw new Exception('transaction_id 和 out_trade_no 必须二选一');
@@ -381,12 +390,12 @@ class Pay
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
-            'sign_type' => I::get($this->_values, 'sign_type'),
-            'transaction_id' => I::get($this->_values, 'transaction_id'),
-            'out_trade_no' => I::get($this->_values, 'out_trade_no'),
-            'out_refund_no' => I::get($this->_values, 'out_refund_no'),
-            'refund_id' => I::get($this->_values, 'refund_id'),
-            'offset' => I::get($this->_values, 'offset'),
+            'sign_type' => I::get($this->_options, 'sign_type'),
+            'transaction_id' => I::get($this->_options, 'transaction_id'),
+            'out_trade_no' => I::get($this->_options, 'out_trade_no'),
+            'out_refund_no' => I::get($this->_options, 'out_refund_no'),
+            'refund_id' => I::get($this->_options, 'refund_id'),
+            'offset' => I::get($this->_options, 'offset'),
         ]);
         if (false === Arrays::keyExistsSome(['transaction_id', 'out_trade_no', 'out_refund_no', 'refund_id'], $values)) {
             throw new Exception('transaction_id、out_trade_no、out_refund_no 和 refund_id 必须四选一');
@@ -404,16 +413,16 @@ class Pay
      */
     public function downloadBill()
     {
-        if (null === ($billDate = I::get($this->_values, 'bill_date'))) {
-            throw new Exception('缺少 bill_date 参数！');
+        if (null === ($billDate = I::get($this->_options, 'bill_date'))) {
+            throw new Exception('请使用 setBillDate() 设置对账单日期 bill_date，格式：20140603');
         }
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'nonce_str' => Strings::random(),
             'bill_date' => $billDate,
-            'bill_type' => I::get($this->_values, 'bill_type'),
-            'tar_type' => I::get($this->_values, 'tar_type'),
+            'bill_type' => I::get($this->_options, 'bill_type'),
+            'tar_type' => I::get($this->_options, 'tar_type'),
         ]);
         $values['sign'] = $this->getSign($values);
         $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/downloadbill', Xml::fromArray($values));
@@ -428,17 +437,17 @@ class Pay
      */
     public function downloadFundFlow()
     {
-        if (null === ($accoutType = I::get($this->_values, 'account_type'))) {
-            throw new Exception('缺少 account_type 参数！');
-        }
-        if (null === ($billDate = I::get($this->_values, 'bill_date'))) {
-            throw new Exception('缺少 bill_date 参数！');
-        }
         if (null === $this->_certPath) {
-            throw new Exception('请使用 setCertPath 提供证书路径');
+            throw new Exception('请使用 setCertPath() 提供证书路径，下载的证书名为：apiclient_cert.pem');
         }
         if (null === $this->_certKeyPath) {
-            throw new Exception('请使用 setCertKeyPath 提供证书密钥路径');
+            throw new Exception('请使用 setCertKeyPath() 提供证书密钥路径，下载的密钥名为：apiclient_key.pem');
+        }
+        if (null === ($accoutType = I::get($this->_options, 'account_type'))) {
+            throw new Exception('请使用 setAccountType() 设置资金账户类型 account_type');
+        }
+        if (null === ($billDate = I::get($this->_options, 'bill_date'))) {
+            throw new Exception('请使用 setBillDate() 设置资金账单日期 bill_date');
         }
         $values = array_filter([
             'appid' => $this->_appId,
@@ -447,7 +456,7 @@ class Pay
             'sign_type' => 'HMAC-SHA256',
             'bill_date' => $billDate,
             'account_type' => $accoutType,
-            'tar_type' => I::get($this->_values, 'tar_type'),
+            'tar_type' => I::get($this->_options, 'tar_type'),
         ]);
         $values['sign'] = $this->getSign($values);
         $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/downloadfundflow', Xml::fromArray($values), [], [
@@ -479,13 +488,13 @@ class Pay
      */
     public function shortUrl()
     {
-        C::assertTrue(null !== ($longUrl = (string)I::get($this->_values, 'long_url')), '缺少 long_url 参数！');
+        C::assertTrue(null !== ($longUrl = (string) I::get($this->_options, 'long_url')), '缺少 long_url 参数！');
         $values = array_filter([
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
             'long_url' => $longUrl,
             'nonce_str' => Strings::random(),
-            'sign_type' => I::get($this->_values, 'sign_type'),
+            'sign_type' => I::get($this->_options, 'sign_type'),
         ]);
         $temp = $values;
         $temp['long_url'] = Url::encode($longUrl);
@@ -504,7 +513,7 @@ class Pay
      */
     public function getQrcodeUrl()
     {
-        C::assertTrue(null !== ($productId = (string)I::get($this->_values, 'product_id')), '缺少 product_id 参数！');
+        C::assertTrue(null !== ($productId = (string) I::get($this->_options, 'product_id')), '缺少 product_id 参数！');
         $values = [
             'appid' => $this->_appId,
             'mch_id' => $this->_mchId,
@@ -535,7 +544,7 @@ class Pay
      */
     public function getQrcodeCallXml()
     {
-        if (null === ($prepayId = I::get($this->_values, 'prepay_id'))) {
+        if (null === ($prepayId = I::get($this->_options, 'prepay_id'))) {
             throw new Exception('缺少 prepay_id 参数！');
         }
         $values = [
@@ -548,48 +557,5 @@ class Pay
         ];
         $values['sign'] = $this->getSign($values);
         return Xml::fromArray($values);
-    }
-
-    /**
-     * 拉取订单评价数据
-     *
-     * @todo 此接口有问题，但我也不知道为什么
-     *
-     * @return static
-     */
-    public function batchQueryComment()
-    {
-        if (null === ($beginTime = I::get($this->_values, 'begin_time'))) {
-            throw new Exception('缺少 begin_time 参数！');
-        }
-        if (null === ($endTime = I::get($this->_values, 'end_time'))) {
-            throw new Exception('缺少 end_time 参数！');
-        }
-        if (null === ($offset = I::get($this->_values, 'offset'))) {
-            throw new Exception('缺少 offset 参数！');
-        }
-        if (null === $this->_certPath) {
-            throw new Exception('请使用 setCertPath 提供证书路径');
-        }
-        if (null === $this->_certKeyPath) {
-            throw new Exception('请使用 setCertKeyPath 提供证书密钥路径');
-        }
-        $values = array_filter([
-            'appid' => $this->_appId,
-            'mch_id' => $this->_mchId,
-            'nonce_str' => Strings::random(),
-            'sign_type' => 'HMAC-SHA256',
-            'begin_time' => $beginTime,
-            'end_time' => $endTime,
-            'limit' => I::get($this->_values, 'limit'),
-        ]);
-        $values['offset'] = $offset;
-        $values['sign'] = $this->getSign($values);
-        $responseBody = Http::body('https://api.mch.weixin.qq.com/pay/batchquerycomment', Xml::fromArray($values), [], [
-            'cert' => $this->_certPath,
-            'ssl_key' => $this->_certKeyPath,
-        ]);
-        $this->_result = Xml::toArray($responseBody);
-        return $this;
     }
 }

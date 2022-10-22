@@ -38,9 +38,9 @@ class DateTime
     public function dayRange($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $y = (int)(date('Y', $time));
-        $m = (int)(date('m', $time));
-        $d = (int)(date('d', $time) + $offset);
+        $y = (int) (date('Y', $time));
+        $m = (int) (date('m', $time));
+        $d = (int) (date('d', $time) + $offset);
         return [
             mktime(0, 0, 0, $m, $d, $y),
             mktime(23, 59, 59, $m, $d, $y),
@@ -60,7 +60,7 @@ class DateTime
     public function weekRange($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $offset = (int)$offset;
+        $offset = (int) $offset;
         return [
             strtotime(date('Y-m-d', strtotime('Sunday ' . ($offset - 1) . ' week', $time))),
             strtotime(date('Y-m-d', strtotime('Saturday ' . $offset . ' week', $time))) + 24 * 3600 - 1,
@@ -78,10 +78,10 @@ class DateTime
     public function monthRange($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $y = (int)(date('Y', $time));
-        $m = (int)(date('m', $time) + $offset);
+        $y = (int) (date('Y', $time));
+        $m = (int) (date('m', $time) + $offset);
         $begin = mktime(0, 0, 0, $m, 1, $y);
-        $end = mktime(23, 59, 59, $m, (int)date('t', $begin), $y);
+        $end = mktime(23, 59, 59, $m, (int) date('t', $begin), $y);
 
         return [$begin, $end];
     }
@@ -97,7 +97,7 @@ class DateTime
     public function yearRange($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $year = (int)(date('Y', $time) + $offset);
+        $year = (int) (date('Y', $time) + $offset);
         return [
             mktime(0, 0, 0, 1, 1, $year),
             mktime(23, 59, 59, 12, 31, $year),
@@ -115,7 +115,7 @@ class DateTime
     public function day($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $offset = (int)$offset;
+        $offset = (int) $offset;
         return $time + 3600 * 24 * $offset;
     }
 
@@ -130,7 +130,7 @@ class DateTime
     public function week($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $offset = (int)$offset;
+        $offset = (int) $offset;
         return $time + 3600 * 24 * 7 * $offset;
     }
 
@@ -145,7 +145,7 @@ class DateTime
     public function month($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $offset = (int)$offset;
+        $offset = (int) $offset;
         return $time + 3600 * 24 * date('t', $time) * $offset;
     }
 
@@ -160,8 +160,8 @@ class DateTime
     public function year($offset = 0, $time = null)
     {
         null === $time && $time = time();
-        $offset = (int)$offset;
-        return mktime((int)date('H', $time), (int)date('i', $time), (int)date('s', $time), (int)date('m', $time), (int)date('d', $time), (int)date('Y', $time) + $offset);
+        $offset = (int) $offset;
+        return mktime((int) date('H', $time), (int) date('i', $time), (int) date('s', $time), (int) date('m', $time), (int) date('d', $time), (int) date('Y', $time) + $offset);
     }
 
     /**
@@ -200,7 +200,7 @@ class DateTime
     public function isLeapYear($time = null)
     {
         null === $time && $time = time();
-        return (bool)date('L', $time);
+        return (bool) date('L', $time);
     }
 
     /**
@@ -215,6 +215,33 @@ class DateTime
     public function yearPosition($time = null)
     {
         null === $time && $time = time();
-        return (int)date('z', $time) + 1;
+        return (int) date('z', $time) + 1;
+    }
+
+    /**
+     * 时间转成秒
+     *
+     * 例如 08:00:00 的值是 8 * 3600 = 28800
+     *
+     * @param string $time
+     *
+     * @return integer
+     */
+    public function toSeconds($time)
+    {
+        return strtotime($time) - strtotime(date('Y-m-d'));
+    }
+
+    /**
+     * 秒转时间
+     *
+     * @param integer $seconds
+     * @param string $format
+     *
+     * @return string
+     */
+    public function fromSeconds($seconds, $format = 'H:i:s')
+    {
+        return date($format, strtotime(date('Y-m-d')) + $seconds);
     }
 }

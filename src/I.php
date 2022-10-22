@@ -63,6 +63,10 @@ class I
             if (false === is_string($keyString) && is_callable($keyString)) {
                 $mixed = self::call($keyString, [$mixed]);
             } else {
+                // 如果是个常规数组，直接取值，只支持一维数组
+                if (is_array($mixed) && array_key_exists($keyString, $mixed)) {
+                    return $mixed[$keyString];
+                }
                 $keyArray = explode('.', $keyString);
                 foreach ($keyArray as $key) {
                     if (is_array($mixed)) {
