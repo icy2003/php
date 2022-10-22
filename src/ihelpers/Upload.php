@@ -51,7 +51,7 @@ class Upload
      */
     public static function create($config = [])
     {
-        if (!static::$_instance instanceof static) {
+        if (!static::$_instance instanceof static ) {
             static::$_instance = new static();
             static::$_instance->__formName = I::get($config, 'formName', 'file');
             static::$_instance->__sizeLimit = static::$_instance->__getSizeLimit(I::get($config, 'sizeLimit', 0));
@@ -189,7 +189,7 @@ class Upload
     private $__errorCode = 0;
 
     /**
-     * 文件上传，对上传的文件进行处理，需要用 save() 保存.
+     * 文件上传，对上传的文件进行处理，需要用 save()、saveTo()、saveAs() 保存.
      *
      * @return static
      */
@@ -201,10 +201,10 @@ class Upload
         }
         if (self::ERROR_SUCCESS === $_FILES[$this->__formName]['error']) {
             if (is_uploaded_file($file = $_FILES[$this->__formName]['tmp_name'])) {
-                $local = new LocalFile();
+                $localFile = new LocalFile();
                 $fileName = $_FILES[$this->__formName]['name'];
-                $fileSize = $local->getFilesize($file);
-                $fileExt = $local->getExtension($fileName);
+                $fileSize = $localFile->getFilesize($file);
+                $fileExt = $localFile->getExtension($fileName);
                 if ($fileSize > $this->__sizeLimit) {
                     $this->__errorCode = self::ERROR_SIZE_LIMIT;
 
@@ -219,9 +219,9 @@ class Upload
                 $this->__attributes['sha1'] = sha1_file($file);
                 $this->__attributes['ext'] = $fileExt;
                 $this->__attributes['size'] = $fileSize;
-                $this->__attributes['filectime'] = $local->splInfo($file)->getCTime();
-                $this->__attributes['filemtime'] = $local->splInfo($file)->getMTime();
-                $this->__attributes['fileatime'] = $local->splInfo($file)->getATime();
+                $this->__attributes['filectime'] = $localFile->splInfo($file)->getCTime();
+                $this->__attributes['filemtime'] = $localFile->splInfo($file)->getMTime();
+                $this->__attributes['fileatime'] = $localFile->splInfo($file)->getATime();
                 $this->__attributes['originName'] = $fileName;
                 $this->__attributes['fileName'] = date('YmdHis') . Strings::random(10) . '.' . $fileExt;
                 $this->__errorCode = self::ERROR_SUCCESS;
@@ -241,22 +241,59 @@ class Upload
     }
 
     /**
-     * 保存文件至路径.
+     * 保存文件至目录.
      *
-     * @param string $savePath 目录
+     * @param string $dirPath 目录
      * @param string $fileName 文件名，如果不给则用系统随机的文件名
      *
-     * @return static
+     * @return boolean
      */
-    public function save($savePath, $fileName = null)
+    public function saveTo($dirPath, $fileName = null)
     {
-        if (!empty($this->__attributes)) {
-            (new LocalFile())->createDir($savePath);
-            $fileName = null === $fileName ? $this->__attributes['fileName'] : $fileName;
-            !empty($this->__attributes) && move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($savePath, '/') . '/' . $fileName);
-        }
+        $localFile = new LocalFile();
+        $localFile->createDir($dirPath);
+        null === $fileName && $fileName = $this->__attributes['fileName'];
+        return move_uploaded_file($_FILES[$this->__formName]['tmp_name'], rtrim($dirPath, '/') . '/' . $fileName);
+    }
 
-        return $this;
+    /**
+     * 保存文件至路径或目录
+     * - saveAs()：$path 为文件时
+     * - saveTo()：$path 为目录时
+     */
+    public function save($path, $fileName = null)
+    {
+        $localFile = new LocalFile();
+        if ($localFile->isFile($path)) {
+            return $this->saveAs($path);
+        } else {
+            return $this->saveTo($path, $fileName);
+        }
+    }
+
+    /**
+     * 保存文件至指定路径.
+     * - 注意：如果目标文件已存在但只是文件名相同，实际是不同的文件，则会修改 fileName 属性并且保存为新的文件
+     *
+     * @param string $filePath 文件路径
+     *
+     * @return boolean
+     */
+    public function saveAs($filePath)
+    {
+        $localFile = new LocalFile();
+        $dirName = $localFile->getDirname($filePath);
+        $localFile->createDir($dirName);
+        $fileName = $localFile->getFilename($filePath);
+        if ($localFile->isFile($filePath)) {
+            if (md5_file($filePath) === $this->__attributes['md5'] && sha1_file($filePath) === $this->__attributes['sha1']) {
+                return true;
+            } else {
+                $this->__attributes['fileName'] = $localFile->getBasename($fileName) . '_' . time() . '.' . $localFile->getExtension($fileName);
+                return $this->saveAs($dirName . '/' . $this->__attributes['fileName']);
+            }
+        }
+        return move_uploaded_file($_FILES[$this->__formName]['tmp_name'], $filePath);
     }
 
     /**
