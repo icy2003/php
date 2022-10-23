@@ -827,6 +827,25 @@ class Arrays
     }
 
     /**
+     * 将查询记录格式的数组转成 csv 文本
+     *
+     * @param array^2 记录
+     *
+     * @return string
+     */
+    public static function recordsToCsv($records)
+    {
+        if(0 === self::count($records)){
+            return '';
+        }
+        $header = array_keys($records[0]);
+        $arrays = self::values($records);
+        return implode(',' , $header) . PHP_EOL . implode(PHP_EOL, self::map($arrays , function($array){
+            return implode(',', $array);
+        }));
+    }
+
+    /**
      * 在数组中搜索给定的值，如果成功则返回首个相应的键名
      *
      * - 第一参数如果不是回调函数，则此方法等同于 array_search
