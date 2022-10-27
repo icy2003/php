@@ -835,12 +835,12 @@ class Arrays
      */
     public static function recordsToCsv($records)
     {
-        if(0 === self::count($records)){
+        if (0 === self::count($records)) {
             return '';
         }
         $header = array_keys($records[0]);
         $arrays = self::values($records);
-        return implode(',' , $header) . PHP_EOL . implode(PHP_EOL, self::map($arrays , function($array){
+        return implode(',', $header) . PHP_EOL . implode(PHP_EOL, self::map($arrays, function ($array) {
             return implode(',', $array);
         }));
     }
@@ -940,8 +940,8 @@ class Arrays
      * 对一个数组执行回调并返回新数组
      *
      * @param array|mixed $array
-     * @param callback $valueCallback 对值的回调
-     * @param callback|null $keyCallback 对键的回调
+     * @param callback|null $valueCallback 对值的回调，null 返回原值。function($value, $key)
+     * @param callback|null $keyCallback 对键的回调，null 返回原值。function($key, $value)
      *
      * @return array
      */
@@ -950,8 +950,8 @@ class Arrays
         $return = [];
         if (is_array($array)) {
             foreach ($array as $key => $value) {
-                $callValue = I::call($valueCallback, [$value, $key]);
-                $callKey = null === $keyCallback ? $key : I::call($keyCallback, [$value, $key]);
+                $callValue = null === $valueCallback ? $value : I::call($valueCallback, [$value, $key]);
+                $callKey = null === $keyCallback ? $key : I::call($keyCallback, [$key, $value]);
                 $return[$callKey] = $callValue;
             }
         }
