@@ -178,7 +178,7 @@ class Header
         self::send('Access-Control-Max-Age:86400');
         self::send('Access-Control-Allow-Credentials:true');
         self::send('Access-Control-Allow-Methods:*');
-        self::send('Access-Control-Allow-Headers:Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With');
+        self::send('Access-Control-Allow-Headers:Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, Authorization, X-E4M-With');
     }
 
     /**
